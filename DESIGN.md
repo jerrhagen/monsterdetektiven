@@ -417,6 +417,8 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 
 ## 9. Belöningar
 
+**Tid är ett rekord att slå, inte en stjärna** (så att man inte stressar förbi texten första gången). Första gången står det "din tid att slå nästa gång". Spelar man om och slår sin tid kommer "🏆 Nytt rekord!" med extra konfetti. Bästa tiden syns på stadskartan under stjärnorna.
+
 Varje fall ger upp till tre stjärnor:
 - ⭐ Du löste fallet.
 - ⭐ Du använde högst 2 tips från Ester.

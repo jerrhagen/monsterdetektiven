@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { cases } from "../src/cases";
-import { formatTime, starsFor } from "../src/engine/save";
+import { formatTime, recordSolved, starsFor } from "../src/engine/save";
 import { sprites } from "../src/sprites";
 
 describe("stjärnor och tid", () => {
@@ -8,6 +8,26 @@ describe("stjärnor och tid", () => {
     expect(starsFor(5, false)).toBe(1);
     expect(starsFor(2, false)).toBe(2);
     expect(starsFor(0, true)).toBe(3);
+  });
+
+  it("nytt rekord bara när man slår en tidigare tid", () => {
+    // A pretend storage in memory – the real browser storage is never touched.
+    const memory = new Map<string, string>();
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => memory.get(k) ?? null,
+      setItem: (k: string, v: string) => memory.set(k, v),
+      removeItem: (k: string) => memory.delete(k),
+    });
+    const first = recordSolved("test", { stars: 3, seconds: 300, egg: true }, []);
+    expect(first.newRecord).toBe(false);
+    expect(first.previousBest).toBeUndefined();
+    const slower = recordSolved("test", { stars: 3, seconds: 400, egg: true }, []);
+    expect(slower.newRecord).toBe(false);
+    expect(slower.previousBest).toBe(300);
+    const faster = recordSolved("test", { stars: 3, seconds: 200, egg: true }, []);
+    expect(faster.newRecord).toBe(true);
+    expect(faster.previousBest).toBe(300);
+    vi.unstubAllGlobals();
   });
 
   it("skriver tiden i minuter och sekunder", () => {

@@ -79,6 +79,18 @@ export function showLeaveCase(onLeave: () => void): void {
 }
 
 /** "Fallet är löst!" – stars, time, new monster cards and a fact. */
+/** The time – and whether it beat the record from last time. */
+function timeLine(result: Result): string {
+  const time = formatTime(result.seconds);
+  if (result.newRecord) {
+    return `<p class="time record">🏆 Nytt rekord! ⏱️ ${time} <small>(förut ${formatTime(result.previousBest!)})</small></p>`;
+  }
+  if (result.previousBest !== undefined) {
+    return `<p class="time">⏱️ ${time} <small>– ditt rekord är ${formatTime(result.previousBest)}</small></p>`;
+  }
+  return `<p class="time">⏱️ ${time} <small>– din tid att slå nästa gång!</small></p>`;
+}
+
 export function showCaseResult(
   c: Case,
   result: Result,
@@ -112,7 +124,7 @@ export function showCaseResult(
         <li class="${hintStar ? "on" : ""}">★ Högst 2 tips från Ester <small>(du tog ${details.hintsUsed})</small></li>
         <li class="${eggStar ? "on" : ""}">★ ${eggStar ? "Du hittade det hemliga monsterägget!" : "Det finns ett hemligt monsterägg någonstans…"}</li>
       </ul>
-      <p class="time">⏱️ ${formatTime(result.seconds)}${result.newRecord ? " – <b>nytt rekord!</b>" : ""}</p>
+      ${timeLine(result)}
       <h2>Monsterkort</h2>
       <div class="cards">${cards}</div>
       <div class="fact"><b>Visste du att…?</b> <span>${escape(c.fact)}</span></div>
@@ -133,4 +145,6 @@ export function showCaseResult(
   open = el;
   playSuccess();
   confetti(140);
+  // A new record gets a second burst.
+  if (result.newRecord) window.setTimeout(() => confetti(140), 700);
 }

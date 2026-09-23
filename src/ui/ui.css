@@ -770,6 +770,12 @@ body {
 
 /* ---------- Confetti ---------- */
 
+.case-result .time.record {
+  color: #ffd66b;
+  font-weight: 700;
+  animation: glow-text 1.2s ease-in-out infinite;
+}
+
 .confetti {
   position: absolute;
   inset: 0;

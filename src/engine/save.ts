@@ -135,7 +135,10 @@ export interface Result {
   stars: number;
   seconds: number;
   egg: boolean;
+  /** Faster than the best time from an earlier solve (never true the first time). */
   newRecord: boolean;
+  /** The best time before this run, if the case was solved before. */
+  previousBest?: number;
   newCards: string[];
 }
 
@@ -148,7 +151,7 @@ export function recordSolved(
   const store = readStore();
   const data = store.players[store.current].data;
   const before = data.cases[caseId];
-  const newRecord = !before || run.seconds < before.bestTime;
+  const newRecord = !!before && run.seconds < before.bestTime;
   data.cases[caseId] = {
     stars: Math.max(run.stars, before?.stars ?? 0),
     bestTime: Math.min(run.seconds, before?.bestTime ?? Infinity),
@@ -157,7 +160,7 @@ export function recordSolved(
   const newCards = cards.filter((c) => !data.cards.includes(c));
   data.cards.push(...newCards);
   writeStore(store);
-  return { ...run, newRecord, newCards };
+  return { ...run, newRecord, previousBest: before?.bestTime, newCards };
 }
 
 /** Stars for a solved case: solved, at most two hints from Ester, found the secret egg. */

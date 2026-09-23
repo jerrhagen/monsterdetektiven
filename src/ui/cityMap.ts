@@ -1,6 +1,6 @@
 import { cases } from "../cases";
 import type { Case } from "../cases/types";
-import { type HelpLevel, isUnlocked, loadSave, loadSettings, saveSettings } from "../engine/save";
+import { type HelpLevel, formatTime, isUnlocked, loadSave, loadSettings, saveSettings } from "../engine/save";
 import { uiRoot } from "./layer";
 import { isMusicOn, toggleMusic } from "./music";
 import { playClick } from "./sound";
@@ -64,7 +64,10 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
         const c = cases[i];
         const open = !!c && isUnlocked(ids, i, save);
         const record = c ? save.cases[c.id] : undefined;
-        const stars = record ? `${"★".repeat(record.stars)}${"☆".repeat(3 - record.stars)}` : "";
+        // Stars and the best time to beat, e.g. "★★★ · ⏱️ 6 min 12 s".
+        const stars = record
+          ? `${"★".repeat(record.stars)}${"☆".repeat(3 - record.stars)} · ⏱️ ${formatTime(record.bestTime)}`
+          : "";
         return `<button class="map-spot ${i === chosen ? "chosen" : ""} ${open ? "" : "locked"}" data-i="${i}"
             style="left: calc(var(--px) * ${spot.x}); top: calc(var(--px) * ${spot.y + 6})">
           <b>${i + 1}. ${escape(c?.title ?? spot.place)}</b>
