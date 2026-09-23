@@ -79,27 +79,246 @@ body {
   50% { opacity: 1; }
 }
 
-/* ---------- Key reminder ---------- */
+/* ---------- Top bar ---------- */
 
-.controls {
+.hud {
   position: absolute;
-  top: calc(var(--px) * 2);
+  top: calc(var(--px) * 1.5);
   left: calc(var(--px) * 3);
+  right: calc(var(--px) * 3);
   display: flex;
-  gap: calc(var(--px) * 5);
+  align-items: center;
+  gap: calc(var(--px) * 4);
   font-size: calc(var(--px) * 4.2);
   color: #e6dcf5;
   text-shadow: 0 calc(var(--px) * 0.4) 0 #14101c;
   pointer-events: none;
 }
 
-.controls kbd {
+.controls {
+  display: flex;
+  gap: calc(var(--px) * 4);
+}
+
+.hud kbd {
   font-family: inherit;
   font-weight: 700;
   padding: 0 calc(var(--px) * 1);
   border-radius: calc(var(--px) * 1);
   background: rgba(20, 16, 28, 0.7);
   color: #ffd66b;
+}
+
+.goal {
+  margin-left: auto;
+  font-weight: 700;
+  color: #8fd14f;
+}
+
+.book-button {
+  pointer-events: auto;
+  cursor: pointer;
+  font: inherit;
+  font-size: calc(var(--px) * 5);
+  padding: 0 calc(var(--px) * 1.5);
+  border: calc(var(--px) * 0.5) solid #f4ecff;
+  border-radius: calc(var(--px) * 1.5);
+  background: #231736;
+  color: #f4ecff;
+}
+
+.book-button kbd {
+  font-size: calc(var(--px) * 3.5);
+}
+
+/* ---------- Toasts ---------- */
+
+.toast {
+  --slot: 0;
+  position: absolute;
+  top: calc(var(--px) * (16 + var(--slot) * 13));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: calc(var(--px) * 2) calc(var(--px) * 6);
+  background: #ffd66b;
+  color: #14101c;
+  font-weight: 700;
+  font-size: calc(var(--px) * 6);
+  border-radius: calc(var(--px) * 3);
+  box-shadow: 0 calc(var(--px) * 1) 0 #8a6a1e;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: pop-in 0.3s ease-out;
+  transition: opacity 0.4s;
+}
+
+.toast img {
+  height: calc(var(--px) * 8);
+  vertical-align: middle;
+  image-rendering: pixelated;
+}
+
+.toast.leaving {
+  opacity: 0;
+}
+
+@keyframes pop-in {
+  from { transform: translateX(-50%) scale(0.6); opacity: 0; }
+  to { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+/* ---------- Room name sign ---------- */
+
+.room-sign {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: "Creepster", cursive;
+  font-size: calc(var(--px) * 18);
+  letter-spacing: calc(var(--px) * 0.5);
+  color: #8fd14f;
+  text-shadow:
+    0 calc(var(--px) * 1) 0 #2d5a12,
+    0 calc(var(--px) * 2) 0 #14101c,
+    0 0 calc(var(--px) * 8) rgba(0, 0, 0, 0.7);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: sign-in 0.5s ease-out;
+  transition: opacity 0.6s;
+}
+
+.room-sign.leaving {
+  opacity: 0;
+}
+
+@keyframes sign-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(calc(var(--px) * -4)); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* ---------- Detective book ---------- */
+
+.notebook {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 4, 15, 0.6);
+}
+
+.notebook .page {
+  position: relative;
+  width: 86%;
+  height: 82%;
+  box-sizing: border-box;
+  padding: calc(var(--px) * 5) calc(var(--px) * 7);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border-radius: calc(var(--px) * 3);
+  border-left: calc(var(--px) * 4) solid #8a2346;
+  box-shadow: 0 calc(var(--px) * 2) 0 #0d0718;
+  overflow: auto;
+}
+
+.notebook h2 {
+  margin: 0 0 calc(var(--px) * 3);
+  font-size: calc(var(--px) * 8);
+}
+
+.notebook h3 {
+  margin: calc(var(--px) * 2) 0 calc(var(--px) * 1.5);
+  font-size: calc(var(--px) * 6);
+  color: #8a2346;
+}
+
+.notebook .columns {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: calc(var(--px) * 6);
+}
+
+.notebook .goals {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: calc(var(--px) * 5);
+}
+
+.notebook .goals li {
+  margin-bottom: calc(var(--px) * 1.5);
+}
+
+.notebook .goals .done {
+  color: #6a8a4a;
+  text-decoration: line-through;
+}
+
+.notebook .goals .current {
+  font-weight: 700;
+}
+
+.notebook .clues {
+  display: grid;
+  gap: calc(var(--px) * 2);
+}
+
+.clue-card {
+  display: flex;
+  gap: calc(var(--px) * 3);
+  align-items: center;
+  padding: calc(var(--px) * 1.5);
+  background: #fffaf0;
+  border-radius: calc(var(--px) * 2);
+  border: calc(var(--px) * 0.5) solid #e0d2b0;
+}
+
+.clue-card img,
+.notebook .item img {
+  width: calc(var(--px) * 14);
+  height: calc(var(--px) * 14);
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex: none;
+}
+
+.clue-card b {
+  font-size: calc(var(--px) * 5);
+}
+
+.clue-card p {
+  margin: calc(var(--px) * 0.5) 0 0;
+  font-size: calc(var(--px) * 4.5);
+}
+
+.notebook .items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--px) * 2);
+  font-size: calc(var(--px) * 5);
+}
+
+.notebook .item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 1);
+}
+
+.notebook .empty {
+  color: #8a7a8a;
+  font-size: calc(var(--px) * 4.5);
+}
+
+.notebook .close {
+  position: absolute;
+  top: calc(var(--px) * 3);
+  right: calc(var(--px) * 4);
+  font-size: calc(var(--px) * 7);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8a2346;
 }
 
 /* ---------- Speech bubble ---------- */

@@ -1,9 +1,14 @@
 import * as Phaser from "phaser";
 import { NORA_IDLE_FRAME } from "../sprites/nora";
 import { TILE } from "./config";
-import { type ParsedRoom, isLowObstacle, isPassable, tileAt } from "./room";
 
 export type Facing = "down" | "up" | "left" | "right";
+
+/** Asks the room whether Nora's feet may be on a tile. */
+export interface Ground {
+  canStand(col: number, row: number, airborne: boolean): boolean;
+  isLowObstacle(col: number, row: number): boolean;
+}
 
 export interface PlayerInput {
   dx: number;
@@ -32,14 +37,17 @@ export class Player {
 
   constructor(
     scene: Phaser.Scene,
-    private readonly room: ParsedRoom,
+    private readonly ground: Ground,
     x: number,
     y: number,
+    facing: Facing = "up",
   ) {
+    this.facing = facing;
     this.x = x;
     this.y = y;
     this.shadow = scene.add.ellipse(x, y - 1, 10, 4, 0x000000, 0.3);
     this.sprite = scene.add.sprite(x, y, `nora-${NORA_IDLE_FRAME.up}`).setOrigin(0.5, 1);
+    this.animate(false);
     this.sync(0);
   }
 
@@ -86,6 +94,11 @@ export class Player {
     this.sync(this.airborne ? Math.sin((Math.min(this.airTime, JUMP_TIME) / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0);
   }
 
+  /** The tile under the middle of Nora's feet. */
+  feetTile(): { col: number; row: number } {
+    return { col: Math.floor(this.x / TILE), row: Math.floor((this.y - FEET_H / 2) / TILE) };
+  }
+
   /** The point just in front of Nora – used to find things to use. */
   frontPoint(): { x: number; y: number } {
     const reach = 11;
@@ -122,11 +135,11 @@ export class Player {
   }
 
   private boxFits(x: number, y: number): boolean {
-    return this.feetTiles(x, y).every(({ col, row }) => isPassable(tileAt(this.room, col, row), this.airborne));
+    return this.feetTiles(x, y).every(({ col, row }) => this.ground.canStand(col, row, this.airborne));
   }
 
   private overLowObstacle(): boolean {
-    return this.feetTiles(this.x, this.y).some(({ col, row }) => isLowObstacle(tileAt(this.room, col, row)));
+    return this.feetTiles(this.x, this.y).some(({ col, row }) => this.ground.isLowObstacle(col, row));
   }
 
   private animate(walking: boolean): void {
