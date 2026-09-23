@@ -1,15 +1,19 @@
 /**
- * Playing on a phone or tablet: a joystick on the left and one action button on the right.
- * None of this shows on a computer – the page gets the class `touch` only on a touch screen
- * (or after the first touch), and all mobile styles hang on that class.
+ * Playing on a phone or tablet: hold a finger anywhere on the game and Nora walks toward it,
+ * and a small action button on the right does what the space bar does. The map, music and book
+ * buttons move to the right side too. None of this shows on a computer – the page gets the class
+ * `touch` only on a touch screen (or after the first touch), and all mobile styles hang on that class.
  */
-
-/** What the fingers ask for right now. RoomScene adds it to the keyboard. */
-export const touchInput = { dx: 0, dy: 0 };
 
 let actionQueued = false;
 let controls: HTMLDivElement | null = null;
 let actionButton: HTMLButtonElement | null = null;
+
+/** Where the steering finger is on the screen (client pixels), or null. */
+let finger: { x: number; y: number } | null = null;
+let fingerId: number | null = null;
+let steerArea: HTMLElement | null = null;
+let steerHandlers: [string, (e: PointerEvent) => void][] = [];
 
 export function isTouch(): boolean {
   return document.documentElement.classList.contains("touch");
@@ -28,6 +32,11 @@ export function takeAction(): boolean {
   const pressed = actionQueued;
   actionQueued = false;
   return pressed;
+}
+
+/** The steering finger, if one is held down. */
+export function fingerPosition(): { x: number; y: number } | null {
+  return finger;
 }
 
 /** Full screen and landscape where the phone allows it (Android; iPhone ignores it). */
@@ -53,79 +62,81 @@ export function setActionIcon(icon: ActionIcon): void {
 
 export function setTouchControlsVisible(visible: boolean): void {
   controls?.classList.toggle("hidden", !visible);
-  if (!visible) resetStick();
+  if (!visible) releaseFinger();
 }
 
-let knob: HTMLDivElement | null = null;
-
-function resetStick(): void {
-  touchInput.dx = 0;
-  touchInput.dy = 0;
-  if (knob) knob.style.transform = "";
+function releaseFinger(): void {
+  finger = null;
+  fingerId = null;
 }
 
-/** Adds the joystick and the action button (in a room, on touch screens). */
+/**
+ * Steering listens on the whole game area (also the dark strips beside it), but only to
+ * touches that land on the game itself – not on buttons, dialogs or menus on top of it.
+ */
+function startSteering(): void {
+  const game = document.getElementById("game")!;
+  const ui = document.getElementById("ui");
+  const onGame = (e: PointerEvent) => e.target === game || e.target === ui || e.target instanceof HTMLCanvasElement;
+  steerArea = game;
+  steerHandlers = [
+    [
+      "pointerdown",
+      (e) => {
+        if (fingerId !== null || !onGame(e) || controls?.classList.contains("hidden")) return;
+        fingerId = e.pointerId;
+        finger = { x: e.clientX, y: e.clientY };
+      },
+    ],
+    [
+      "pointermove",
+      (e) => {
+        if (e.pointerId === fingerId) finger = { x: e.clientX, y: e.clientY };
+      },
+    ],
+    [
+      "pointerup",
+      (e) => {
+        if (e.pointerId === fingerId) releaseFinger();
+      },
+    ],
+    [
+      "pointercancel",
+      (e) => {
+        if (e.pointerId === fingerId) releaseFinger();
+      },
+    ],
+  ];
+  for (const [type, handler] of steerHandlers) game.addEventListener(type, handler as EventListener);
+}
+
+function stopSteering(): void {
+  for (const [type, handler] of steerHandlers) steerArea?.removeEventListener(type, handler as EventListener);
+  steerHandlers = [];
+  steerArea = null;
+  releaseFinger();
+}
+
+/** Adds the steering and the action button (in a room, on touch screens). */
 export function showTouchControls(): void {
   if (!isTouch() || controls) return;
   controls = document.createElement("div");
   controls.className = "touch-controls";
-  controls.innerHTML = `
-    <div class="stick"><div class="stick-knob"></div></div>
-    <button class="action" data-icon="jump">${ICONS.jump}</button>`;
+  controls.innerHTML = `<button class="action" data-icon="jump">${ICONS.jump}</button>`;
   document.body.appendChild(controls);
-
-  const stick = controls.querySelector<HTMLDivElement>(".stick")!;
-  knob = controls.querySelector<HTMLDivElement>(".stick-knob")!;
-  let pointer: number | null = null;
-  const move = (e: PointerEvent) => {
-    const r = stick.getBoundingClientRect();
-    const radius = r.width / 2;
-    let x = (e.clientX - (r.left + radius)) / radius;
-    let y = (e.clientY - (r.top + radius)) / radius;
-    const len = Math.hypot(x, y);
-    if (len > 1) {
-      x /= len;
-      y /= len;
-    }
-    knob!.style.transform = `translate(${x * radius * 0.55}px, ${y * radius * 0.55}px)`;
-    // Eight directions, with a small dead zone in the middle.
-    const dead = 0.35;
-    touchInput.dx = x > dead ? 1 : x < -dead ? -1 : 0;
-    touchInput.dy = y > dead ? 1 : y < -dead ? -1 : 0;
-  };
-  stick.addEventListener("pointerdown", (e) => {
-    pointer = e.pointerId;
-    // Keep following the finger even if it slides off the stick.
-    try {
-      stick.setPointerCapture(e.pointerId);
-    } catch {
-      // Not a real pointer (e.g. in a test) – fine without capture.
-    }
-    move(e);
-  });
-  stick.addEventListener("pointermove", (e) => {
-    if (e.pointerId === pointer) move(e);
-  });
-  const release = (e: PointerEvent) => {
-    if (e.pointerId !== pointer) return;
-    pointer = null;
-    resetStick();
-  };
-  stick.addEventListener("pointerup", release);
-  stick.addEventListener("pointercancel", release);
 
   actionButton = controls.querySelector<HTMLButtonElement>(".action")!;
   actionButton.addEventListener("pointerdown", (e) => {
     e.preventDefault();
     actionQueued = true;
   });
+  startSteering();
 }
 
 export function hideTouchControls(): void {
+  stopSteering();
   controls?.remove();
   controls = null;
   actionButton = null;
-  knob = null;
   actionQueued = false;
-  resetStick();
 }

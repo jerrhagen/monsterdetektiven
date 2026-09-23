@@ -1392,13 +1392,6 @@ html.touch .hud .controls {
 }
 
 /* Bigger buttons for fingers, and bigger small print. */
-html.touch .book-button,
-html.touch .music-button,
-html.touch .map-button {
-  font-size: calc(var(--px) * 7);
-  padding: calc(var(--px) * 0.5) calc(var(--px) * 2.5);
-}
-
 html.touch .goal .room-clues {
   font-size: 0.9em;
 }
@@ -1441,7 +1434,8 @@ html.touch .player-tools button {
   font-size: calc(var(--px) * 5);
 }
 
-/* The joystick (left) and the action button (right), in the corners of the screen. */
+/* The right side on a touch screen: the menu buttons in a column at the top, and the action
+   button at the bottom. They sit in the dark strip beside the game when there is one. */
 .touch-controls {
   position: fixed;
   inset: 0;
@@ -1453,44 +1447,17 @@ html.touch .player-tools button {
   display: none;
 }
 
-.touch-controls .stick {
-  position: absolute;
-  left: calc(env(safe-area-inset-left) + 14px);
-  bottom: calc(env(safe-area-inset-bottom) + 14px);
-  /* Fits in the dark strip beside the game when there is one (the game is 5:3). */
-  --side: max(80px, calc((100vw - 100vh * 5 / 3) / 2 - 22px));
-  width: min(34vh, 150px, var(--side));
-  height: min(34vh, 150px, var(--side));
-  border-radius: 50%;
-  background: rgba(244, 236, 255, 0.12);
-  border: 2px solid rgba(244, 236, 255, 0.35);
-  pointer-events: auto;
-  touch-action: none;
-}
-
-.touch-controls .stick-knob {
-  position: absolute;
-  left: 30%;
-  top: 30%;
-  width: 40%;
-  height: 40%;
-  border-radius: 50%;
-  background: rgba(244, 236, 255, 0.55);
-  box-shadow: 0 2px 0 rgba(13, 7, 24, 0.6);
-}
-
 .touch-controls .action {
   position: absolute;
-  right: calc(env(safe-area-inset-right) + 18px);
-  bottom: calc(env(safe-area-inset-bottom) + 22px);
-  --side: max(64px, calc((100vw - 100vh * 5 / 3) / 2 - 26px));
-  width: min(24vh, 100px, var(--side));
-  height: min(24vh, 100px, var(--side));
+  right: calc(env(safe-area-inset-right) + 12px);
+  bottom: calc(env(safe-area-inset-bottom) + 16px);
+  width: 68px;
+  height: 68px;
   border-radius: 50%;
   border: 3px solid #f4ecff;
-  background: rgba(143, 209, 79, 0.75);
+  background: rgba(143, 209, 79, 0.8);
   color: #14101c;
-  font-size: min(10vh, 42px);
+  font-size: 30px;
   font-family: "Lexend", system-ui, sans-serif;
   font-weight: 700;
   pointer-events: auto;
@@ -1501,6 +1468,47 @@ html.touch .player-tools button {
 .touch-controls .action:active {
   transform: translateY(3px);
   box-shadow: none;
+}
+
+html.touch .hud .map-button,
+html.touch .hud .music-button,
+html.touch .hud .book-button {
+  position: fixed;
+  right: calc(env(safe-area-inset-right) + 16px);
+  width: 60px;
+  height: 48px;
+  padding: 0;
+  font-size: 24px;
+  z-index: 11;
+}
+
+html.touch .hud .book-button {
+  top: calc(env(safe-area-inset-top) + 12px);
+}
+
+html.touch .hud .map-button {
+  top: calc(env(safe-area-inset-top) + 68px);
+}
+
+html.touch .hud .music-button {
+  top: calc(env(safe-area-inset-top) + 124px);
+}
+
+/* Squarer screens (tablets) have the dark strip above the game instead: buttons in a row there. */
+@media (max-aspect-ratio: 5/3) {
+  html.touch .hud .map-button,
+  html.touch .hud .music-button,
+  html.touch .hud .book-button {
+    top: calc(env(safe-area-inset-top) + 10px);
+  }
+
+  html.touch .hud .map-button {
+    right: calc(env(safe-area-inset-right) + 84px);
+  }
+
+  html.touch .hud .music-button {
+    right: calc(env(safe-area-inset-right) + 152px);
+  }
 }
 
 /* "Turn the phone" when it's held upright. */

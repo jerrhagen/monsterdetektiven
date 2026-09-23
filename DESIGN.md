@@ -402,7 +402,9 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 | Siffror och bokstäver | I kodlås och textrutor |
 
 **På mobil och surfplatta** (bara när spelet märker en pekskärm; på dator är allt som vanligt):
-- Ett **styrspak** nere till vänster för att gå, och en stor **åtgärdsknapp** nere till höger som gör samma sak som mellanslag. Knappen visar vad den gör: ⤒ hoppa, 💬 prata, 🔍 undersöka, ▶ nästa i dialog. Knapparna ligger i de mörka kanterna bredvid spelet när det finns plats.
+- **Håll fingret var som helst** på spelet så går Nora åt det hållet, sett från henne själv (åtta riktningar). Nära henne, eller när man släpper, stannar hon. Ingen synlig styrspak.
+- En liten **åtgärdsknapp** nere till höger gör samma sak som mellanslag och visar vad den gör: ⤒ hoppa, 💬 prata, 🔍 undersöka, ▶ nästa i dialog.
+- **Boken, kartan och musiken** ligger i en kolumn till höger på mobil (i den mörka kanten bredvid spelet), och i en rad upptill på surfplattor där kanten är ovanför spelet.
 - Man trycker på pratbubblan, svaren och menyerna. Tangentbordstips döljs, och små texter och knappar blir större.
 - Håller man mobilen upprätt visas "Vänd mobilen så spelar vi!". På Android går spelet till helskärm i liggande läge när man startar.
 - Spelet kan läggas till på hemskärmen (manifest och ikon med Nora i `public/`, ikonerna görs med `node scripts/make-icons.ts`).
