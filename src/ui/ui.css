@@ -639,6 +639,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: calc(var(--px) * 1);
   background: #f4ecd8;
   color: #2a1a2e;
@@ -659,14 +660,6 @@ body {
   height: calc(var(--px) * 22);
   image-rendering: pixelated;
   object-fit: contain;
-}
-
-.option .key {
-  position: absolute;
-  top: calc(var(--px) * 1);
-  left: calc(var(--px) * 1.5);
-  font-size: calc(var(--px) * 3.5);
-  color: #8a7a8a;
 }
 
 .order-slots {

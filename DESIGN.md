@@ -335,7 +335,7 @@ Varje fall slutar med en **"Visste du att…?"**-fakta kopplad till temat.
 | **Talföljd, dubbelt/hälften** ✅ | Kodlås med uträknade tal (`derive`) | 3, 5, 7, __ | Matte: mönster |
 | **Ordningslås** ✅ | Välj bilder i rätt ordning | Former, väderstreck, händelser | Matte, logik, SO |
 | **ABC-ordning** ✅ | Ordningslås med slumpade ord (`alphabetize`) | Böcker i bokstavsordning (å ä ö sist) | Svenska |
-| **Bildval** ✅ | Klicka eller tryck 1–4 | Gåtor, "Vilket djur gjorde spåret?" | Svenska, NO |
+| **Bildval** ✅ | Klicka på svaret (inga siffror på knapparna) | Gåtor, "Vilket djur gjorde spåret?" | Svenska, NO |
 | **Spegelskrift** ✅ | Bildval med spegelvänd text (`mirror`) | Vad står det på lappen? | Svenska |
 | **Para ihop** ✅ | Klicka vänster, sedan höger (`match`) | Rimord, djur och spår | Svenska, NO |
 | **Vilken klocka?** ✅ | Välj bland fyra ritade klockor (`clock`) | "Klockan är halv fyra" | Matte: tid |

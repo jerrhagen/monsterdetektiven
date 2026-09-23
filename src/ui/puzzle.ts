@@ -133,19 +133,14 @@ function button(label: string, className = ""): HTMLButtonElement {
   return b;
 }
 
-function optionButton(o: PuzzleOption, index: number): HTMLButtonElement {
+/** An answer to click on: a picture (if any) and the label. */
+function optionButton(o: PuzzleOption): HTMLButtonElement {
   const b = document.createElement("button");
   b.className = "option";
   b.lang = "sv";
-  b.innerHTML = `<span class="key">${index + 1}</span>${o.sprite ? `<img src="${spriteUrl(o.sprite)}" alt="">` : ""}<span></span>`;
+  b.innerHTML = `${o.sprite ? `<img src="${spriteUrl(o.sprite)}" alt="">` : ""}<span></span>`;
   b.querySelector("span:last-child")!.textContent = o.label;
   return b;
-}
-
-/** Number keys 1–9 pick an option. */
-function optionIndex(e: KeyboardEvent, count: number): number {
-  const n = Number(e.key);
-  return Number.isInteger(n) && n >= 1 && n <= count ? n - 1 : -1;
 }
 
 // ---------- Code lock ----------
@@ -236,8 +231,8 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   };
 
   const shown = shuffleOptions(p.options);
-  shown.forEach((o, i) => {
-    const b = optionButton(o, i);
+  shown.forEach((o) => {
+    const b = optionButton(o);
     b.addEventListener("click", () => pick(o));
     options.appendChild(b);
   });
@@ -245,9 +240,7 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   ui.body.append(slots, options);
 
   return (e) => {
-    const i = optionIndex(e, shown.length);
-    if (i >= 0) pick(shown[i]);
-    else if (e.key === "Backspace") {
+    if (e.key === "Backspace") {
       picked.pop();
       render();
     }
@@ -263,17 +256,13 @@ function choice(p: ChoicePuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
     if (o.id === p.answer) ui.solved();
     else ui.say(p.wrong ?? `${o.label}? Nej… tänk en gång till!`);
   };
-  const shown = shuffleOptions(p.options);
-  shown.forEach((o, i) => {
-    const b = optionButton(o, i);
+  for (const o of shuffleOptions(p.options)) {
+    const b = optionButton(o);
     b.addEventListener("click", () => pick(o));
     options.appendChild(b);
-  });
+  }
   ui.body.append(options);
-  return (e) => {
-    const i = optionIndex(e, shown.length);
-    if (i >= 0) pick(shown[i]);
-  };
+  return () => {};
 }
 
 // ---------- The reveal: who did it, and what proves it? ----------
@@ -295,17 +284,13 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
       if (o.id === q.answer) showEvidence(o);
       else ui.say(`Ester: "${q.whyNot?.[o.id] ?? `Hmm… var det verkligen ${o.label}? Titta i detektivboken!`}"`);
     };
-    const shown = shuffleOptions(q.options);
-    shown.forEach((o, i) => {
-      const b = optionButton(o, i);
+    for (const o of shuffleOptions(q.options)) {
+      const b = optionButton(o);
       b.addEventListener("click", () => pick(o));
       options.appendChild(b);
-    });
+    }
     ui.body.append(options);
-    keys = (e) => {
-      const i = optionIndex(e, shown.length);
-      if (i >= 0) pick(shown[i]);
-    };
+    keys = () => {};
   };
 
   const showEvidence = (culprit: PuzzleOption) => {
@@ -491,18 +476,13 @@ function clocks(p: ClockPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
     if (id === p.answer) ui.solved();
     else ui.say("Titta på visarna igen! Den korta visar timmen, den långa minuterna.");
   };
-  times.forEach((t, i) => {
+  for (const t of times) {
     const b = document.createElement("button");
     b.className = "option";
-  b.lang = "sv";
-    b.innerHTML = `<span class="key">${i + 1}</span>`;
     b.appendChild(drawClock(t.hour, t.minute));
     b.addEventListener("click", () => pick(t.id));
     options.appendChild(b);
-  });
+  }
   ui.body.append(options);
-  return (e) => {
-    const i = optionIndex(e, times.length);
-    if (i >= 0) pick(times[i].id);
-  };
+  return () => {};
 }
