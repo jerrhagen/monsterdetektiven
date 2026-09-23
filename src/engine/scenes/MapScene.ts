@@ -100,6 +100,8 @@ function inForest(x: number, y: number): boolean {
 /** The town map: choose which case to play. */
 export class MapScene extends Phaser.Scene {
   private marker!: Phaser.GameObjects.Sprite;
+  /** The building image for each place (the forest has none). */
+  private buildings: (Phaser.GameObjects.Image | undefined)[] = [];
 
   constructor() {
     super("map");
@@ -108,6 +110,7 @@ export class MapScene extends Phaser.Scene {
   create(): void {
     registerSprites(this);
     this.input.keyboard!.clearCaptures();
+    this.buildings = [];
     this.drawTown();
 
     const save = loadSave();
@@ -121,7 +124,7 @@ export class MapScene extends Phaser.Scene {
     this.marker = this.add.sprite(0, 0, "nora-0").setOrigin(0.5, 1).setDepth(1000);
     this.moveMarker(selected, false);
 
-    showCityMap(selected, {
+    const map = showCityMap(selected, {
       play: (index) => {
         newGame(index);
         this.scene.start("room", {});
@@ -129,8 +132,20 @@ export class MapScene extends Phaser.Scene {
       select: (index) => this.moveMarker(index, true),
       players: () => this.scene.start("title"),
     });
+    this.makePlacesTappable((i) => map.tap(i));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideCityMap);
     this.cameras.main.fadeIn(200);
+  }
+
+  /** The whole building (and the forest) can be tapped, not just the sign under it. */
+  private makePlacesTappable(tap: (index: number) => void): void {
+    MAP_SPOTS.forEach((spot, i) => {
+      const building = this.buildings[i];
+      const zone = building
+        ? this.add.zone(building.x, building.y - building.height / 2, building.width, building.height)
+        : this.add.zone(spot.x + 6, spot.y - 14, 76, 56); // the forest around the spot
+      zone.setInteractive({ useHandCursor: true }).on("pointerdown", () => tap(i));
+    });
   }
 
   private moveMarker(index: number, animate: boolean): void {
@@ -214,6 +229,7 @@ export class MapScene extends Phaser.Scene {
       const key = BUILDINGS[i];
       if (!key) return;
       const building = put(key, spot.x, spot.y);
+      this.buildings[i] = building;
       const open = !!cases[i] && isUnlocked(ids, i, save);
       if (!open) building.setTint(0x6a6480);
     });

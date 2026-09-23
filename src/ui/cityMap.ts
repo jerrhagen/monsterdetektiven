@@ -34,8 +34,11 @@ export interface MapActions {
   players(): void;
 }
 
-/** Labels, stars, moonstone pieces and the buttons for monster cards, settings and players. */
-export function showCityMap(selected: number, actions: MapActions): void {
+/**
+ * Labels, stars, moonstone pieces and the buttons for monster cards, settings and players.
+ * Returns `tap`, for tapping a place on the map itself (a building): choose it, or play it if chosen.
+ */
+export function showCityMap(selected: number, actions: MapActions): { tap(index: number): void } {
   hideCityMap();
   el = document.createElement("div");
   el.className = "city-map";
@@ -189,6 +192,13 @@ export function showCityMap(selected: number, actions: MapActions): void {
   };
   window.addEventListener("keydown", onKey);
   render();
+  return {
+    tap: (i) => {
+      if (busy) return;
+      if (i === chosen) start();
+      else choose(i);
+    },
+  };
 }
 
 export function hideCityMap(): void {

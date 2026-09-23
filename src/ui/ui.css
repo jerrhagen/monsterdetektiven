@@ -1480,9 +1480,10 @@ html.touch .player-tools button {
   width: 68px;
   height: 68px;
   border-radius: 50%;
-  border: 3px solid #f4ecff;
-  background: rgba(143, 209, 79, 0.8);
-  color: #14101c;
+  /* Neutral, like the joystick. */
+  border: 2px solid rgba(244, 236, 255, 0.35);
+  background: rgba(244, 236, 255, 0.18);
+  color: #f4ecff;
   font-size: 30px;
   font-family: "Lexend", system-ui, sans-serif;
   font-weight: 700;
