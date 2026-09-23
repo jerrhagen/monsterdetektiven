@@ -1,6 +1,9 @@
 import * as Phaser from "phaser";
+import { startMusic } from "../../ui/music";
 import { hideTitle, showTitle } from "../../ui/title";
+import { cases } from "../../cases";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config";
+import { loadSave } from "../save";
 import { registerSprites } from "../textures";
 
 /** Small seeded random generator, so the town looks the same every time. */
@@ -18,6 +21,16 @@ const SILHOUETTE = 0x0d0718;
 const WINDOW_LIT = 0xffd66b;
 const WINDOW_DARK = 0x1c1230;
 
+/** "Fall 1 löst! ★★☆ · 3 monsterkort" – or nothing before the first solved case. */
+function progressLine(): string {
+  const save = loadSave();
+  const solved = cases.filter((c) => save.cases[c.id]);
+  if (solved.length === 0) return "";
+  const last = solved[solved.length - 1];
+  const stars = save.cases[last.id].stars;
+  return `Fall ${last.number} löst! ${"★".repeat(stars)}${"☆".repeat(3 - stars)} · ${save.cards.length} monsterkort`;
+}
+
 /** Title screen: Mystiska staden at night, with Fladder flying past. */
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -34,14 +47,18 @@ export class TitleScene extends Phaser.Scene {
     this.launchFladder();
     this.drawTown(rand);
 
-    showTitle();
+    showTitle(progressLine());
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideTitle);
 
+    const begin = () => {
+      startMusic();
+      this.scene.start("room");
+    };
     const K = Phaser.Input.Keyboard.KeyCodes;
     for (const key of [K.SPACE, K.ENTER, K.CTRL]) {
-      this.input.keyboard!.addKey(key).once("down", () => this.scene.start("room"));
+      this.input.keyboard!.addKey(key).once("down", begin);
     }
-    this.input.once("pointerdown", () => this.scene.start("room"));
+    this.input.once("pointerdown", begin);
   }
 
   private drawSky(): void {

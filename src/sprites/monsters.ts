@@ -1,0 +1,158 @@
+import type { PixelSprite } from "./pixelSprite";
+
+const E = "................";
+
+/** Viskan the ghost, out of her bin. Frame 1: eyes squeezed shut – she freezes when looked at. */
+export const viskanGhost: PixelSprite = {
+  palette: { ".": null, o: "#7a8a7a", g: "#eef2e6", G: "#9aa89a", e: "#0a0a12", k: "#0a0a12" },
+  frames: [
+    [
+      E,
+      ".....oooooo.....",
+      "....oggggggo....",
+      "...oggggggggo...",
+      "...ogeeggeego...",
+      "...ogeeggeego...",
+      "...oggggggggo...",
+      "...ogkggggkgo...",
+      "...oggkkkkggo...",
+      ".ogoggggggggogo.",
+      "..ooggggggggoo..",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...ogo.oo.ogo...",
+      "....o......o....",
+    ],
+    [
+      E,
+      ".....oooooo.....",
+      "....oggggggo....",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...oGGggggGGo...",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...oggkkkkggo...",
+      ".ogoggggggggogo.",
+      "..ooggggggggoo..",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...oggggggggo...",
+      "...ogo.oo.ogo...",
+      "....o......o....",
+    ],
+  ],
+};
+
+/** An empty trash can – Viskan's home. */
+export const trashBin: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", c: "#8a94a8", C: "#5f687c", l: "#a9b2c4" },
+  frames: [
+    [
+      E,
+      E,
+      E,
+      E,
+      E,
+      E,
+      "..oooooooooooo..",
+      "..ollllllllllo..",
+      "..oooooooooooo..",
+      "...occCcccCcco..",
+      "...occCcccCcco..",
+      "...occCcccCcco..",
+      "...occCcccCcco..",
+      "...occCcccCcco..",
+      "...ooooooooooo..",
+      E,
+    ],
+  ],
+};
+
+/** Two glowing eyes in a dark corner. They blink now and then. */
+export const shadowEyes: PixelSprite = {
+  palette: { ".": null, d: "#0d0718", D: "#1c1230", y: "#ffe27a" },
+  frameRate: 3,
+  frames: [
+    [
+      E,
+      E,
+      "....dddddddd....",
+      "..dddddddddddd..",
+      ".dddDDDDDDDDddd.",
+      ".ddDDyyDDyyDDdd.",
+      ".ddDDyyDDyyDDdd.",
+      ".dddDDDDDDDDddd.",
+      "..dddddddddddd..",
+      "....dddddddd....",
+      E,
+      E,
+      E,
+      E,
+      E,
+      E,
+    ],
+    [
+      E,
+      E,
+      "....dddddddd....",
+      "..dddddddddddd..",
+      ".dddDDDDDDDDddd.",
+      ".ddDDyyDDyyDDdd.",
+      ".ddDDyyDDyyDDdd.",
+      ".dddDDDDDDDDddd.",
+      "..dddddddddddd..",
+      "....dddddddd....",
+      E,
+      E,
+      E,
+      E,
+      E,
+      E,
+    ],
+    [
+      E,
+      E,
+      "....dddddddd....",
+      "..dddddddddddd..",
+      ".dddDDDDDDDDddd.",
+      ".ddDDDDDDDDDDdd.",
+      ".ddDDyyDDyyDDdd.",
+      ".dddDDDDDDDDddd.",
+      "..dddddddddddd..",
+      "....dddddddd....",
+      E,
+      E,
+      E,
+      E,
+      E,
+      E,
+    ],
+  ],
+};
+
+/** Nora's magnifying glass – she drops it when a monster scares her. */
+export const magnifier: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", g: "#ffd66b", G: "#c9961e", w: "#cfe8ff", W: "#ffffff", b: "#7a4f2a" },
+  frames: [
+    [
+      E,
+      E,
+      "....oooooo......",
+      "...ogggggGo.....",
+      "..ogwWwwwwGo....",
+      "..ogWwwwwwGo....",
+      "..ogwwwwwwGo....",
+      "..ogwwwwwwGo....",
+      "..oGwwwwwwGo....",
+      "...oGGGGGGoo....",
+      "....ooooooboo...",
+      "..........obbo..",
+      "...........obbo.",
+      "............oo..",
+      E,
+      E,
+    ],
+  ],
+};

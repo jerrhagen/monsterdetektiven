@@ -223,25 +223,110 @@ export const sun: PixelSprite = {
   ],
 };
 
-/** A green sleeve with a hand – crawling around on its own. */
+/** A hand in a green sleeve, scuttling on its fingertips like a spider. */
 export const arm: PixelSprite = {
-  palette: { ".": null, o: "#1a1024", g: "#3fae4a", G: "#2a8a3a", s: "#b8d8a0", r: "#c0182c" },
+  palette: { ".": null, o: "#1a1024", g: "#3fae4a", s: "#b8d8a0", r: "#c0182c" },
+  frameRate: 10,
+  frames: [
+    [
+      E,
+      E,
+      "......oooooo....",
+      ".ooooosssssso...",
+      "orggggossssssoo.",
+      "orggggossssssso.",
+      ".ooooooossssoo..",
+      ".......os.os.so.",
+      "......os..os..so",
+      "......o...o....o",
+      E,
+      E,
+    ],
+    [
+      E,
+      E,
+      "......oooooo....",
+      ".ooooosssssso...",
+      "orggggossssssoo.",
+      "orggggossssssso.",
+      ".ooooooossssoo..",
+      "........so.so.os",
+      ".........so.so.o",
+      "..........o..o..",
+      E,
+      E,
+    ],
+  ],
+};
+
+// ---------- More pictures for riddles ----------
+
+export const comb: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", p: "#ff8ade", P: "#c93aa6" },
   frames: [
     [
       E,
       E,
       E,
       E,
+      "..oooooooooooo..",
+      "..oppppppppppo..",
+      "..oPPPPPPPPPPo..",
+      "..oPoPoPoPoPoo..",
+      "..oPoPoPoPoPoo..",
+      "..oPoPoPoPoPoo..",
+      "..o.o.o.o.o.o...",
       E,
       E,
-      "..ooooooooo.....",
-      ".rgggggggGosso..",
-      ".rggggggggosssso",
-      "..oooooooooosso.",
-      "............oso.",
       E,
       E,
       E,
+    ],
+  ],
+};
+
+export const needle: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", G: "#c8c4d4", r: "#e04848" },
+  frames: [
+    [
+      E,
+      "..........oo....",
+      ".........oGGo...",
+      ".........oG.o...",
+      "........oGGo....",
+      "........oGo.r...",
+      ".......oGGo..r..",
+      ".......oGo...r..",
+      "......oGGo..r...",
+      "......oGo..r....",
+      ".....oGGo.r.....",
+      ".....oGo........",
+      "....oGo.........",
+      "....oo..........",
+      E,
+      E,
+    ],
+  ],
+};
+
+export const chair: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", w: "#b07a44", W: "#7a4f2a" },
+  frames: [
+    [
+      E,
+      "...oooooo.......",
+      "...owwwwo.......",
+      "...owWWwo.......",
+      "...owwwwo.......",
+      "...owWWwo.......",
+      "...owwwwoooooo..",
+      "...owwwwwwwwwo..",
+      "...oooooooooooo.",
+      "...oWo.....oWo..",
+      "...oWo.....oWo..",
+      "...oWo.....oWo..",
+      "...oWo.....oWo..",
+      "...ooo.....ooo..",
       E,
       E,
     ],

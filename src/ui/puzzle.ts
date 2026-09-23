@@ -1,6 +1,7 @@
 import type { ChoicePuzzle, CodePuzzle, OrderPuzzle, Puzzle, PuzzleOption, RevealPuzzle } from "../cases/types";
 import type { CaseState } from "../engine/caseState";
-import { checkCode, checkEvidence, checkOrder } from "../engine/puzzleCheck";
+import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../engine/puzzleCheck";
+import { shuffleOptions } from "../engine/puzzleRoll";
 import { confetti } from "./confetti";
 import { uiRoot } from "./layer";
 import { playClick, playSuccess, playWrong } from "./sound";
@@ -216,7 +217,8 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
     }
   };
 
-  p.options.forEach((o, i) => {
+  const shown = shuffleOptions(p.options);
+  shown.forEach((o, i) => {
     const b = optionButton(o, i);
     b.addEventListener("click", () => pick(o));
     options.appendChild(b);
@@ -225,8 +227,8 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   ui.body.append(slots, options);
 
   return (e) => {
-    const i = optionIndex(e, p.options.length);
-    if (i >= 0) pick(p.options[i]);
+    const i = optionIndex(e, shown.length);
+    if (i >= 0) pick(shown[i]);
     else if (e.key === "Backspace") {
       picked.pop();
       render();
@@ -243,15 +245,16 @@ function choice(p: ChoicePuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
     if (o.id === p.answer) ui.solved();
     else ui.say(`${o.label}? Nej… tänk en gång till!`);
   };
-  p.options.forEach((o, i) => {
+  const shown = shuffleOptions(p.options);
+  shown.forEach((o, i) => {
     const b = optionButton(o, i);
     b.addEventListener("click", () => pick(o));
     options.appendChild(b);
   });
   ui.body.append(options);
   return (e) => {
-    const i = optionIndex(e, p.options.length);
-    if (i >= 0) pick(p.options[i]);
+    const i = optionIndex(e, shown.length);
+    if (i >= 0) pick(shown[i]);
   };
 }
 
@@ -266,17 +269,18 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
     options.className = "options";
     const pick = (o: PuzzleOption) => {
       if (o.id === p.answer) showEvidence(o);
-      else ui.say(`Ester: "Hmm… var det verkligen ${o.label}? Titta i detektivboken!"`);
+      else ui.say(`Ester: "${p.whyNot?.[o.id] ?? `Hmm… var det verkligen ${o.label}? Titta i detektivboken!`}"`);
     };
-    p.options.forEach((o, i) => {
+    const shown = shuffleOptions(p.options);
+    shown.forEach((o, i) => {
       const b = optionButton(o, i);
       b.addEventListener("click", () => pick(o));
       options.appendChild(b);
     });
     ui.body.append(options);
     keys = (e) => {
-      const i = optionIndex(e, p.options.length);
-      if (i >= 0) pick(p.options[i]);
+      const i = optionIndex(e, shown.length);
+      if (i >= 0) pick(shown[i]);
     };
   };
 
@@ -286,7 +290,7 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
     ui.body.innerHTML = "";
     const intro = document.createElement("p");
     intro.className = "evidence-intro";
-    intro.textContent = `${culprit.label}! Visa två ledtrådar som bevisar det.`;
+    intro.textContent = `${culprit.label}! Visa ${p.proof.length === 2 ? "två" : p.proof.length} ledtrådar som bevisar det.`;
     const grid = document.createElement("div");
     grid.className = "evidence";
     const chosen = new Set<string>();
@@ -297,9 +301,9 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
     const toggle = (id: string, card: HTMLButtonElement) => {
       playClick();
       if (chosen.has(id)) chosen.delete(id);
-      else if (chosen.size < 2) chosen.add(id);
+      else if (chosen.size < p.proof.length) chosen.add(id);
       card.classList.toggle("chosen", chosen.has(id));
-      submit.disabled = chosen.size !== 2;
+      submit.disabled = chosen.size !== p.proof.length;
     };
     clueIds.forEach((id, i) => {
       const clue = state.data.clues[id];
@@ -312,7 +316,7 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
     });
     submit.addEventListener("click", () => {
       if (checkEvidence(p, [...chosen])) ui.solved();
-      else ui.say("De där ledtrådarna bevisar inte det. Välj två andra!");
+      else ui.say(`Ester: "${explainEvidence(p, [...chosen])}"`);
     });
     ui.body.append(intro, grid, submit);
 

@@ -50,6 +50,24 @@ export const teddy: PixelSprite = {
   ],
 };
 
+/** "?" – a monster that lost sight of Nora. */
+export const questionBubble: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", w: "#ffffff" },
+  frames: [
+    [
+      ".ooooo.",
+      "owwwwwo",
+      "owooowo",
+      "owwwowo",
+      "owwowwo",
+      "owwwwwo",
+      "owwowwo",
+      ".ooooo.",
+      "...o...",
+    ],
+  ],
+};
+
 /** Small speech bubble shown above things Nora can use. */
 export const hintBubble: PixelSprite = {
   palette: { ".": null, o: "#1a1024", w: "#ffffff" },

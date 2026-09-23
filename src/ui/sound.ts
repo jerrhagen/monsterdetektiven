@@ -2,7 +2,7 @@
 
 let ctx: AudioContext | null = null;
 
-function audio(): AudioContext | null {
+export function audio(): AudioContext | null {
   try {
     ctx ??= new AudioContext();
     if (ctx.state === "suspended") void ctx.resume();
@@ -38,6 +38,23 @@ export function playSuccess(): void {
 export function playWrong(): void {
   tone(220, 0, 0.18, "square", 0.08);
   tone(165, 0.12, 0.25, "square", 0.08);
+}
+
+/** A shriek when a monster catches Nora. */
+export function playScare(): void {
+  const a = audio();
+  if (!a) return;
+  const osc = a.createOscillator();
+  const gain = a.createGain();
+  osc.type = "sawtooth";
+  const t = a.currentTime;
+  osc.frequency.setValueAtTime(1400, t);
+  osc.frequency.exponentialRampToValueAtTime(180, t + 0.5);
+  gain.gain.setValueAtTime(0.12, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+  osc.connect(gain).connect(a.destination);
+  osc.start(t);
+  osc.stop(t + 0.6);
 }
 
 export function playClick(): void {

@@ -217,6 +217,56 @@ export const dragMarks: PixelSprite = {
   ],
 };
 
+/** Clue: pink, see-through scales – like Fladder's wings. */
+export const pinkScales: PixelSprite = {
+  palette: { ".": null, p: "#ff8ade", P: "#c93aa6" },
+  frames: [
+    [
+      "................",
+      "................",
+      "................",
+      "................",
+      "................",
+      "....pp..........",
+      "...pPPp....pp...",
+      "....pp....pPPp..",
+      "...........pp...",
+      "................",
+      "......pp........",
+      ".....pPPp.......",
+      "......pp........",
+      "................",
+      "................",
+      "................",
+    ],
+  ],
+};
+
+/** Stina's knitting basket with green yarn. */
+export const yarnBasket: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", k: "#c8c4d4", g: "#3fae4a", G: "#2a8a3a", b: "#b07a44", w: "#7a4f2a" },
+  frames: [
+    [
+      "................",
+      "................",
+      "................",
+      "................",
+      "......k...k.....",
+      ".......k.k......",
+      "....ggg.ggg.....",
+      "...gGggggGgg....",
+      "..oooooooooooo..",
+      "..obwbwbwbwbwo..",
+      "..owbwbwbwbwbo..",
+      "..obwbwbwbwbwo..",
+      "...oooooooooo...",
+      "................",
+      "................",
+      "................",
+    ],
+  ],
+};
+
 /** Item: the storeroom key. */
 export const key: PixelSprite = {
   palette: { ".": null, o: "#1a1024", y: "#ffd66b" },

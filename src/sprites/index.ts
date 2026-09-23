@@ -5,20 +5,27 @@ import {
   handprints,
   key,
   noticeboard,
+  pinkScales,
   slimeJar,
   stina,
   thread,
   toyCarBlue,
   toyCarRed,
   viskanBin,
+  yarnBasket,
 } from "./case1";
 import { alertBubble, ester } from "./ester";
+import { magnifier, shadowEyes, trashBin, viskanGhost } from "./monsters";
 import { fladder } from "./fladder";
+import { grymlan, monsterEgg, moonShard, rustle } from "./finale";
 import { nora } from "./nora";
 import type { PixelSprite } from "./pixelSprite";
 import {
   arm,
+  chair,
+  comb,
   iceCream,
+  needle,
   register,
   shapeCone,
   shapeCube,
@@ -28,7 +35,7 @@ import {
   towel,
   umbrella,
 } from "./puzzles";
-import { hintBubble, sign, teddy } from "./things";
+import { hintBubble, questionBubble, sign, teddy } from "./things";
 
 /** Every pixel sprite in the game, by texture key. */
 export const sprites: Record<string, PixelSprite> = {
@@ -43,6 +50,8 @@ export const sprites: Record<string, PixelSprite> = {
   teddy,
   handprints,
   thread,
+  pinkScales,
+  yarnBasket,
   bloodDrops,
   dragMarks,
   key,
@@ -59,6 +68,18 @@ export const sprites: Record<string, PixelSprite> = {
   umbrella,
   iceCream,
   sun,
+  comb,
+  needle,
+  chair,
+  viskanGhost,
+  trashBin,
+  shadowEyes,
+  magnifier,
+  grymlan,
+  moonShard,
+  monsterEgg,
+  rustle,
   hintBubble,
+  questionBubble,
   alertBubble,
 };

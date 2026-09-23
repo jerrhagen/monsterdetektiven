@@ -55,6 +55,16 @@ export class Ester {
     this.trail.push({ x, y });
   }
 
+  /** Nora was moved suddenly (carried off by a monster): Ester hurries over and starts following from there. */
+  jumpTo(x: number, y: number): void {
+    this.x = x;
+    this.y = y;
+    this.trail.length = 0;
+    this.trail.push({ x, y });
+    this.trailIndex = 0;
+    this.startIdle();
+  }
+
   /** Shows the "!" and makes her bounce when she has a hint. */
   setAlert(on: boolean): void {
     this.alerting = on;

@@ -28,6 +28,8 @@ Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bar
 
 - Varje fall ska vara ett **komplett mysterium**: problem, utredning med ledtrådar **och** klurigheter (pussel), faror, avslöjande med bevis, och en koppling till **den röda tråden** genom alla fall (se avsnitt 4 i `DESIGN.md`).
 - Monstren ska vara **farliga och mystiska**, inte bara stå still och prata. De ska jaga, smyga, flyga iväg med Nora och vara en del av mysteriet.
+- Följ **"Regler för bra monster"** (avsnitt 5 i `DESIGN.md`): det ska finnas ett motdrag, varning före anfall, monster som reagerar på spelaren och visar vad de "tänker", uppbyggd spänning, en värld som stämmer med texten och milda följder. Pussel ska ha slump mot muskelminne (avsnitt 6.5).
+- **Fallen får inte kunna låsa sig.** Spelaren gör saker i oväntad ordning. En figurs grund-`gives` ges alltid, vad den än säger. Skriv tester som spelar i "fel" ordning.
 - Pedagogiken ska vävas in i klurigheterna enligt den pedagogiska planen (avsnitt 6 i `DESIGN.md`). Claude får gärna hitta på eget innehåll, men Noras idéer och monster ska finnas med genom spelet.
 - Det som byggts hittills är **test av byggstenar**, och fall 1 i koden är en testbana. De färdiga mysterierna, även fall 1, ska tänkas igenom ordentligt och får göras om från grunden (steg 6).
 

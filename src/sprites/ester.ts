@@ -107,11 +107,13 @@ export const alertBubble: PixelSprite = {
   frames: [
     [
       ".ooooo.",
+      "oyyyyyo",
       "oyyoyyo",
       "oyyoyyo",
       "oyyoyyo",
       "oyyyyyo",
       "oyyoyyo",
+      "oyyyyyo",
       ".ooooo.",
       "..ooo..",
       "...o...",

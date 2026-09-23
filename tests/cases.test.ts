@@ -39,7 +39,12 @@ describe("fallen", () => {
   it("hittar fel i en trasig karta", () => {
     const broken: Case = {
       id: "x",
+      number: 0,
       title: "Trasig",
+      intro: [],
+      finale: [],
+      fact: "",
+      cards: [],
       startRoom: "a",
       rooms: { a: { name: "A", theme: "shop", layout: ["#?#"], doors: [{ at: "left", to: "nope", requires: "magi" }] } },
       clues: {},
@@ -67,24 +72,42 @@ describe("detektivens anteckningar", () => {
     const state = new CaseState(c);
     state.give("talked-to-stina");
     expect(state.currentGoalIndex()).toBe(1);
-    state.give(["clue:handprints", "clue:thread", "clue:teddy", "storeroom-key"]);
+    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales", "storeroom-key"]);
     expect(state.currentGoalIndex()).toBe(2);
     state.give("visited:storeroom");
     expect(state.currentGoalIndex()).toBe(3);
     expect(state.give(["talked-to-stina", "clue:thread"])).toEqual([]);
-    expect(state.foundClues()).toEqual(["handprints", "thread", "teddy"]);
+    expect(state.foundClues()).toEqual(["handprints", "thread", "scales", "teddy"]);
   });
 
   it("Ester ger tydligare och tydligare tips för det aktuella målet", () => {
     const state = new CaseState(c);
-    const hints = c.goals[0].hints;
+    const hints = c.goals[0].hints as string[];
     expect(state.nextHint()).toBe(hints[0]);
     expect(state.nextHint()).toBe(hints[1]);
     expect(state.nextHint()).toBe(hints[2]);
     expect(state.nextHint()).toBe(hints[2]);
     expect(state.hintsUsed).toBe(4);
     state.give("talked-to-stina");
-    expect(state.nextHint()).toBe(c.goals[1].hints[0]);
+    expect(state.nextHint()).toContain("glöder");
+  });
+
+  it("målet 'prata med Stina' blir klart även om man hittat ledtrådarna först", () => {
+    const state = new CaseState(c);
+    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales"]);
+    const talk = state.talkFor(c.rooms.store.things!.s);
+    state.give(talk.gives);
+    expect(state.has("talked-to-stina")).toBe(true);
+    expect(state.has("heard-about-register")).toBe(true);
+    expect(state.currentGoalIndex()).toBe(2);
+  });
+
+  it("Ester tipsar inte om sådant man redan gjort", () => {
+    const state = new CaseState(c);
+    state.give(["talked-to-stina", "clue:teddy"]);
+    for (let i = 0; i < 5; i++) expect(state.nextHint()).not.toContain("Nallen");
+    state.give(["clue:handprints", "clue:thread", "clue:scales", "heard-about-register", "storeroom-key"]);
+    expect(state.nextHint()).toContain("Du har nyckeln");
   });
 
   it("väljer rätt repliker beroende på vad man gjort", () => {
@@ -92,11 +115,11 @@ describe("detektivens anteckningar", () => {
     const stina = c.rooms.store.things!.s;
     expect(state.talkFor(stina).gives).toBe("talked-to-stina");
     state.give("talked-to-stina");
-    expect(state.talkFor(stina).gives).toBeUndefined();
-    state.give(["clue:handprints", "clue:thread", "clue:teddy"]);
-    expect(state.talkFor(stina).gives).toBe("heard-about-register");
+    expect(state.talkFor(stina).gives).toEqual(["talked-to-stina"]);
+    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales"]);
+    expect(state.talkFor(stina).gives).toEqual(["talked-to-stina", "heard-about-register"]);
     state.give("heard-about-register");
-    expect(state.talkFor(stina).gives).toBeUndefined();
+    expect(state.talkFor(stina).gives).toEqual(["talked-to-stina"]);
     state.give("storeroom-key");
     expect(state.items()).toEqual(["storeroom-key"]);
   });

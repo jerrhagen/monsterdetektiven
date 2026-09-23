@@ -1,5 +1,7 @@
 import type { Case, Clue, Door, Edge, Room, Thing } from "../cases/types";
 import { clueFlag, flagList } from "./caseState";
+import { emergedFlag } from "./monsters";
+import { rollPuzzle } from "./puzzleRoll";
 import { ROOM_COLS, ROOM_ROWS } from "./config";
 
 export type TileKind =
@@ -141,7 +143,7 @@ export function entryPoint(room: ParsedRoom, edge: Edge): { col: number; row: nu
 }
 
 /** Flags set by the game itself rather than by things in the rooms. */
-export const SYSTEM_FLAGS = ["solved"];
+export const SYSTEM_FLAGS = ["solved", "magnifier", "caught"];
 
 /** Set the first time Nora walks into a room. */
 export const visitedFlag = (roomId: string) => `visited:${roomId}`;
@@ -151,13 +153,20 @@ function givableFlags(c: Case): Set<string> {
   const out = new Set<string>(SYSTEM_FLAGS);
   for (const id of Object.keys(c.rooms)) out.add(visitedFlag(id));
   for (const p of Object.values(c.puzzles ?? {})) out.add(p.gives);
+  for (const step of c.finale) if ("give" in step) out.add(step.give);
   for (const room of Object.values(c.rooms)) {
     for (const clueId of Object.values(room.clues ?? {})) out.add(clueFlag(clueId));
-    for (const thing of Object.values(room.things ?? {})) {
+    const monsterThings = (room.monsters ?? []).flatMap((m) => (m.type === "sneaker" ? [m.thing] : []));
+    for (const m of room.monsters ?? []) if (m.type === "sneaker" && m.hideUntil) out.add(emergedFlag(m.sprite));
+    for (const thing of [...Object.values(room.things ?? {}), ...monsterThings]) {
       for (const t of [thing, ...(thing.talkIf ?? [])]) {
         flagList(t.gives).forEach((f) => out.add(f));
         if (t.clue) out.add(clueFlag(t.clue));
       }
+    }
+    if (room.onEnter) {
+      flagList(room.onEnter.gives).forEach((f) => out.add(f));
+      if (room.onEnter.clue) out.add(clueFlag(room.onEnter.clue));
     }
   }
   return out;
@@ -245,23 +254,60 @@ export function validateCase(c: Case): string[] {
       if (id && !c.puzzles?.[id]) errors.push(`I rummet '${room.name}': pusslet '${id}' finns inte.`);
     }
     for (const thing of Object.values(room.things ?? {})) need(thing.puzzleWhen, `${thing.name} (pussel)`);
+    for (const m of room.monsters ?? []) {
+      const points =
+        m.type === "flyer" ? [m.center] : m.type === "sneaker" ? [m.home] : [...m.routes.flat(), ...(m.shelters ?? [])];
+      for (const [col, row] of points) {
+        if (col < 0 || col >= ROOM_COLS || row < 0 || row >= ROOM_ROWS) {
+          errors.push(`I rummet '${room.name}': ett monster är utanför rummet (${col}, ${row}).`);
+        }
+      }
+      if (m.type === "sneaker") {
+        need(m.calmWhen, `${m.thing.name} (lugn)`);
+        need(m.hideUntil?.when, `${m.thing.name} (gömd)`);
+        if (m.thing.puzzle && !c.puzzles?.[m.thing.puzzle]) errors.push(`${m.thing.name}: pusslet '${m.thing.puzzle}' finns inte.`);
+      }
+    }
   }
   for (const [id, p] of Object.entries(c.puzzles ?? {})) {
     const where = `Pusslet '${id}'`;
-    if (p.type === "code" && !/^\d+$/.test(p.answer)) errors.push(`${where}: svaret ska bara vara siffror.`);
-    if (p.type === "order" || p.type === "choice" || p.type === "reveal") {
-      const ids = p.options.map((o) => o.id);
-      const answers = p.type === "order" ? p.answer : [p.answer];
+    let rolled = p;
+    try {
+      rolled = rollPuzzle(id, p).puzzle;
+    } catch (e) {
+      errors.push(`${where}: ${(e as Error).message}`);
+    }
+    if (rolled.type === "code" && !/^\d+$/.test(rolled.answer)) errors.push(`${where}: svaret ska bara vara siffror.`);
+    const optionSets =
+      p.type === "choice" && p.variants
+        ? p.variants.map((v) => ({ options: v.options, answers: [v.answer] }))
+        : rolled.type === "order" || rolled.type === "choice" || rolled.type === "reveal"
+          ? [{ options: rolled.options, answers: rolled.type === "order" ? rolled.answer : [rolled.answer] }]
+          : [];
+    for (const { options, answers } of optionSets) {
+      const ids = options.map((o) => o.id);
       for (const a of answers) if (!ids.includes(a)) errors.push(`${where}: svaret '${a}' finns inte bland valen.`);
     }
+    if (p.type === "order" && p.describe) {
+      for (const key of Object.keys(p.describe)) {
+        if (!p.options.some((o) => o.id === key)) errors.push(`${where}: '${key}' finns inte bland valen.`);
+      }
+    }
     if (p.type === "reveal") {
-      if (p.evidence.length < 2) errors.push(`${where}: behöver minst två bevis.`);
-      for (const e of p.evidence) if (!c.clues[e]) errors.push(`${where}: beviset '${e}' är ingen ledtråd.`);
+      if (p.proof.length < 2) errors.push(`${where}: behöver minst två grupper av bevis.`);
+      for (const e of [...p.proof.flat(), ...Object.keys(p.why ?? {})]) {
+        if (!c.clues[e]) errors.push(`${where}: '${e}' är ingen ledtråd.`);
+      }
     }
   }
 
   c.goals.forEach((g, i) => {
     need(g.doneWhen, `Mål ${i + 1}`);
+    for (const h of g.hints) {
+      if (typeof h === "string") continue;
+      need(h.when, `Tips i mål ${i + 1}`);
+      need(h.skipWhen, `Tips i mål ${i + 1}`);
+    }
     if (g.hints.length === 0) errors.push(`Mål ${i + 1} ('${g.text}') har inga tips från Ester.`);
   });
   return errors;

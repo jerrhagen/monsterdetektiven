@@ -115,7 +115,8 @@ body {
   color: #8fd14f;
 }
 
-.book-button {
+.book-button,
+.music-button {
   pointer-events: auto;
   cursor: pointer;
   font: inherit;
@@ -127,7 +128,8 @@ body {
   color: #f4ecff;
 }
 
-.book-button kbd {
+.book-button kbd,
+.music-button kbd {
   font-size: calc(var(--px) * 3.5);
 }
 
@@ -156,6 +158,16 @@ body {
   height: calc(var(--px) * 8);
   vertical-align: middle;
   image-rendering: pixelated;
+}
+
+.toast.scare {
+  background: #c0182c;
+  color: #fff;
+  font-family: "Creepster", cursive;
+  font-weight: 400;
+  font-size: calc(var(--px) * 12);
+  letter-spacing: calc(var(--px) * 0.5);
+  box-shadow: 0 calc(var(--px) * 1) 0 #5a0a14;
 }
 
 .toast.leaving {
@@ -672,4 +684,188 @@ body {
 @keyframes confetti-fall {
   0% { transform: translate(0, 0) rotate(0); opacity: 1; }
   100% { transform: translate(calc(var(--drift) * var(--px)), calc(var(--px) * 210)) rotate(var(--spin)); opacity: 0.8; }
+}
+
+/* ---------- Case intro and result ---------- */
+
+.title .progress {
+  margin: calc(var(--px) * 3) 0 0;
+  font-size: calc(var(--px) * 5);
+  color: #ffd66b;
+}
+
+.case-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: rgba(7, 4, 15, 0.92);
+}
+
+.case-intro .case-number {
+  font-size: calc(var(--px) * 7);
+  color: #cdb8ec;
+  letter-spacing: calc(var(--px) * 1);
+}
+
+.case-screen h1 {
+  margin: 0 0 calc(var(--px) * 4);
+  font-family: "Creepster", cursive;
+  font-weight: 400;
+  font-size: calc(var(--px) * 22);
+  color: #8fd14f;
+  text-shadow: 0 calc(var(--px) * 1.5) 0 #14101c;
+}
+
+.case-text p {
+  margin: 0 0 calc(var(--px) * 1.5);
+  font-size: calc(var(--px) * 7);
+}
+
+.case-screen button.start,
+.case-result .buttons button {
+  margin-top: calc(var(--px) * 5);
+  padding: calc(var(--px) * 2) calc(var(--px) * 8);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: calc(var(--px) * 7);
+  background: #5cc46a;
+  color: #14101c;
+  border: none;
+  border-radius: calc(var(--px) * 3);
+  box-shadow: 0 calc(var(--px) * 1.2) 0 #1a1024;
+  cursor: pointer;
+}
+
+.case-screen kbd {
+  font-family: inherit;
+  font-size: calc(var(--px) * 4);
+  opacity: 0.7;
+}
+
+.case-result {
+  justify-content: flex-start;
+  overflow: auto;
+}
+
+.result-page {
+  padding: calc(var(--px) * 5) calc(var(--px) * 10);
+}
+
+.case-result h1 {
+  font-size: calc(var(--px) * 18);
+  margin-bottom: 0;
+}
+
+.stars {
+  font-size: calc(var(--px) * 18);
+  line-height: 1;
+}
+
+.star {
+  color: #3d3350;
+}
+
+.star.on {
+  color: #ffd66b;
+  text-shadow: 0 0 calc(var(--px) * 4) rgba(255, 214, 107, 0.6);
+}
+
+.star-reasons {
+  list-style: none;
+  padding: 0;
+  margin: calc(var(--px) * 2) 0;
+  font-size: calc(var(--px) * 5);
+  color: #8a7a9a;
+}
+
+.star-reasons .on {
+  color: #f4ecff;
+}
+
+.star-reasons small {
+  font-size: calc(var(--px) * 4);
+  opacity: 0.8;
+}
+
+.case-result .time {
+  font-size: calc(var(--px) * 6);
+  margin: calc(var(--px) * 2) 0;
+}
+
+.case-result h2 {
+  margin: calc(var(--px) * 3) 0 calc(var(--px) * 2);
+  font-size: calc(var(--px) * 7);
+  color: #ffd66b;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 4);
+}
+
+.monster-card {
+  position: relative;
+  width: calc(var(--px) * 58);
+  padding: calc(var(--px) * 3);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border-radius: calc(var(--px) * 3);
+  border: calc(var(--px) * 1) solid #8a2346;
+  box-shadow: 0 calc(var(--px) * 1.5) 0 #0d0718;
+}
+
+.monster-card img {
+  width: calc(var(--px) * 26);
+  height: calc(var(--px) * 26);
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.monster-card b {
+  display: block;
+  font-size: calc(var(--px) * 6);
+}
+
+.monster-card p {
+  margin: calc(var(--px) * 1) 0 0;
+  font-size: calc(var(--px) * 4.2);
+}
+
+.monster-card .badge {
+  position: absolute;
+  top: calc(var(--px) * -3);
+  right: calc(var(--px) * -2);
+  padding: calc(var(--px) * 0.5) calc(var(--px) * 2);
+  background: #c0182c;
+  color: #fff;
+  font-weight: 700;
+  font-size: calc(var(--px) * 4);
+  border-radius: calc(var(--px) * 2);
+  transform: rotate(8deg);
+}
+
+.fact {
+  max-width: calc(var(--px) * 230);
+  margin: calc(var(--px) * 5) auto 0;
+  font-size: calc(var(--px) * 5.5);
+}
+
+.fact b {
+  color: #8fd14f;
+}
+
+.case-result .buttons {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 4);
+}
+
+.case-result .buttons .to-title {
+  background: #3d3d50;
+  color: #f4ecff;
 }

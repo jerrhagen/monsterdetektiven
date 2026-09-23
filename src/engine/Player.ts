@@ -94,6 +94,14 @@ export class Player {
     this.sync(this.airborne ? Math.sin((Math.min(this.airTime, JUMP_TIME) / JUMP_TIME) * Math.PI) * JUMP_HEIGHT : 0);
   }
 
+  /** Puts Nora somewhere directly, e.g. while a monster carries her. */
+  place(x: number, y: number, lift = 0): void {
+    this.x = x;
+    this.y = y;
+    this.airTime = -1;
+    this.sync(lift);
+  }
+
   /** The tile under the middle of Nora's feet. */
   feetTile(): { col: number; row: number } {
     return { col: Math.floor(this.x / TILE), row: Math.floor((this.y - FEET_H / 2) / TILE) };
