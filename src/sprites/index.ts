@@ -19,6 +19,7 @@ import { case3Sprites } from "./case3";
 import { case4Sprites } from "./case4";
 import { case5Sprites } from "./case5";
 import { case6Sprites } from "./case6";
+import { mapSprites } from "./map";
 import { alertBubble, ester } from "./ester";
 import { magnifier, shadowEyes, trashBin, viskanGhost } from "./monsters";
 import { customerBook, fingerDots, fladderHang, gBlock, gCurly, gDotted, gThin, gift, sleeveScrap } from "./clues";
@@ -105,4 +106,5 @@ export const sprites: Record<string, PixelSprite> = {
   ...case4Sprites,
   ...case5Sprites,
   ...case6Sprites,
+  ...mapSprites,
 };

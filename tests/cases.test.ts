@@ -101,6 +101,10 @@ describe("detektivens anteckningar", () => {
     expect(state.has("talked-to-stina")).toBe(true);
     expect(state.has("heard-about-register")).toBe(true);
     expect(state.currentGoalIndex()).toBe(2);
+    // She first tells her own clue (about the teddy), so it's heard and ends up in the book.
+    expect(talk.clue).toContain("teddyMoved");
+    expect(talk.talk.join(" ")).toContain("nallen");
+    expect(talk.talk.join(" ")).toContain("Så många ledtrådar");
   });
 
   it("Ester tipsar inte om sådant man redan gjort", () => {

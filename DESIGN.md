@@ -53,7 +53,7 @@ Spelet ses uppifrån i 2D med pixelgrafik. Det är lugnt och utforskande och ska
 Titelskärm (välj spelare) → Stadskartan (välj fall) → Introkort → FALLET → Avslöjandet → Fånga den skyldige → Slutscen → Stjärnor och monsterkort → tillbaka till kartan
 ```
 
-På **stadskartan** finns sex platser. Nästa fall låses upp när det förra är löst. Kartan visar stjärnor per fall, hur många **månstensbitar** man har (◆), knappen **🃏 Monsterkort** (K) som visar hela samlingen (kort man inte har visas som svarta skuggor), **⚙️ Inställningar** (I) för hur snart Ester ger tips och för musiken, och **👥** för att byta spelare.
+**Stadskartan** är ritad efter huvudarkitektens teckning (`assets/bilder/teckningar/stadskarta.jpg`): bäcken som slingrar sig runt ängen, leksaksaffären med det runda orangea taket, bageriet med regnbågstaket, det höga klocktornet med rosa spira, det orangea biblioteket, festtältet och skogen med röda bär och kantareller. Byggnaderna är pixelbilder i `src/sprites/map.ts`. På kartan finns sex platser. Nästa fall låses upp när det förra är löst. Kartan visar stjärnor per fall, hur många **månstensbitar** man har (◆), knappen **🃏 Monsterkort** (K) som visar hela samlingen (kort man inte har visas som svarta skuggor), **⚙️ Inställningar** (I) för hur snart Ester ger tips och för musiken, och **👥** för att byta spelare.
 
 **Inne i ett fall:**
 1. **Uppdraget.** Någon berättar vad som hänt ("Mina bullar är borta!").

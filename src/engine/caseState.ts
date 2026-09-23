@@ -97,11 +97,20 @@ export class CaseState {
   /**
    * Which talk a thing uses right now. The thing's own `gives` always comes along –
    * "has talked to Stina" must be true whichever of her lines Nora heard first.
+   * If Nora hasn't got the thing's own clue yet, it first says its own lines (where the
+   * clue is told) and then the current ones – so the clue is heard, not just added.
    */
   talkFor(thing: Thing): Talk {
     const variant = thing.talkIf?.find((t) => this.has(t.when));
     if (!variant) return thing;
-    return { ...variant, gives: [...flagList(thing.gives), ...flagList(variant.gives)] };
+    const gives = [...flagList(thing.gives), ...flagList(variant.gives)];
+    const missed = flagList(thing.clue).some((id) => !this.hasClue(id));
+    if (!missed) return { ...variant, gives };
+    return {
+      talk: [...thing.talk, ...variant.talk],
+      gives,
+      clue: [...new Set([...flagList(thing.clue), ...flagList(variant.clue)])],
+    };
   }
 
   /** Index of the talk a thing uses right now (-1 = its own talk). */

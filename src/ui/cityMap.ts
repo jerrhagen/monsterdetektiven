@@ -8,12 +8,12 @@ import { spriteUrl } from "./spriteImage";
 
 /** Where each case lies on the town map (game pixels), in case order. */
 export const MAP_SPOTS: { x: number; y: number; place: string }[] = [
-  { x: 62, y: 62, place: "Leksaksaffären" },
-  { x: 150, y: 44, place: "Bageriet" },
-  { x: 250, y: 62, place: "Biblioteket" },
-  { x: 58, y: 146, place: "Skogen" },
-  { x: 160, y: 104, place: "Klocktornet" },
-  { x: 258, y: 146, place: "Torget" },
+  { x: 60, y: 62, place: "Leksaksaffären" },
+  { x: 220, y: 58, place: "Bageriet" },
+  { x: 268, y: 94, place: "Biblioteket" },
+  { x: 70, y: 134, place: "Skogen" },
+  { x: 170, y: 116, place: "Klocktornet" },
+  { x: 232, y: 158, place: "Torget" },
 ];
 
 let el: HTMLDivElement | null = null;
@@ -62,7 +62,7 @@ export function showCityMap(selected: number, actions: MapActions): void {
         const record = c ? save.cases[c.id] : undefined;
         const stars = record ? `${"★".repeat(record.stars)}${"☆".repeat(3 - record.stars)}` : "";
         return `<button class="map-spot ${i === chosen ? "chosen" : ""} ${open ? "" : "locked"}" data-i="${i}"
-            style="left: calc(var(--px) * ${spot.x}); top: calc(var(--px) * ${spot.y + 14})">
+            style="left: calc(var(--px) * ${spot.x}); top: calc(var(--px) * ${spot.y + 6})">
           <b>${i + 1}. ${escape(c?.title ?? spot.place)}</b>
           <small>${!c ? "Kommer snart" : open ? stars || "Nytt fall!" : "🔒 Lös fallet innan"}</small>
         </button>`;

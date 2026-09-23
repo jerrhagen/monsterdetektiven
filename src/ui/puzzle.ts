@@ -136,6 +136,7 @@ function button(label: string, className = ""): HTMLButtonElement {
 function optionButton(o: PuzzleOption, index: number): HTMLButtonElement {
   const b = document.createElement("button");
   b.className = "option";
+  b.lang = "sv";
   b.innerHTML = `<span class="key">${index + 1}</span>${o.sprite ? `<img src="${spriteUrl(o.sprite)}" alt="">` : ""}<span></span>`;
   b.querySelector("span:last-child")!.textContent = o.label;
   return b;
@@ -493,6 +494,7 @@ function clocks(p: ClockPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   times.forEach((t, i) => {
     const b = document.createElement("button");
     b.className = "option";
+  b.lang = "sv";
     b.innerHTML = `<span class="key">${i + 1}</span>`;
     b.appendChild(drawClock(t.hour, t.minute));
     b.addEventListener("click", () => pick(t.id));
