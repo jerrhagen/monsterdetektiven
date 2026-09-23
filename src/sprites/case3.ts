@@ -570,6 +570,42 @@ export const cellarMirrorNote: PixelSprite = {
   ],
 };
 
+/** The window at the top of the library tower: blue sky, a cloud and red town roofs far below. */
+export const towerWindow: PixelSprite = {
+  palette: {
+    ".": null,
+    o: "#1a1024",
+    F: "#a8744a", // frame
+    f: "#7a4f2a", // window bars
+    S: "#b8dcff", // sky
+    s: "#8ac0ec", // sky, lower
+    w: "#ffffff", // cloud
+    r: "#c95050", // roofs
+    R: "#a33a3a", // roofs, dark
+    g: "#4ea84a", // a treetop
+  },
+  frames: [
+    [
+      E16,
+      ".....ooooooo....",
+      "...ooFFFFFFFoo..",
+      "..oFSSSSfSSSSFo.",
+      "..oFSwwSfSSSSFo.",
+      "..oFwwwwfSSwSFo.",
+      "..oFSSSSfSwwwFo.",
+      "..oFfffffffffFo.",
+      "..oFssssfssssFo.",
+      "..oFsrrsfsssgFo.",
+      "..oFrrrrfsrrgFo.",
+      "..oFRRRRfrrrrFo.",
+      "..oFRRRRfRRRRFo.",
+      "..oFFFFFFFFFFFo.",
+      ".oFFFFFFFFFFFFFo",
+      ".oooooooooooooo.",
+    ],
+  ],
+};
+
 export const case3Sprites: Record<string, PixelSprite> = {
   bodil,
   pelle,
@@ -589,4 +625,5 @@ export const case3Sprites: Record<string, PixelSprite> = {
   bladdraFort,
   libraryChest,
   cellarMirrorNote,
+  towerWindow,
 };

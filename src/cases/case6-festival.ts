@@ -47,16 +47,16 @@ export const case6: Case = {
       name: "Torget",
       theme: "square",
       layout: [
-        "####################",
-        "####################",
+        "######DD############",
+        "######..############",
         "#HHH.l..t.p...j.HH.#",
         "#.....3............#",
         "#...2....UU.....4.H#",
-        "D...q....oUs..x...H#",
-        "D........UU........#",
+        "#...q....oUs..x...H#",
+        "#........UU........#",
         "#.1.....g.....T....#",
-        "#..KKb........k....#",
-        "#..KKm.........HH..#",
+        "D..KKb........k....#",
+        "D..KKm.........HH..#",
         "#HH.......N....HH..#",
         "#########DD#########",
       ],
@@ -89,7 +89,7 @@ export const case6: Case = {
             },
             {
               when: ["park-open", ...SQUARE_CLUES],
-              talk: ["Du har nyckeln till parken!", "Spåren på torget leder ditåt. Grinden är till vänster."],
+              talk: ["Du har nyckeln till parken!", "Spåren på torget leder ditåt. Grinden är längst upp på torget."],
             },
             {
               when: SQUARE_CLUES,
@@ -142,7 +142,7 @@ export const case6: Case = {
             },
             {
               when: "park-open",
-              talk: ["Tack för hjälpen!", "Grinden till parken är öppen nu. Den är till vänster."],
+              talk: ["Tack för hjälpen!", "Grinden till parken är öppen nu. Den är längst upp på torget."],
             },
           ],
           puzzle: "lanterns",
@@ -273,8 +273,17 @@ export const case6: Case = {
         },
       ],
       doors: [
-        { at: "left", to: "park", requires: "park-open", lockedText: "Grinden till parken är låst." },
+        { at: "top", to: "park", requires: "park-open", lockedText: "Grinden till parken är låst." },
         { at: "bottom", lockedText: "Vi kan inte gå hem nu! Det är ju fest – och ett mysterium." },
+        // A hidden hatch with steps down to a tunnel that comes out in Skuggan's cave – a shortcut
+        // back once Nora has found the ring of lights. The case never needs it.
+        {
+          at: "left",
+          to: "cave",
+          stairs: "down",
+          requires: "clue:lanternCircle",
+          lockedText: "En trappa ner under torget! Men luckan sitter fast. Den går nog bara att öppna underifrån.",
+        },
       ],
     },
 
@@ -282,18 +291,18 @@ export const case6: Case = {
       name: "Stadsparken",
       theme: "forest",
       layout: [
-        "########DD##########",
-        "#TT....t....RR....T#",
-        "#T..........R..a...#",
-        "#...~~.............#",
-        "#...~~..TT.........#",
-        "#.......TT..3......D",
-        "#..u...............D",
+        "####################",
+        "#TT.........RR....T#",
+        "#T..........R..a...D",
+        "#...~~.............D",
+        "#...~~..TT........t#",
+        "#.......TT..3......#",
+        "#..u...............#",
         "#............TT....#",
         "#..~~..............#",
         "#TT........~.......#",
         "#TTT.............TT#",
-        "####################",
+        "########DD##########",
       ],
       things: {
         t: {
@@ -383,8 +392,8 @@ export const case6: Case = {
         { type: "sleeper", sprite: "mossjatte", at: [6, 6] },
       ],
       doors: [
-        { at: "right", to: "square" },
-        { at: "top", to: "cave", requires: "cave-open", lockedText: "Grottan! Men Trattis vaktar ingången." },
+        { at: "bottom", to: "square" },
+        { at: "right", to: "cave", stairs: "down", requires: "cave-open", lockedText: "Grottan! Men Trattis vaktar ingången." },
       ],
     },
 
@@ -397,13 +406,13 @@ export const case6: Case = {
         "#RR....d....RRR..Le#",
         "#R.................#",
         "#...RR.............#",
-        "#.1.RR.......LL....#",
-        "#.........b........#",
+        "#.1.RR.......LL....D",
+        "#.........b........D",
         "#..LL..........RR..#",
-        "#..LL..........RR..#",
-        "#R.................#",
+        "D..LL..........RR..#",
+        "D..................#",
         "#RR..............RR#",
-        "#########DD#########",
+        "####################",
       ],
       things: {
         b: {
@@ -449,7 +458,17 @@ export const case6: Case = {
         { type: "patroller", sprite: "skuggkryp", path: [[6, 3], [16, 3]], speed: 28 },
         { type: "patroller", sprite: "skuggkryp", path: [[5, 8], [14, 8]], speed: 24 },
       ],
-      doors: [{ at: "bottom", to: "park" }],
+      doors: [
+        { at: "left", to: "park", stairs: "up" },
+        // Skuggan's own tunnel up to the hatch on the square – a shortcut back, once the ring is found.
+        {
+          at: "right",
+          to: "square",
+          stairs: "up",
+          requires: "clue:lanternCircle",
+          lockedText: "En smal trappa upp i mörkret! Men först vill jag se vad som lyser mitt i grottan.",
+        },
+      ],
     },
   },
 
@@ -758,9 +777,9 @@ export const case6: Case = {
     { reveal: "culprit", sprite: "skuggNightLight" },
     { frame: "culprit", index: 2 },
     { say: "Skuggan", lines: ["Ett eget… nattljus?", "Nu behöver jag aldrig försvinna i mörkret igen!"] },
-    { enter: "trattis", sprite: "trattis", from: [0, 5], to: [3, 6] },
-    { enter: "viskan", sprite: "viskanGhost", from: [0, 6], to: [2, 4] },
-    { enter: "fladder", sprite: "fladder", from: [0, 5], to: [6, 6] },
+    { enter: "trattis", sprite: "trattis", from: [6, 1], to: [3, 6] },
+    { enter: "viskan", sprite: "viskanGhost", from: [7, 1], to: [2, 4] },
+    { enter: "fladder", sprite: "fladder", from: [6, 1], to: [6, 6] },
     { say: "Trattis", lines: ["Vi hörde att det var fest!"] },
     { say: "Viskan", lines: ["Psssst… välkommen, Skuggan…", "Hihi. Jag lyser, så jag kan vara din kompis i mörkret."] },
     { say: "Fladder", lines: ["Jag tar mörkret. Du tar ljuset.", "Okej?"] },
@@ -811,7 +830,7 @@ export const case6: Case = {
         { text: "Bläddras fråga: {shadows:hint}", skipWhen: "shadow-lesson" },
         { text: "Prata med Bläddra igen – hon vet något om Månstenen.", when: "shadow-lesson", skipWhen: "clue:moonBook" },
         {
-          text: "Ledtrådarna på marken ligger vid lyktorna: till vänster, uppe till vänster och uppe till höger. Och nära grinden!",
+          text: "Ledtrådarna på marken ligger vid lyktorna: till vänster, uppe till vänster och uppe till höger. Och nere till vänster, nära bullståndet!",
           skipWhen: ["clue:blackPrints", "clue:blueFluff", "clue:cog", "clue:mothDust"],
         },
       ],
@@ -820,10 +839,10 @@ export const case6: Case = {
       text: "Ta dig in i parken",
       doneWhen: "visited:park",
       hints: [
-        { text: "Parken är bakom grinden till vänster. Men den är låst…", skipWhen: "park-open" },
+        { text: "Parken är bakom grinden längst upp på torget. Men den är låst…", skipWhen: "park-open" },
         { text: "Kugg-trollet har nyckeln. Prata med honom!", skipWhen: "park-open" },
         { text: "Räkna: {total} minus {lit}. Ta tiotalen först, sen entalen!", skipWhen: "park-open" },
-        { text: "Du har nyckeln! Gå genom grinden till vänster.", when: "park-open" },
+        { text: "Du har nyckeln! Gå genom grinden längst upp på torget.", when: "park-open" },
       ],
     },
     {
@@ -842,10 +861,10 @@ export const case6: Case = {
       text: "Ta dig in i grottan",
       doneWhen: "visited:cave",
       hints: [
-        { text: "Grottan är längst upp i parken. Men Trattis vaktar den.", skipWhen: "cave-open" },
+        { text: "Trappan ner till grottan är uppe till höger i parken. Men Trattis vaktar den.", skipWhen: "cave-open" },
         { text: "Prata med Trattis och räkna hennes svampar!", skipWhen: "cave-open" },
         { text: "Talen ökar med {mstep} varje gång: {m1}, {m2}, {m3}, {m4} … lägg till {mstep} en gång till!", skipWhen: "cave-open" },
-        { text: "Trattis släpper förbi dig! Gå in i grottan längst upp.", when: "cave-open" },
+        { text: "Trattis släpper förbi dig! Gå ner för trappan uppe till höger.", when: "cave-open" },
       ],
     },
     {
@@ -862,7 +881,7 @@ export const case6: Case = {
       text: "Vem tar ljusen – och varför?",
       doneWhen: "solved",
       hints: [
-        "Gå tillbaka till Stina på torget och berätta vad du vet.",
+        "Gå tillbaka till Stina på torget och berätta vad du vet. Trappan till höger i grottan är en genväg dit!",
         "Vem smög längs marken, svart som bläck? Och var hamnade ljusen?",
         "Läs lappen från parken igen: när ska ljusen lämnas tillbaka? Och tänk på teckningen: hur kändes det i mörkret?",
         "Spåren, vittnena, lappen och ringen av ljus visar VEM. Lappen, boksidan, ljusringen och teckningen visar VARFÖR.",

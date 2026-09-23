@@ -14,6 +14,8 @@ import type { Case } from "./types";
 //                  and Viskan (who can't carry anything) hears someone sound out B… O… K… at night.
 // The first case with an unreliable witness: Pelle says he saw the ghost, but he only heard the rumour.
 // The reveal asks who it is (reading room + cellar) and why (library hall + cellar).
+// Route: hall →top door→ reading room →stairs down (left)→ cellar. From the hall, stairs up (right)
+// lead to the top of the library tower – optional, with nothing but the secret egg and a view.
 // Ugo only tells what it LOOKED like, Viskan only what she HEARD – so each clue shows one thing.
 
 const HALL_CLUES = ["clue:messyBooks", "clue:eraserCrumbs", "clue:missingList", "clue:locked", "clue:pelleSaw"];
@@ -42,16 +44,16 @@ export const case3: Case = {
       name: "Biblioteket",
       theme: "library",
       layout: [
-        "####################",
-        "####################",
+        "#####DD#############",
+        "#####..#############",
         "#HHHH..HHHH...KlK..#",
         "#.............K.b..#",
         "#..v..........K....#",
         "#..................#",
-        "#.HH..HH..1...HH...D",
-        "#.HH..HH......HH...D",
-        "#..................#",
-        "#..pKK2............#",
+        "#.HH..HH..1...HH...#",
+        "#.HH..HH......HH...#",
+        "#..................D",
+        "#..pKK2............D",
         "#......s..N........#",
         "#########DD#########",
       ],
@@ -92,7 +94,7 @@ export const case3: Case = {
             },
             {
               when: "reading-key",
-              talk: ["Du hittade nyckeln! Och böckerna står i ABC-ordning. Tack!", "Läsrummet är bakom dörren till höger."],
+              talk: ["Du hittade nyckeln! Och böckerna står i ABC-ordning. Tack!", "Läsrummet är bakom dörren uppe till vänster."],
             },
             {
               when: "talked-to-bodil",
@@ -192,9 +194,57 @@ export const case3: Case = {
         },
       ],
       doors: [
-        { at: "right", to: "reading", requires: "reading-key", lockedText: "Dörren till läsrummet är låst." },
+        { at: "top", to: "reading", requires: "reading-key", lockedText: "Dörren till läsrummet är låst." },
+        // Up into the library tower – optional, only the secret egg is up there.
+        { at: "right", to: "tower", stairs: "up" },
         { at: "bottom", lockedText: "Vi kan inte gå än. Vi har ett mysterium att lösa!" },
       ],
+    },
+
+    // The top of the tall tower on the library's right side. Optional: no clues, nothing needed.
+    tower: {
+      name: "Tornet",
+      theme: "library",
+      layout: [
+        "####################",
+        "#########w##########",
+        "#####HH.....HH######",
+        "#####........g######",
+        "#####.........######",
+        "#####..Kb.....######",
+        "#####.........######",
+        "#####.........######",
+        "D.............######",
+        "D.............######",
+        "#####HH.......######",
+        "####################",
+      ],
+      things: {
+        w: {
+          name: "Tornfönstret",
+          sprite: "towerWindow",
+          on: "#",
+          talk: ["Vilken utsikt! Man ser ut över hela staden.", "Alla hus ser ut som små leksakshus härifrån."],
+        },
+        b: {
+          name: "Den dammiga boken",
+          sprite: "libraryBook",
+          on: "K",
+          talk: ["En tjock, gammal bok. Den är full av damm. ATJO!", "Den har nog ingen läst på hundra år."],
+        },
+        g: {
+          name: "Något glittrar",
+          sprite: "monsterEgg",
+          talk: ["Ett hemligt monsterägg, högst upp i tornet!", "Det är varmt… och det luktar gammal bok."],
+          gives: "egg",
+          hideWhen: "egg",
+        },
+      },
+      onEnter: {
+        name: "Ester",
+        talk: ["Puh, vilken lång trappa! Nu är vi högst upp i tornet.", "Här uppe är det dammigt och alldeles tyst."],
+      },
+      doors: [{ at: "left", to: "hall", stairs: "down" }],
     },
 
     reading: {
@@ -204,15 +254,15 @@ export const case3: Case = {
         "####################",
         "####################",
         "#HHHH..HHHH..HHHHKm#",
+        "D.1................#",
+        "D..KK....KK....KK..#",
         "#..................#",
-        "#..KK....KK....KK..#",
+        "#.....HH.....HH....#",
+        "#.....HH.....HH....#",
         "#..................#",
-        "D.....HH.....HH....#",
-        "D.....HH.....HH....#",
+        "#..KK..........KK..#",
         "#..................#",
-        "#..KK.....1....KK..#",
-        "#..................#",
-        "#########DD#########",
+        "#####DD#############",
       ],
       things: {
         m: {
@@ -274,13 +324,14 @@ export const case3: Case = {
         ],
       },
       doors: [
-        { at: "left", to: "hall" },
+        { at: "bottom", to: "hall" },
         {
-          at: "bottom",
+          at: "left",
           to: "cellar",
+          stairs: "down",
           requires: "cellar-open",
           puzzle: "rhyme-lock",
-          lockedText: "Källardörren har ett gammalt lås med ord på.",
+          lockedText: "Nere i trappan sitter källardörren. Den har ett gammalt lås med ord på.",
         },
       ],
     },
@@ -289,10 +340,10 @@ export const case3: Case = {
       name: "Källaren",
       theme: "storage",
       layout: [
-        "#########DD#########",
+        "####################",
         "#LL.x............LL#",
-        "#L...............Lg#",
-        "#.....LL......LL...#",
+        "#L...............L.D",
+        "#.....LL......LL...D",
         "#..c..LL......LL...#",
         "#..................#",
         "#..................#",
@@ -338,13 +389,6 @@ export const case3: Case = {
             "På väggen sitter en lapp. Skriften är spegelvänd!",
             "Läs den baklänges. Vad står det?",
           ],
-        },
-        g: {
-          name: "Något glittrar",
-          sprite: "monsterEgg",
-          talk: ["Ett hemligt monsterägg, bakom lådorna!", "Det är varmt… och det luktar gammal bok."],
-          gives: "egg",
-          hideWhen: "egg",
         },
       },
       clues: { "1": "wormTrail", "2": "practiceSheet" },
@@ -402,7 +446,7 @@ export const case3: Case = {
           "Akta dig för den där dammtussen! Smit förbi när den vänder.",
         ],
       },
-      doors: [{ at: "top", to: "reading" }],
+      doors: [{ at: "right", to: "reading", stairs: "up" }],
     },
   },
 
@@ -767,7 +811,8 @@ export const case3: Case = {
         "Du ska få ett eget lånekort. Och vi läser tillsammans varje dag!",
       ],
     },
-    { enter: "viskan", sprite: "viskanGhost", from: [18, 6], to: [15, 8] },
+    // Viskan floats up from the cellar, in through the door to the reading room.
+    { enter: "viskan", sprite: "viskanGhost", from: [6, 1], to: [15, 8] },
     { say: "Viskan", lines: ["Hihihi… Så det var inte jag. Det sa jag ju!", "Får jag också vara med? Jag älskar spökhistorier."] },
     {
       say: "Bläddra",
@@ -829,13 +874,13 @@ export const case3: Case = {
       text: "Ta dig in i läsrummet",
       doneWhen: "visited:reading",
       hints: [
-        { text: "Läsrummet är bakom dörren till höger. Men den är låst…", skipWhen: "reading-key" },
+        { text: "Läsrummet är bakom dörren uppe till vänster. Men den är låst…", skipWhen: "reading-key" },
         { text: "Bodil sa att nyckeln ligger på bokvagnen.", skipWhen: "reading-key" },
         {
           text: "Ställ böckerna i ABC-ordning. A kommer först – och Å, Ä, Ö kommer allra sist!",
           skipWhen: "reading-key",
         },
-        { text: "Du har nyckeln! Gå in genom dörren till höger.", when: "reading-key" },
+        { text: "Du har nyckeln! Gå in genom dörren uppe till vänster.", when: "reading-key" },
       ],
     },
     {
@@ -850,17 +895,17 @@ export const case3: Case = {
         { text: "Hjälp Ugo med hans ord: {spelling:hint}", skipWhen: "ugo-helped" },
         { text: "Nu vill Ugo berätta något. Göm dig tills han blir trött och vilar – prata sen med honom igen!", when: "ugo-helped", skipWhen: "clue:ugoSaw" },
         { text: "Det står en bok på ett ställ uppe till höger.", skipWhen: "clue:moonBook" },
-        { text: "Titta på golvet nära dörren längst ner.", skipWhen: "clue:bookLine" },
+        { text: "Titta på golvet nära trappan till vänster.", skipWhen: "clue:bookLine" },
       ],
     },
     {
       text: "Ta dig ner i källaren",
       doneWhen: "visited:cellar",
       hints: [
-        { text: "Källardörren längst ner har ett lås med ord.", skipWhen: "cellar-open" },
+        { text: "Trappan till källaren är till vänster. Källardörren har ett lås med ord.", skipWhen: "cellar-open" },
         { text: "Ord som rimmar slutar likadant. Bok – klok!", skipWhen: "cellar-open" },
         { text: "Säg orden högt! Katt rimmar på hatt, och sol rimmar på stol.", skipWhen: "cellar-open" },
-        { text: "Låset är öppet! Gå ner genom dörren längst ner.", when: "cellar-open" },
+        { text: "Låset är öppet! Gå ner för trappan till vänster.", when: "cellar-open" },
       ],
     },
     {

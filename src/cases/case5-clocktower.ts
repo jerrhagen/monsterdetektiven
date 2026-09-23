@@ -46,7 +46,7 @@ export const case5: Case = {
       name: "Torget",
       theme: "square",
       layout: [
-        "#########DD#########",
+        "######DD############",
         "#TT.....k.........T#",
         "#T..........c.....T#",
         "#.......UUUU.......#",
@@ -179,18 +179,18 @@ export const case5: Case = {
       name: "Trappan i tornet",
       theme: "tower",
       layout: [
-        "#########DD#########",
-        "#x......#..#.....HH#",
-        "#.......#..#.......#",
+        "####################",
+        "#x......#..#.HH....D",
+        "#.......#..#.......D",
         "#..LL..........LL..#",
         "#..LL.....1....LL..#",
         "#w.................#",
         "#.....GG.....HH..p.#",
         "#.....GG.....HH....#",
-        "#..HH..............#",
-        "#..HH.......LL....k#",
-        "#...........LL.....#",
-        "#########DD#########",
+        "##.HH..............#",
+        "##.HH.......LL....k#",
+        "###.........LL....##",
+        "######DD############",
       ],
       things: {
         k: {
@@ -303,8 +303,9 @@ export const case5: Case = {
       doors: [
         { at: "bottom", to: "square" },
         {
-          at: "top",
+          at: "right",
           to: "clockwork",
+          stairs: "up",
           requires: "hatch-open",
           puzzle: "hatch-code",
           lockedText: "Luckan upp till urverket är låst med ett kodlås.",
@@ -325,9 +326,9 @@ export const case5: Case = {
         "#..................#",
         "#..p.............c.#",
         "#.GG...........HH..#",
-        "#.GG.b.........HH.g#",
-        "#..................#",
-        "#########DD#########",
+        "D.GG.b.........HH.g#",
+        "D..................#",
+        "####################",
       ],
       things: {
         m: {
@@ -420,7 +421,7 @@ export const case5: Case = {
           "Och… sprang något litet förbi där borta? Något som LYSTE?",
         ],
       },
-      doors: [{ at: "bottom", to: "stairs" }],
+      doors: [{ at: "left", to: "stairs", stairs: "down" }],
     },
   },
 
@@ -675,7 +676,7 @@ export const case5: Case = {
     { say: "Ester", lines: ["En bit av Månstenen!", "Den lyser precis som de andra bitarna."] },
     { say: "Kugg-trollet", lines: ["Ta den, Nora. Du samlar ju på dem."] },
     { give: "moonshard" },
-    { enter: "knut", sprite: "clockKeeper", from: [9, 11], to: [9, 8] },
+    { enter: "knut", sprite: "clockKeeper", from: [0, 10], to: [4, 10] },
     { say: "Tornvakten Knut", lines: ["Kugg-trollet… förlåt. Jag trodde att det var du.", "Du ville ju bara hjälpa till."] },
     {
       say: "Kugg-trollet",
@@ -772,7 +773,7 @@ export const case5: Case = {
       text: "Ta dig upp till urverket",
       doneWhen: "visited:clockwork",
       hints: [
-        { text: "Luckan högst upp är låst med en kod.", skipWhen: "hatch-open" },
+        { text: "Trappan uppe till höger leder till en lucka. Den är låst med en kod.", skipWhen: "hatch-open" },
         { text: "Titta på talen i trappan. Hur mycket större blir talet varje gång?", skipWhen: "hatch-open" },
         { text: "Talen ökar med {seqStep} varje gång. Vad kommer efter {seqD}?", skipWhen: "hatch-open" },
         { text: "Luckan är öppen! Klättra upp.", when: "hatch-open" },

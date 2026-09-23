@@ -209,7 +209,7 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 
 ### Fall 3: Spöket i biblioteket (`case3-library.ts`)
 
-**Rum:** Biblioteket → Läsrummet → Källaren. **Misstänkta:** Viskan, Pelle, bibliotekarien Bodil, Ugo (flygande uppslagsbok).
+**Rum:** Biblioteket → Läsrummet → (trappa ner) Källaren, och ett frivilligt rum högst upp i Tornet (trappa upp från biblioteket) där monsterägget ligger. **Misstänkta:** Viskan, Pelle, bibliotekarien Bodil, Ugo (flygande uppslagsbok).
 
 **Sanningen:** Bokmalen Bläddra lånar lätta böcker på nätterna för att öva läsning ("B… O… K…" lät som ett spöke). Den blå lampan är en månstensbit. Pelle är ett opålitligt vittne som bara hört ryktet. Skuggans lapp i källarhörnet: "Jag behöver ljuset."
 
@@ -619,6 +619,10 @@ export const case1: Case = {
 
 **Hur spellogiken hänger ihop:** Allt drivs av **flaggor**, alltså enkla namn som `"backdoor-open"`. Saker, pussel och ledtrådar kan ge en flagga (`gives`) och kräva en (`requires`). Ett mål är klart när dess flagga finns. Det räcker för 95 % av alla fall. Behövs något specialbeteende för ett visst fall kan det få en egen liten funktion.
 
+### 11.4b Rummens form
+
+Alla fall har tre rum som man går igenom i ordning (fall 3 har ett frivilligt fjärde), men dörrarna sitter på olika ställen i varje fall så att det inte blir upprepande. Rummen ska stämma med hur byggnaden ser ut på stadskartan: bageriet är smalt med bakgården på baksidan, klocktornet och bibliotekstornet har trappor uppåt, källare och grottor nås med trappor nedåt. En dörr kan ritas som **trappa** (`stairs: "up" | "down"`), och i skogen är öppningarna grusstigar. Ett fall har en **genväg** som öppnas först när man har förstått något.
+
 ### 11.5 Validering, viktig när banor ändras ofta
 
 Ett test (`npm test`), och en kontroll när spelet startar i utvecklingsläge, går igenom alla fall:
@@ -631,6 +635,8 @@ Ett test (`npm test`), och en kontroll när spelet startar i utvecklingsläge, g
 
 Fel visas **på svenska i spelet**, till exempel: *"Rad 4 i rummet 'Bageriet' har 19 tecken, den ska ha 20."*
 
+
+`tests/reachable.test.ts` kontrollerar att Nora kan gå eller hoppa från varje ingång till varje sak, ledtråd och dörr i varje rum – viktigt när dörrar flyttas.
 ### 11.6 Hur pixelgrafiken skapas
 
 Claude gör pixelgrafiken som färgrutnät i koden (`src/sprites/`). De görs om till vanliga bilder när spelet startar. Det gör att Claude kan rita, ändra färger och justera figurer direkt när barnet ber om det ("gör Smulan rundare", "ge Nora en röd hatt").

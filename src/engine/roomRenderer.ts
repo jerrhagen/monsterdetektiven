@@ -1,7 +1,7 @@
 import type * as Phaser from "phaser";
 import type { Theme } from "../cases/types";
 import { ROOM_COLS, ROOM_ROWS, TILE } from "./config";
-import type { ParsedRoom, TileKind } from "./room";
+import { type ParsedRoom, type TileKind, edgeOf } from "./room";
 
 type G = Phaser.GameObjects.Graphics;
 
@@ -330,6 +330,16 @@ class Painter {
 
   private door(col: number, row: number, x: number, y: number): void {
     const { g } = this;
+    const edge = edgeOf(col, row);
+    const stairs = this.room.data.doors?.find((d) => d.at === edge)?.stairs;
+    if (edge && stairs) {
+      this.stairs(col, row, x, y, edge, stairs);
+      return;
+    }
+    if (this.theme === "forest") {
+      this.forestPath(col, row, x, y);
+      return;
+    }
     if (row === ROOM_ROWS - 1) {
       // Opening in the bottom wall, with a doormat.
       this.floor(col, row, x, y);
@@ -357,6 +367,72 @@ class Painter {
     g.fillStyle(C.woodDark).fillRect(x + 3, y + (topHalf ? 1 : 0), 10, TILE - (topHalf ? 1 : 0) - (bottomHalf ? 1 : 0));
     g.fillStyle(C.woodMid).fillRect(x + 4, y + (topHalf ? 2 : 0), 8, TILE - (topHalf ? 2 : 0) - (bottomHalf ? 2 : 0));
     if (bottomHalf) g.fillStyle(C.gold).fillRect(x + (col === 0 ? 10 : 5), y + 2, 2, 2);
+  }
+
+  /** In the forest an exit is just a dirt path between the trees, not a door. */
+  private forestPath(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    this.floor(col, row, x, y);
+    g.fillStyle(0x7a5a34).fillRect(x, y, TILE, TILE);
+    g.fillStyle(0x9a7448).fillRect(x + 1, y + 1, TILE - 2, TILE - 2);
+    // Where the path meets grass or trees beside it, a softer edge.
+    const vertical = row === 0 || row === ROOM_ROWS - 1;
+    g.fillStyle(0x9a7448);
+    if (vertical) {
+      if (this.at(col - 1, row) === "door") g.fillRect(x, y + 1, 1, TILE - 2);
+      if (this.at(col + 1, row) === "door") g.fillRect(x + TILE - 1, y + 1, 1, TILE - 2);
+      g.fillRect(x + 1, y, TILE - 2, TILE);
+    } else {
+      if (this.at(col, row - 1) === "door") g.fillRect(x + 1, y, TILE - 2, 1);
+      if (this.at(col, row + 1) === "door") g.fillRect(x + 1, y + TILE - 1, TILE - 2, 1);
+      g.fillRect(x, y + 1, TILE, TILE - 2);
+    }
+    // Pebbles and footprints in the dirt.
+    g.fillStyle(0xb08a58);
+    for (let i = 0; i < 4; i++) {
+      const px = x + 2 + Math.floor(hash(col, row, i + 7) * (TILE - 4));
+      const py = y + 2 + Math.floor(hash(col, row, i + 13) * (TILE - 4));
+      g.fillRect(px, py, 1, 1);
+    }
+  }
+
+  /**
+   * Stone steps in the opening. Going up they get lighter away from the room;
+   * going down they get darker, into the dark below.
+   */
+  private stairs(col: number, row: number, x: number, y: number, edge: "left" | "right" | "top" | "bottom", dir: "up" | "down"): void {
+    const { g } = this;
+    const up = [0x8a86a0, 0x9e9ab4, 0xb4b0c8, 0xc8c4da, 0xdcd8ea];
+    const down = [0x8a86a0, 0x6a6680, 0x4e4a64, 0x34304a, 0x1f1a30];
+    const shades = dir === "up" ? up : down;
+    const vertical = edge === "top" || edge === "bottom";
+    // Step 0 is next to the room, the last one furthest away.
+    for (let i = 0; i < 5; i++) {
+      const band = 3;
+      const d = i * band + 1;
+      g.fillStyle(shades[i]);
+      if (edge === "top") g.fillRect(x, y + TILE - d - band, TILE, band);
+      else if (edge === "bottom") g.fillRect(x, y + d, TILE, band);
+      else if (edge === "left") g.fillRect(x + TILE - d - band, y, band, TILE);
+      else g.fillRect(x + d, y, band, TILE);
+    }
+    // A dark line on each step edge, and the walls beside the stairs.
+    g.fillStyle(C.outline, 0.35);
+    for (let i = 1; i < 5; i++) {
+      const d = i * 3 + 1;
+      if (edge === "top") g.fillRect(x, y + TILE - d, TILE, 1);
+      else if (edge === "bottom") g.fillRect(x, y + d - 1, TILE, 1);
+      else if (edge === "left") g.fillRect(x + TILE - d, y, 1, TILE);
+      else g.fillRect(x + d - 1, y, 1, TILE);
+    }
+    g.fillStyle(C.woodDark);
+    if (vertical) {
+      if (this.at(col - 1, row) !== "door") g.fillRect(x, y, 2, TILE);
+      if (this.at(col + 1, row) !== "door") g.fillRect(x + TILE - 2, y, 2, TILE);
+    } else {
+      if (this.at(col, row - 1) !== "door") g.fillRect(x, y, TILE, 2);
+      if (this.at(col, row + 1) !== "door") g.fillRect(x, y + TILE - 2, TILE, 2);
+    }
   }
 
   private shelf(col: number, row: number, x: number, y: number): void {

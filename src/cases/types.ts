@@ -166,6 +166,8 @@ export interface Door {
   lockedText?: string;
   /** A puzzle on the lock – solving it should give the `requires` flag. */
   puzzle?: string;
+  /** Drawn as a staircase instead of a door: up to a higher floor, or down to a lower one. */
+  stairs?: "up" | "down";
 }
 
 export type Theme = "shop" | "storage" | "yard" | "bakery" | "library" | "forest" | "tower" | "square";
