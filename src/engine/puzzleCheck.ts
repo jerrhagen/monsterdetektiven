@@ -1,4 +1,4 @@
-import type { CodePuzzle, OrderPuzzle, RevealPuzzle } from "../cases/types";
+import type { CodePuzzle, OrderPuzzle, RevealQuestion } from "../cases/types";
 
 /** Digits typed into a code lock. Spaces and leading zeros don't matter. */
 export function checkCode(p: CodePuzzle, input: string): boolean {
@@ -11,7 +11,7 @@ export function checkOrder(p: OrderPuzzle, picked: string[]): boolean {
 }
 
 /** One clue from each proof group – each clue has to show something different. */
-export function checkEvidence(p: RevealPuzzle, picked: string[]): boolean {
+export function checkEvidence(p: RevealQuestion, picked: string[]): boolean {
   if (picked.length !== p.proof.length || new Set(picked).size !== picked.length) return false;
   // Try to match every picked clue to its own group.
   const match = (i: number, used: Set<number>): boolean => {
@@ -22,7 +22,7 @@ export function checkEvidence(p: RevealPuzzle, picked: string[]): boolean {
 }
 
 /** What Ester says when the evidence doesn't hold. */
-export function explainEvidence(p: RevealPuzzle, picked: string[]): string {
+export function explainEvidence(p: RevealQuestion, picked: string[]): string {
   const useless = picked.find((id) => !p.proof.some((group) => group.includes(id)));
   if (useless) return p.why?.[useless] ?? "Den ledtråden bevisar inte det. Välj en annan!";
   return "De två ledtrådarna visar nästan samma sak. Välj en som visar något annat också!";

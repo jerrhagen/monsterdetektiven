@@ -9,7 +9,7 @@ import { closePuzzle, isPuzzleOpen, openPuzzle } from "../../ui/puzzle";
 import { spriteUrl } from "../../ui/spriteImage";
 import { playClick, playScare, playSuccess } from "../../ui/sound";
 import { roomSign, toast } from "../../ui/toast";
-import { clueFlag } from "../caseState";
+import { clueFlag, flagList } from "../caseState";
 import { TILE } from "../config";
 import { Ester } from "../Ester";
 import { CAUGHT_FLAG, Crawler, type Monster, createMonster } from "../monsters";
@@ -74,6 +74,8 @@ export class RoomScene extends Phaser.Scene {
   private esterOffset = { x: 0, y: 0 };
   private pickup: Phaser.GameObjects.GameObject[] = [];
   private thingShadows: Phaser.GameObjects.Ellipse[] = [];
+  /** Glowing outlines on things that still have a clue to give. */
+  private thingGlows = new Map<number, Phaser.GameObjects.GameObject[]>();
   /** True while the ending plays – no walking, no monsters. */
   private cutscene = false;
   private keys!: {
@@ -103,6 +105,7 @@ export class RoomScene extends Phaser.Scene {
     this.graceUntil = 0;
     this.pickup = [];
     this.cutscene = false;
+    this.thingGlows = new Map();
   }
 
   create(): void {
@@ -128,6 +131,13 @@ export class RoomScene extends Phaser.Scene {
       const y = row * TILE + TILE;
       this.thingShadows.push(this.add.ellipse(x, y - 1, 12, 4, 0x000000, 0.25).setDepth(y - 0.5));
       return this.add.sprite(x, y, `${thing.sprite}-0`).setOrigin(0.5, 1).setDepth(y);
+    });
+    this.room.things.forEach(({ thing }, i) => {
+      if (!this.hasUnfoundClue(thing)) return;
+      const s = this.thingSprites[i];
+      const glow = this.addGlow(s.x, s.y - s.height / 2, `${thing.sprite}-0`);
+      glow.forEach((o) => (o as Phaser.GameObjects.Image).setDepth(s.depth - 0.1));
+      this.thingGlows.set(i, glow);
     });
     this.updateHiddenThings();
 
@@ -405,7 +415,7 @@ export class RoomScene extends Phaser.Scene {
       if (!this.isThingHidden(index)) consider({ kind: "thing", index }, t.col, t.row);
     });
     this.monsters.forEach((m, index) => {
-      if (!m.thing) return;
+      if (!m.thing || m.canTalk?.() === false) return;
       const d = Math.hypot(m.x - p.x, m.y - 6 - p.y);
       if (d < bestDist) {
         best = { kind: "monster", index };
@@ -541,8 +551,17 @@ export class RoomScene extends Phaser.Scene {
     return hideWhen !== undefined && this.state.has(hideWhen);
   }
 
-  /** Things with `hideWhen` disappear once it's true (e.g. a found egg). */
+  private hasUnfoundClue(thing: Thing): boolean {
+    return flagList(thing.clue).some((id) => !this.state.hasClue(id));
+  }
+
+  /** Things with `hideWhen` disappear once it's true (e.g. a found egg); found clues stop glowing. */
   private updateHiddenThings(): void {
+    this.thingGlows.forEach((glow, i) => {
+      if (this.hasUnfoundClue(this.room.things[i].thing) && !this.isThingHidden(i)) return;
+      glow.forEach((o) => o.destroy());
+      this.thingGlows.delete(i);
+    });
     this.thingSprites.forEach((s, i) => {
       const hidden = this.isThingHidden(i);
       s.setVisible(!hidden);
@@ -823,9 +842,9 @@ export class RoomScene extends Phaser.Scene {
   }
 
   /** Gives flags/clues and tells the player about anything new. */
-  private reward(gives?: Flags, clueId?: string): void {
+  private reward(gives?: Flags, clues?: string | string[]): void {
     const goalBefore = this.state.currentGoalIndex();
-    const added = this.state.give([...(Array.isArray(gives) ? gives : gives ? [gives] : []), ...(clueId ? [clueFlag(clueId)] : [])]);
+    const added = this.state.give([...flagList(gives), ...flagList(clues).map(clueFlag)]);
     const { data } = this.state;
     if (added.length > 0) session.hintTimer.progress();
 

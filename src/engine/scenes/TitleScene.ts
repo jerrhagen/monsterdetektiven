@@ -1,9 +1,8 @@
 import * as Phaser from "phaser";
 import { startMusic } from "../../ui/music";
 import { hideTitle, showTitle } from "../../ui/title";
-import { cases } from "../../cases";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config";
-import { loadSave } from "../save";
+import { newGame } from "../session";
 import { registerSprites } from "../textures";
 
 /** Small seeded random generator, so the town looks the same every time. */
@@ -16,20 +15,13 @@ function seededRandom(seed: number): () => number {
   };
 }
 
+/** Height of the dark strip at the bottom where the players are listed. */
+const PLAYER_STRIP = 22;
+
 const SKY = [0x0b0620, 0x110828, 0x170b31, 0x1e0e3a, 0x261244, 0x2f164d, 0x381b55, 0x42205c];
 const SILHOUETTE = 0x0d0718;
 const WINDOW_LIT = 0xffd66b;
 const WINDOW_DARK = 0x1c1230;
-
-/** "Fall 1 löst! ★★☆ · 3 monsterkort" – or nothing before the first solved case. */
-function progressLine(): string {
-  const save = loadSave();
-  const solved = cases.filter((c) => save.cases[c.id]);
-  if (solved.length === 0) return "";
-  const last = solved[solved.length - 1];
-  const stars = save.cases[last.id].stars;
-  return `Fall ${last.number} löst! ${"★".repeat(stars)}${"☆".repeat(3 - stars)} · ${save.cards.length} monsterkort`;
-}
 
 /** Title screen: Mystiska staden at night, with Fladder flying past. */
 export class TitleScene extends Phaser.Scene {
@@ -43,22 +35,18 @@ export class TitleScene extends Phaser.Scene {
 
     this.drawSky();
     this.drawStars(rand);
-    this.drawMoon(GAME_WIDTH - 30, 20);
+    this.drawMoon(GAME_WIDTH - 26, 50);
     this.launchFladder();
     this.drawTown(rand);
 
-    showTitle(progressLine());
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideTitle);
-
-    const begin = () => {
+    // The title is plain HTML (players, name boxes) – Phaser must not swallow keys like space.
+    this.input.keyboard!.clearCaptures();
+    showTitle(() => {
+      newGame();
       startMusic();
       this.scene.start("room");
-    };
-    const K = Phaser.Input.Keyboard.KeyCodes;
-    for (const key of [K.SPACE, K.ENTER, K.CTRL]) {
-      this.input.keyboard!.addKey(key).once("down", begin);
-    }
-    this.input.once("pointerdown", begin);
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideTitle);
   }
 
   private drawSky(): void {
@@ -97,7 +85,7 @@ export class TitleScene extends Phaser.Scene {
     const fladder = this.add.sprite(-20, 110, "fladder-0").play("fladder");
     const fly = () => {
       const goingRight = Math.random() < 0.5;
-      const baseY = 95 + Math.random() * 25;
+      const baseY = 80 + Math.random() * 22;
       fladder.setPosition(goingRight ? -20 : GAME_WIDTH + 20, baseY);
       this.tweens.add({
         targets: fladder,
@@ -114,7 +102,8 @@ export class TitleScene extends Phaser.Scene {
 
   private drawTown(rand: () => number): void {
     const g = this.add.graphics();
-    const ground = GAME_HEIGHT - 8;
+    // The town stands a bit up; the dark strip below it holds the players.
+    const ground = GAME_HEIGHT - PLAYER_STRIP;
     const lit: { x: number; y: number }[] = [];
     const dark: { x: number; y: number }[] = [];
 
@@ -140,17 +129,17 @@ export class TitleScene extends Phaser.Scene {
 
     // Clock tower (case 5) in the middle of town.
     const tx = 150;
-    g.fillStyle(SILHOUETTE).fillRect(tx, ground - 78, 20, 78);
-    g.fillTriangle(tx - 3, ground - 78, tx + 23, ground - 78, tx + 10, ground - 100);
-    g.fillStyle(0xe8dcb0).fillCircle(tx + 10, ground - 64, 6);
-    g.lineStyle(1, SILHOUETTE).lineBetween(tx + 10, ground - 64, tx + 10, ground - 68);
-    g.lineBetween(tx + 10, ground - 64, tx + 13, ground - 64);
+    g.fillStyle(SILHOUETTE).fillRect(tx, ground - 80, 20, 80);
+    g.fillTriangle(tx - 3, ground - 80, tx + 23, ground - 80, tx + 10, ground - 100);
+    g.fillStyle(0xe8dcb0).fillCircle(tx + 10, ground - 66, 6);
+    g.lineStyle(1, SILHOUETTE).lineBetween(tx + 10, ground - 66, tx + 10, ground - 70);
+    g.lineBetween(tx + 10, ground - 66, tx + 13, ground - 66);
 
     for (const w of lit) g.fillStyle(WINDOW_LIT).fillRect(w.x, w.y, 3, 4);
     for (const w of dark) g.fillStyle(WINDOW_DARK).fillRect(w.x, w.y, 3, 4);
 
-    // Street.
-    g.fillStyle(0x07040f).fillRect(0, ground, GAME_WIDTH, 8);
+    // Street, and the dark ground below it.
+    g.fillStyle(0x07040f).fillRect(0, ground, GAME_WIDTH, GAME_HEIGHT - ground);
 
     // Something with glowing eyes watches from a dark window…
     const spot = dark[Math.floor(dark.length / 3)];

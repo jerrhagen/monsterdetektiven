@@ -34,16 +34,15 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: calc(var(--px) * 22);
+  padding-top: calc(var(--px) * 3);
   text-align: center;
-  pointer-events: none;
 }
 
 .title h1 {
   margin: 0;
   font-family: "Creepster", cursive;
   font-weight: 400;
-  font-size: calc(var(--px) * 34);
+  font-size: calc(var(--px) * 30);
   letter-spacing: calc(var(--px) * 0.6);
   color: #8fd14f;
   text-shadow:
@@ -54,29 +53,16 @@ body {
 }
 
 .title .subtitle {
-  margin: calc(var(--px) * 2) 0 0;
-  font-size: calc(var(--px) * 8);
+  margin: 0;
+  font-size: calc(var(--px) * 7);
   font-weight: 700;
   color: #ffd66b;
   text-shadow: 0 calc(var(--px) * 0.7) 0 #14101c;
 }
 
-.title .soon {
-  margin: calc(var(--px) * 6) 0 0;
-  font-size: calc(var(--px) * 5.5);
-  color: #cdb8ec;
-  text-shadow: 0 calc(var(--px) * 0.6) 0 #14101c;
-  animation: pulse 2.4s ease-in-out infinite;
-}
-
 @keyframes wobble {
   0%, 100% { transform: rotate(-1.5deg); }
   50% { transform: rotate(1.5deg); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
 }
 
 /* ---------- Top bar ---------- */
@@ -688,11 +674,6 @@ body {
 
 /* ---------- Case intro and result ---------- */
 
-.title .progress {
-  margin: calc(var(--px) * 3) 0 0;
-  font-size: calc(var(--px) * 5);
-  color: #ffd66b;
-}
 
 .case-screen {
   position: absolute;
@@ -868,4 +849,159 @@ body {
 .case-result .buttons .to-title {
   background: #3d3d50;
   color: #f4ecff;
+}
+
+/* ---------- Players on the title screen ---------- */
+
+.start-hint {
+  margin: calc(var(--px) * 1) 0 0;
+  font-size: calc(var(--px) * 5);
+  color: #cdb8ec;
+  text-shadow: 0 calc(var(--px) * 0.6) 0 #14101c;
+  cursor: pointer;
+  animation: glow-text 2.4s ease-in-out infinite;
+}
+
+@keyframes glow-text {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* A thin row in the dark strip below the town. */
+.players {
+  position: absolute;
+  left: calc(var(--px) * 4);
+  right: calc(var(--px) * 4);
+  bottom: calc(var(--px) * 3);
+  display: flex;
+  gap: calc(var(--px) * 2.5);
+}
+
+.player {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 1);
+  padding: calc(var(--px) * 1.2) calc(var(--px) * 2);
+  background: rgba(35, 23, 54, 0.85);
+  border: calc(var(--px) * 0.6) solid #3a2a50;
+  border-radius: calc(var(--px) * 2);
+  cursor: pointer;
+  text-align: left;
+}
+
+.player.chosen {
+  border-color: #8fd14f;
+  box-shadow: 0 0 calc(var(--px) * 3) rgba(143, 209, 79, 0.45);
+}
+
+.player-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.player b {
+  font-size: calc(var(--px) * 4.6);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player .number {
+  color: #8a7a9a;
+  font-weight: 400;
+}
+
+.player small {
+  font-size: calc(var(--px) * 3.4);
+  color: #ffd66b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player-tools {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-tools button {
+  font-size: calc(var(--px) * 3.6);
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.55;
+}
+
+.player-tools button:hover {
+  opacity: 1;
+}
+
+.title-dialog {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 4, 15, 0.75);
+}
+
+.title-dialog-box {
+  width: 60%;
+  padding: calc(var(--px) * 5);
+  background: #231736;
+  border: calc(var(--px) * 1) solid #f4ecff;
+  border-radius: calc(var(--px) * 4);
+  font-size: calc(var(--px) * 6);
+}
+
+.title-dialog-box p {
+  margin: 0 0 calc(var(--px) * 3);
+}
+
+.title-dialog-box .warning {
+  color: #ff9a9a;
+  font-size: calc(var(--px) * 5);
+}
+
+.title-dialog-box input {
+  width: 80%;
+  padding: calc(var(--px) * 1.5) calc(var(--px) * 3);
+  font-family: inherit;
+  font-size: calc(var(--px) * 7);
+  border: none;
+  border-radius: calc(var(--px) * 2);
+}
+
+.title-dialog-box .buttons {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 4);
+  margin-top: calc(var(--px) * 4);
+}
+
+.title-dialog-box button {
+  padding: calc(var(--px) * 1.5) calc(var(--px) * 6);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: calc(var(--px) * 5.5);
+  border: none;
+  border-radius: calc(var(--px) * 2);
+  cursor: pointer;
+  background: #5cc46a;
+  color: #14101c;
+}
+
+.title-dialog-box .cancel {
+  background: #3d3d50;
+  color: #f4ecff;
+}
+
+.title-dialog-box .danger {
+  background: #c0182c;
+  color: #fff;
 }

@@ -72,12 +72,12 @@ describe("detektivens anteckningar", () => {
     const state = new CaseState(c);
     state.give("talked-to-stina");
     expect(state.currentGoalIndex()).toBe(1);
-    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales", "storeroom-key"]);
+    state.give(["clue:dots", "clue:thread", "clue:teddy", "clue:customerBook", "storeroom-key"]);
     expect(state.currentGoalIndex()).toBe(2);
     state.give("visited:storeroom");
     expect(state.currentGoalIndex()).toBe(3);
     expect(state.give(["talked-to-stina", "clue:thread"])).toEqual([]);
-    expect(state.foundClues()).toEqual(["handprints", "thread", "scales", "teddy"]);
+    expect(state.foundClues()).toEqual(["dots", "thread", "teddy", "customerBook"]);
   });
 
   it("Ester ger tydligare och tydligare tips för det aktuella målet", () => {
@@ -94,7 +94,7 @@ describe("detektivens anteckningar", () => {
 
   it("målet 'prata med Stina' blir klart även om man hittat ledtrådarna först", () => {
     const state = new CaseState(c);
-    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales"]);
+    state.give(["clue:dots", "clue:thread", "clue:teddy", "clue:customerBook"]);
     const talk = state.talkFor(c.rooms.store.things!.s);
     state.give(talk.gives);
     expect(state.has("talked-to-stina")).toBe(true);
@@ -106,7 +106,7 @@ describe("detektivens anteckningar", () => {
     const state = new CaseState(c);
     state.give(["talked-to-stina", "clue:teddy"]);
     for (let i = 0; i < 5; i++) expect(state.nextHint()).not.toContain("Nallen");
-    state.give(["clue:handprints", "clue:thread", "clue:scales", "heard-about-register", "storeroom-key"]);
+    state.give(["clue:dots", "clue:thread", "clue:customerBook", "heard-about-register", "storeroom-key"]);
     expect(state.nextHint()).toContain("Du har nyckeln");
   });
 
@@ -116,7 +116,7 @@ describe("detektivens anteckningar", () => {
     expect(state.talkFor(stina).gives).toBe("talked-to-stina");
     state.give("talked-to-stina");
     expect(state.talkFor(stina).gives).toEqual(["talked-to-stina"]);
-    state.give(["clue:handprints", "clue:thread", "clue:teddy", "clue:scales"]);
+    state.give(["clue:dots", "clue:thread", "clue:teddy", "clue:customerBook"]);
     expect(state.talkFor(stina).gives).toEqual(["talked-to-stina", "heard-about-register"]);
     state.give("heard-about-register");
     expect(state.talkFor(stina).gives).toEqual(["talked-to-stina"]);

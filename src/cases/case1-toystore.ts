@@ -1,11 +1,17 @@
 import type { Case } from "./types";
 
 // Case 1 – the architect's own idea: the toys have started moving in the daytime.
-// SPOILER: the solution is described in DESIGN.md.
+// SPOILER: the solution and how the clues fit together are described in DESIGN.md.
+//
+// Built as a "theory ladder": every room changes what Nora believes.
+//   Store:      "The toys are alive!?"   – ambiguous clues, nothing seen.
+//   Storeroom:  "Someone got hurt here." – Fladder is cleared, a gift from "G.", a torn sleeve.
+//   Yard:       "It's a HAND!"           – clear prints in wet sand, the poster from "G.".
+// The reveal asks two questions – what is it, and whose is it – and each needs clues from several rooms.
 
-const STORE_CLUES = ["clue:handprints", "clue:thread", "clue:teddy", "clue:scales"];
-const STOREROOM_CLUES = ["clue:blood", "clue:fladder", "clue:shadow"];
-const YARD_CLUES = ["clue:drag", "clue:poster", "clue:viskan"];
+const STORE_CLUES = ["clue:dots", "clue:thread", "clue:teddy", "clue:customerBook"];
+const STOREROOM_CLUES = ["clue:blood", "clue:fladderSaw", "clue:gift", "clue:sleeve"];
+const YARD_CLUES = ["clue:sandprints", "clue:poster", "clue:viskan"];
 
 export const case1: Case = {
   id: "toystore",
@@ -26,7 +32,7 @@ export const case1: Case = {
       layout: [
         "####################",
         "####################",
-        "#HHHH..HHHH....rKK.#",
+        "#HHHH..HHHH....rkK.#",
         "#...=...3....s.K...#",
         "#.b.=..a.......K.y.#",
         "#...=..............#",
@@ -57,10 +63,14 @@ export const case1: Case = {
             {
               when: "solved",
               talk: [
-                "En lös hand!? Men var är den nu?",
+                "Grymlans hand!? Men var är den nu?",
                 "Titta – leksakerna skakar på en av hyllorna…",
                 "Den gömmer sig! Fånga den, Nora!",
               ],
+            },
+            {
+              when: YARD_CLUES,
+              talk: ["Du är nära, Nora! Men något fattas…", "Har du undersökt allt i lagret?"],
             },
             {
               when: "storeroom-key",
@@ -74,7 +84,7 @@ export const case1: Case = {
               when: STORE_CLUES,
               talk: [
                 "Så många ledtrådar! Du är en riktig detektiv.",
-                "Spåren leder mot lagret. Nyckeln ligger inlåst i kassaapparaten…",
+                "Nästa ställe att leta på är lagret. Nyckeln ligger inlåst i kassaapparaten…",
                 "…men jag har glömt koden! Kvittot sitter kvar i kassan.",
               ],
               gives: "heard-about-register",
@@ -85,8 +95,8 @@ export const case1: Case = {
             },
           ],
           puzzle: "reveal",
-          puzzleWhen: YARD_CLUES,
-          puzzleIntro: ["Nora! Där är du!", "Vet du vem som flyttar på leksakerna?"],
+          puzzleWhen: [...STOREROOM_CLUES, ...YARD_CLUES],
+          puzzleIntro: ["Nora! Där är du!", "Vet du vad det är som flyttar på leksakerna?"],
         },
         r: {
           name: "Kassaapparaten",
@@ -96,6 +106,18 @@ export const case1: Case = {
           talkIf: [{ when: "storeroom-key", talk: ["Kassaapparaten är öppen och tom."] }],
           puzzle: "register",
           puzzleWhen: "heard-about-register",
+        },
+        k: {
+          name: "Stinas kundbok",
+          sprite: "customerBook",
+          on: "K",
+          talk: [
+            "Stinas kundbok. Kunder den här veckan:",
+            "Gunnar Gris – köpte en boll.",
+            "Gerda Groda – köpte ett spel till sin mormor.",
+            "Grymlan – letade efter en present till sin lillebror. Köpte inget.",
+          ],
+          clue: "customerBook",
         },
         a: {
           name: "Skylt",
@@ -118,19 +140,19 @@ export const case1: Case = {
           sprite: "teddy",
           talk: [
             "…",
-            "Psst! Du hoppade hit!",
-            "Jag såg något kravla förbi på golvet.",
-            "Det hade FEM ben! Och inget huvud!",
+            "Jag har INTE rört mig! Jag lovar!",
+            "Jag… jag såg bara något som LYSTE i natt.",
+            "Sen blev det mörkt. Och jag satt här.",
           ],
           clue: "teddy",
         },
       },
-      clues: { "1": "handprints", "2": "thread", "3": "scales" },
+      clues: { "1": "dots", "2": "thread", "3": "scales" },
       onEnter: {
         name: "Ester",
         talk: ["Oj! Såg du, Nora? Bilen körde alldeles själv!", "Vi måste prata med Stina."],
       },
-      // Something scuttles between the shelves…
+      // Something hides in the shelves. It isn't seen until Nora knows what to look for.
       monsters: [
         {
           type: "crawler",
@@ -142,6 +164,7 @@ export const case1: Case = {
             [[16, 9], [18, 9], [18, 8]],
           ],
           shelters: [[2, 2], [8, 2], [5, 9], [14, 9]],
+          unseenUntil: "clue:sandprints",
           catchWhen: "solved",
         },
       ],
@@ -162,7 +185,7 @@ export const case1: Case = {
       layout: [
         "####################",
         "####################",
-        "#LL..LLL....LL..LLL#",
+        "#LLp.LLL....LL..LLL#",
         "#L..............LLL#",
         "#...............L.g#",
         "#..LL.....LL.......#",
@@ -170,10 +193,21 @@ export const case1: Case = {
         "D..........1.......#",
         "#......LL..........#",
         "#x.....LL..........#",
-        "#..............LL..#",
+        "#...........2..LL..#",
         "#############DD#####",
       ],
       things: {
+        p: {
+          name: "Ett paket",
+          sprite: "gift",
+          talk: [
+            "Ett paket med rosett, gömt bakom lådorna.",
+            "På etiketten står det:",
+            "\"Till lillebror, från G.\"",
+            "G:et är snirkligt, med en lång svans.",
+          ],
+          clue: "gift",
+        },
         g: {
           name: "Något glittrar",
           sprite: "monsterEgg",
@@ -188,15 +222,35 @@ export const case1: Case = {
           clue: "shadow",
         },
       },
-      clues: { "1": "blood" },
-      monsters: [{ type: "flyer", sprite: "fladder", center: [10, 6], size: [6, 3] }],
+      clues: { "1": "blood", "2": "sleeve" },
+      monsters: [
+        {
+          type: "flyer",
+          sprite: "fladder",
+          center: [10, 6],
+          size: [6, 3],
+          perch: [9, 3],
+          perchSprite: "fladderHang",
+          thing: {
+            name: "Fladder",
+            sprite: "fladderHang",
+            talk: [
+              "Vad vill DU? Det var inte jag som flyttade leksakerna!",
+              "Jag har ju inga händer, bara vingar.",
+              "Något LYSANDE kröp förbi och väckte mig…",
+              "Det hade FEM ben! Nu kan jag inte somna om.",
+            ],
+            clue: "fladderSaw",
+          },
+        },
+      ],
       onEnter: {
         name: "Ester",
         talk: [
           "Nora, titta! Det är Fladder!",
           "Men fladdermöss sover ju på dagen…",
           "Varför är hon vaken? Något är fel här.",
-          "Akta dig! Göm dig bakom lådorna om hon dyker mot dig!",
+          "Göm dig bakom lådorna om hon dyker! Och när hon vilar kanske vi kan prata med henne.",
         ],
         clue: "fladder",
       },
@@ -235,6 +289,16 @@ export const case1: Case = {
           sprite: "noticeboard",
           talk: ["Det sitter en lapp här:", "\"SAKNAS: Något grönt som är mitt.\"", "\"Det kan inte sitta still!\"", "\"/ G.\""],
           clue: "poster",
+          talkIf: [
+            {
+              when: "same-g",
+              talk: ["Samma snirkliga G som på paketet i lagret!", "Den som saknar något grönt… lämnade paketet!"],
+              clue: ["poster", "sameG"],
+            },
+          ],
+          puzzle: "handwriting",
+          puzzleWhen: "clue:gift",
+          puzzleIntro: ["\"SAKNAS: Något grönt som är mitt. Det kan inte sitta still! / G.\"", "Hmm… det där G:et ser bekant ut."],
         },
         v: {
           name: "Soptunnan",
@@ -244,7 +308,7 @@ export const case1: Case = {
           talkIf: [{ when: "emerged:viskanGhost", talk: ["Soptunnan är tom nu.", "Det luktar spöke."] }],
         },
       },
-      clues: { "1": "drag" },
+      clues: { "1": "sandprints" },
       monsters: [
         {
           type: "sneaker",
@@ -265,8 +329,8 @@ export const case1: Case = {
                 when: "riddle-solved",
                 talk: [
                   "Rätt! Hihihi…",
-                  "Jag såg något litet och grönt krypa in i affären…",
-                  "…och det hade inget huvud! Det höll i något som LYSTE.",
+                  "Jag såg något litet och grönt krypa genom sanden…",
+                  "…in i affären. Det höll i något som LYSTE.",
                 ],
                 clue: "viskan",
               },
@@ -383,71 +447,134 @@ export const case1: Case = {
       ],
       gives: "riddle-solved",
     },
+    handwriting: {
+      type: "choice",
+      title: "Jämför handstilen",
+      text: ["På paketet i lagret stod \"från G.\"", "Vilket G är samma sort som på paketet?"],
+      options: [
+        { id: "curly", label: "Snirkligt G", sprite: "gCurly" },
+        { id: "block", label: "Tjockt G", sprite: "gBlock" },
+        { id: "thin", label: "Smalt G", sprite: "gThin" },
+        { id: "dotted", label: "G med prick", sprite: "gDotted" },
+      ],
+      answer: "curly",
+      gives: "same-g",
+    },
     reveal: {
       type: "reveal",
       title: "Avslöjandet",
-      text: ["Vem flyttar på leksakerna?"],
-      options: [
-        { id: "fladder", label: "Fladder", sprite: "fladder" },
-        { id: "viskan", label: "Viskan", sprite: "viskanGhost" },
-        { id: "stina", label: "Stina Snurr", sprite: "stina" },
-        { id: "teddy", label: "Nallen", sprite: "teddy" },
-        { id: "hand", label: "En lös hand", sprite: "arm" },
+      text: ["Nu ska vi lösa mysteriet!"],
+      questions: [
+        {
+          question: "Vad är det som flyttar på leksakerna?",
+          options: [
+            { id: "fladder", label: "Fladder", sprite: "fladder" },
+            { id: "viskan", label: "Viskan", sprite: "viskanGhost" },
+            { id: "stina", label: "Stina Snurr", sprite: "stina" },
+            { id: "teddy", label: "Nallen", sprite: "teddy" },
+            { id: "hand", label: "En lös hand", sprite: "arm" },
+          ],
+          answer: "hand",
+          // Something that shows hands but no feet, and a witness who saw it crawl.
+          proof: [["sandprints"], ["fladderSaw", "viskan"]],
+          whyNot: {
+            fladder: "Fladder har vingar, inte händer. Och hon blev själv väckt av det!",
+            viskan: "Viskan svävar… och hon såg själv vad det var. Läs hennes vittnesmål!",
+            stina: "Stina har fötter – men i sanden fanns bara avtryck av händer.",
+            teddy: "Nallen har tassar, inte fingrar. Titta på avtrycken i sanden!",
+          },
+          why: {
+            dots: "Fem små prickar… det kan vara vad som helst. Finns det tydligare avtryck någonstans?",
+            thread: "Grön tråd? Men Stina stickar ju med grönt garn…",
+            yarn: "Garnet visar bara att Stina stickar.",
+            scales: "Rosa fjäll pekar på Fladder – men hon har inga händer.",
+            teddyMoved: "Att nallen har flyttat sig visar inte VEM som flyttade den.",
+            teddy: "Nallen säger bara att han inte har rört sig.",
+            blood: "Blod visar att någon har skadat sig. Men vad var det som kröp?",
+            fladder: "Att Fladder är vaken är konstigt – men det bevisar inte det här.",
+            shadow: "Ögonen i hörnet… det är nog ett annat mysterium!",
+            gift: "Paketet säger VEM – men vi frågar VAD. Spara det till nästa fråga!",
+            sleeve: "Tröjbiten säger VEM – men vi frågar VAD. Spara den till nästa fråga!",
+            poster: "Lappen säger att något saknas. Men inte vad!",
+            sameG: "Samma G säger VEM – men vi frågar VAD. Spara det till nästa fråga!",
+            customerBook: "Kundboken säger VEM – men vi frågar VAD. Spara den till nästa fråga!",
+          },
+        },
+        {
+          question: "Vems hand är det?",
+          options: [
+            { id: "grymlan", label: "Grymlan" },
+            { id: "gunnar", label: "Gunnar Gris" },
+            { id: "gerda", label: "Gerda Groda" },
+            { id: "stina", label: "Stina Snurr" },
+          ],
+          answer: "grymlan",
+          // Who was looking for a present for a little brother – and the present from "G." in the storeroom.
+          proof: [["customerBook"], ["gift", "sameG"]],
+          whyNot: {
+            gunnar: "Gunnar Gris köpte en boll. Vem letade efter en present till sin lillebror?",
+            gerda: "Gerda Groda är grön – men hon köpte ett spel till sin mormor, inte till en lillebror.",
+            stina: "Stinas namn börjar inte ens på G!",
+          },
+          why: {
+            thread: "Grön tråd kan vara från vem som helst som är grön – till och med Gerda Groda!",
+            poster: "Lappen säger bara G. Det finns flera som börjar på G!",
+            sleeve: "Tröjbiten är grön. Men vem var i lagret?",
+            sandprints: "Avtrycken visar att det är en hand – men inte vems.",
+            fladderSaw: "Fladder såg vad det var – men inte vems det var.",
+            viskan: "Viskan såg vad det var – men inte vems det var.",
+          },
+        },
       ],
-      answer: "hand",
-      // One clue that shows it has hands but no feet, and one that shows it has no head.
-      proof: [
-        ["handprints", "drag"],
-        ["teddy", "viskan"],
-      ],
-      whyNot: {
-        fladder: "Fladder har vingar, inte händer. Och hon flyger – hon lämnar inga spår i dammet.",
-        viskan: "Viskan svävar… och hon såg ju själv vad det var. Läs hennes vittnesmål igen!",
-        stina: "Stina har fötter – men i dammet fanns bara handavtryck.",
-        teddy: "Nallen har tassar, inte fingrar. Och han har ett huvud!",
-      },
-      why: {
-        thread: "Grön tråd? Men Stina stickar ju med grönt garn…",
-        yarn: "Garnet visar bara att Stina stickar.",
-        scales: "Rosa fjäll pekar på Fladder, inte på en hand!",
-        teddyMoved: "Att nallen har flyttat sig visar inte VEM som flyttade den.",
-        blood: "Blod kan vem som helst ha tappat.",
-        fladder: "Att Fladder är vaken är konstigt – men det bevisar inte det här.",
-        shadow: "Ögonen i hörnet… det är nog ett annat mysterium!",
-        poster: "Lappen säger att något saknas. Men den säger inte vad!",
-      },
       gives: "solved",
     },
   },
 
   clues: {
-    handprints: { name: "Handavtryck", sprite: "handprints", text: "Små handavtryck i dammet. Men inga fotspår!" },
-    thread: { name: "Grön tråd", sprite: "thread", text: "En grön ulltråd som fastnat i hyllan." },
+    dots: { name: "Fem prickar", sprite: "fingerDots", text: "Fem små prickar på rad i dammet. Vad kan ha gjort dem?" },
+    thread: { name: "Grön tråd", sprite: "thread", text: "En grön ulltråd som fastnat vid hyllan." },
     scales: { name: "Rosa fjäll", sprite: "pinkScales", text: "Rosa, genomskinliga fjäll vid hyllan. Precis som Fladders vingar…" },
     teddyMoved: {
       name: "Nallen har flyttat sig",
       sprite: "teddy",
       text: "Stina: \"I morse satt nallen på hyllan. Nu sitter han bakom klossarna!\"",
     },
+    teddy: { name: "Nallens förklaring", sprite: "teddy", text: "Nallen säger att han inte har rört sig. Men han såg något som LYSTE i natt." },
     yarn: { name: "Stinas gröna garn", sprite: "yarnBasket", text: "Stina stickar med grönt garn – samma färg som tråden vid hyllan." },
-    teddy: { name: "Nallens vittnesmål", sprite: "teddy", text: "Nallen såg något med fem ben kravla på golvet." },
-    blood: { name: "Blodsdroppar", sprite: "bloodDrops", text: "Små droppar blod som leder mot bakdörren." },
+    customerBook: {
+      name: "Stinas kundbok",
+      sprite: "customerBook",
+      text: "Gunnar Gris köpte en boll. Gerda Groda köpte ett spel till mormor. Grymlan letade efter en present till sin lillebror – men köpte inget.",
+    },
     fladder: {
       name: "Fladder är vaken",
       sprite: "fladder",
       text: "Fladder flyger runt mitt på dagen, fast fladdermöss sover på dagen. Något är fel…",
     },
+    fladderSaw: {
+      name: "Fladders vittnesmål",
+      sprite: "fladderHang",
+      text: "Fladder har inga händer. Hon väcktes av något LYSANDE som kröp förbi – det hade FEM ben!",
+    },
+    blood: { name: "Blodsdroppar", sprite: "bloodDrops", text: "Små droppar blod som leder mot bakdörren. Någon har skadat sig." },
+    gift: { name: "Paketet", sprite: "gift", text: "Ett paket gömt i lagret: \"Till lillebror, från G.\" G:et är snirkligt, med en lång svans." },
+    sleeve: { name: "Tröjbiten", sprite: "sleeveScrap", text: "En bit grön tröja har fastnat på en spik vid bakdörren. Det är lite blod på den." },
     shadow: {
       name: "Ögonen i hörnet",
       sprite: "shadowEyes",
       text: "Två glödande ögon i ett mörkt hörn av lagret. Sen var de borta. Iskallt!",
     },
-    drag: { name: "Släpspår", sprite: "dragMarks", text: "Spår i sanden, som om något kravlat fram med händerna." },
+    sandprints: {
+      name: "Avtryck i sanden",
+      sprite: "handprints",
+      text: "Tydliga avtryck i den blöta sanden: fem fingrar och en handflata – men inga fötter! Det är en HAND som har krupit här.",
+    },
     poster: { name: "Lappen", sprite: "noticeboard", text: "\"SAKNAS: Något grönt som är mitt. Det kan inte sitta still! / G.\"" },
+    sameG: { name: "Samma G", sprite: "gCurly", text: "Lappen och paketet har samma snirkliga G. Det är samma person!" },
     viskan: {
       name: "Viskans vittnesmål",
       sprite: "viskanGhost",
-      text: "Viskan såg något litet och grönt krypa in i affären. Det hade inget huvud – och höll i något som lyste!",
+      text: "Viskan såg något litet och grönt krypa genom sanden och in i affären. Det höll i något som lyste!",
     },
   },
 
@@ -459,24 +586,25 @@ export const case1: Case = {
   },
 
   finale: [
-    { say: "Nora", lines: ["Hittade dig!", "Det är ju en ARM… som springer på fingrarna!"] },
+    { say: "Nora", lines: ["Hittade dig!", "Grymlans hand… som springer på fingrarna!"] },
     { enter: "grymlan", sprite: "grymlan", from: [10, 11], to: [10, 8] },
     {
       say: "Grymlan",
       lines: [
-        "MIN ARM! Äntligen!",
+        "MIN HAND! Äntligen!",
         "Jag kom hit för att köpa en present till min lillebror…",
         "…men i lagret såg jag en skugga med glödande ögon.",
-        "Jag blev så rädd att armen trillade av. Och så sprang den iväg!",
+        "Jag blev så rädd att jag fastnade i en spik – och armen trillade av!",
+        "Och så sprang den iväg.",
       ],
     },
     { say: "Stina Snurr", lines: ["Oj oj oj! Det fixar vi.", "Jag har ett syskrin för trasiga nallar."] },
     { flash: true },
     { hide: "culprit" },
     { frame: "grymlan", index: 1 },
-    { say: "Grymlan", lines: ["Den sitter som gjuten! Tack!", "Förlåt att min arm busade med leksakerna."] },
+    { say: "Grymlan", lines: ["Den sitter som gjuten! Tack!", "Förlåt att min hand busade med leksakerna."] },
     { reveal: "grymlan", sprite: "moonShard" },
-    { say: "Ester", lines: ["Nora, titta! Armen tappade något…", "Det lyser! Som en bit av… månen?"] },
+    { say: "Ester", lines: ["Nora, titta! Handen tappade något…", "Det lyser! Som en bit av… månen?"] },
     {
       say: "Nora",
       lines: [
@@ -510,9 +638,9 @@ export const case1: Case = {
       text: "Leta efter ledtrådar i affären",
       doneWhen: STORE_CLUES,
       hints: [
-        { text: "Ledtrådar glöder lite. Titta noga på golvet!", skipWhen: ["clue:handprints", "clue:thread"] },
+        { text: "Ledtrådar glöder lite. Titta noga på golvet!", skipWhen: ["clue:dots", "clue:thread"] },
         { text: "Leta vid hyllorna längst ner till höger.", skipWhen: "clue:thread" },
-        { text: "Något rosa glimmar på golvet nära hyllorna uppe till vänster.", skipWhen: "clue:scales" },
+        { text: "Stina har en bok på disken. Vilka kunder har varit här?", skipWhen: "clue:customerBook" },
         { text: "Prata med alla i affären – även leksakerna!", skipWhen: "clue:teddy" },
         { text: "Nallen bakom klossarna vet något. Hoppa över klossarna med mellanslag!", skipWhen: "clue:teddy" },
       ],
@@ -536,9 +664,11 @@ export const case1: Case = {
       text: "Undersök lagret",
       doneWhen: STOREROOM_CLUES,
       hints: [
-        { text: "Leta efter något som glöder på golvet. Och akta dig för Fladder!", skipWhen: "clue:blood" },
+        { text: "Leta efter något som glöder på golvet. Och akta dig för Fladder!", skipWhen: ["clue:blood", "clue:sleeve"] },
         "Göm dig bakom en låda när Fladder kommer – då ser hon dig inte!",
-        { text: "Något blinkar i det mörka hörnet längst ner till vänster…", skipWhen: "clue:shadow" },
+        { text: "Ibland vilar Fladder uppe i taket. Då kan du prata med henne!", skipWhen: "clue:fladderSaw" },
+        { text: "Något är gömt bakom lådorna uppe till vänster.", skipWhen: "clue:gift" },
+        { text: "Titta vid bakdörren längst ner. Har något fastnat där?", skipWhen: "clue:sleeve" },
       ],
     },
     {
@@ -558,7 +688,7 @@ export const case1: Case = {
       text: "Vart leder spåren?",
       doneWhen: YARD_CLUES,
       hints: [
-        { text: "Titta noga i sandlådan!", skipWhen: "clue:drag" },
+        { text: "Titta noga i sandlådan!", skipWhen: "clue:sandprints" },
         { text: "Det sitter en lapp på anslagstavlan.", skipWhen: "clue:poster" },
         { text: "Knacka på soptunnan… om du vågar!", skipWhen: "emerged:viskanGhost" },
         {
@@ -570,12 +700,13 @@ export const case1: Case = {
       ],
     },
     {
-      text: "Vem flyttar på leksakerna?",
+      text: "Vad flyttar på leksakerna – och vems är det?",
       doneWhen: "solved",
       hints: [
+        { text: "Titta på lappen igen. Känner du igen G:et från paketet?", when: "clue:gift", skipWhen: "clue:sameG" },
         "Berätta för Stina vad du har kommit fram till.",
-        "Läs ledtrådarna i detektivboken (B). Vem – eller vad – har fingrar men inga fötter?",
-        "Handavtryck men inga fotspår. Fem ben men inget huvud. Vad kan det vara?",
+        "Avtrycken i sanden visar VAD det är. Kundboken och paketet visar VEMS det är.",
+        "Vem letade efter en present till sin lillebror? Titta i detektivboken (B)!",
       ],
     },
     {

@@ -25,6 +25,8 @@ export interface Monster {
   y: number;
   /** Something to say when Nora talks to it, if it can be talked to. */
   readonly thing?: Thing;
+  /** Can Nora talk to it right now? (Defaults to yes, if it has a `thing`.) */
+  canTalk?(): boolean;
   update(dt: number, time: number): void;
   /** After catching Nora: back off for a while. */
   retreat(): void;
@@ -60,8 +62,15 @@ class Flyer implements Monster {
   private readonly puzzled: Phaser.GameObjects.Image;
   private readonly center: { x: number; y: number };
   private readonly size: { x: number; y: number };
-  private mode: "loop" | "windup" | "swoop" | "return" | "rest" = "loop";
+  private mode: "loop" | "windup" | "swoop" | "return" | "rest" | "toPerch" | "perched" = "loop";
   private puzzledFor = 0;
+  private readonly perch?: { x: number; y: number };
+  private readonly spriteKey: string;
+  private readonly perchSprite?: string;
+  private readonly talkHint: Phaser.GameObjects.Image;
+  readonly thing?: Thing;
+  /** Seconds of flying left before the next rest on the perch. */
+  private flyFor = 8 + Math.random() * 4;
   private modeTime = 0;
   private t = Math.random() * Math.PI * 2;
   x: number;
@@ -74,12 +83,21 @@ class Flyer implements Monster {
   ) {
     this.center = tileCenter(def.center);
     this.size = { x: def.size[0] * TILE, y: def.size[1] * TILE };
+    this.perch = def.perch ? tileCenter(def.perch) : undefined;
+    this.spriteKey = def.sprite;
+    this.perchSprite = def.perchSprite;
+    this.thing = def.thing;
     const start = this.loopPoint();
     this.x = start.x;
     this.y = start.y;
     this.shadow = scene.add.ellipse(this.x, this.y, 10, 3, 0x000000, 0.25).setDepth(1);
     this.sprite = scene.add.sprite(this.x, this.y - FLY_HEIGHT, `${def.sprite}-0`).play(def.sprite).setDepth(9000);
     this.puzzled = scene.add.image(0, 0, "questionBubble-0").setOrigin(0.5, 1).setDepth(9001).setVisible(false);
+    this.talkHint = scene.add.image(0, 0, "hintBubble-0").setOrigin(0.5, 1).setDepth(9001).setVisible(false);
+  }
+
+  canTalk(): boolean {
+    return this.mode === "perched";
   }
 
   /** A figure-eight around the centre of the room. */
@@ -97,9 +115,16 @@ class Flyer implements Monster {
 
     if (this.mode === "loop") {
       this.t += dt * 0.6;
+      this.flyFor -= dt;
       const p = this.loopPoint();
       this.moveTo(p.x, p.y, 80, dt);
       if (toNora < 48 && !hidden && this.world.canCatch()) this.setMode("windup");
+      else if (this.perch && this.flyFor <= 0) this.setMode("toPerch");
+    } else if (this.mode === "toPerch") {
+      if (this.moveTo(this.perch!.x, this.perch!.y, 60, dt) < 1) this.land();
+    } else if (this.mode === "perched") {
+      // Resting, hanging upside down – she won't attack now, and can be talked to.
+      if (this.modeTime > 7) this.takeOff();
     } else if (this.mode === "windup") {
       // Hovers and shivers for a moment before diving – time to hide!
       shake = Math.sin(time / 25) * 1.5;
@@ -117,11 +142,25 @@ class Flyer implements Monster {
       this.setMode("return");
     }
 
-    const bob = Math.sin(time / 120) * 2;
+    const bob = this.mode === "perched" ? 0 : Math.sin(time / 120) * 2;
     this.sprite.setPosition(Math.round(this.x + shake), Math.round(this.y - FLY_HEIGHT + bob));
+    this.talkHint
+      .setVisible(this.mode === "perched" && !!this.thing && toNora < 64)
+      .setPosition(this.sprite.x, this.sprite.y - 8 + Math.round(Math.sin(time / 200)));
     this.shadow.setPosition(Math.round(this.x), Math.round(this.y));
     this.puzzledFor = Math.max(0, this.puzzledFor - dt);
     this.puzzled.setVisible(this.puzzledFor > 0).setPosition(this.sprite.x, this.sprite.y - 7);
+  }
+
+  private land(): void {
+    this.setMode("perched");
+    if (this.perchSprite) this.sprite.stop().setTexture(`${this.perchSprite}-0`);
+  }
+
+  private takeOff(): void {
+    this.flyFor = 8 + Math.random() * 4;
+    this.sprite.play(this.spriteKey);
+    this.setMode("return");
   }
 
   /** Nora hid behind something: "Huh? Where did she go?" */
@@ -289,6 +328,7 @@ export class Crawler implements Monster {
   private readonly routes: { x: number; y: number }[][];
   readonly shelters: [number, number][];
   private readonly catchWhen?: Flags;
+  private readonly unseenUntil?: Flags;
   private hiddenFor = 6 + Math.random() * 4;
   private path: { x: number; y: number }[] = [];
   private shelterIndex = -1;
@@ -305,6 +345,7 @@ export class Crawler implements Monster {
     this.routes = def.routes.map((r) => r.map(tileCenter));
     this.shelters = def.shelters ?? [];
     this.catchWhen = def.catchWhen;
+    this.unseenUntil = def.unseenUntil;
     this.x = this.routes[0][0].x;
     this.y = this.routes[0][0].y;
     this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setVisible(false);
@@ -317,9 +358,9 @@ export class Crawler implements Monster {
     this.rustle.setVisible(false);
   }
 
-  /** The shelter it hides in right now, or -1. */
+  /** The shelter it hides in right now (at the end of the case), or -1. */
   get shelter(): number {
-    return this.shelterIndex;
+    return this.hunted ? this.shelterIndex : -1;
   }
 
   private get hunted(): boolean {
@@ -335,6 +376,11 @@ export class Crawler implements Monster {
     this.shelterIndex = -1;
     if (this.world.has(CAUGHT_FLAG)) {
       this.sprite.setVisible(false);
+      return;
+    }
+
+    if (this.unseenUntil !== undefined && !this.world.has(this.unseenUntil)) {
+      this.rustleSomewhere(dt, time);
       return;
     }
 
@@ -361,6 +407,29 @@ export class Crawler implements Monster {
         this.sprite.stop();
         this.sprite.setVisible(false);
       }
+    }
+  }
+
+  /** Never seen yet: now and then the toys on a shelf far from Nora rustle. */
+  private rustleSomewhere(dt: number, time: number): void {
+    this.hiddenFor -= dt;
+    if (this.hiddenFor <= 0) {
+      const nora = this.world.nora();
+      const far = this.shelters.filter(([c, r]) => {
+        const p = tileCenter([c, r]);
+        return Math.hypot(p.x - nora.x, p.y - nora.y) > 64;
+      });
+      this.shelterIndex = far.length ? this.shelters.indexOf(far[Math.floor(Math.random() * far.length)]) : -1;
+      this.shelterTime = 1.2;
+      this.hiddenFor = 7 + Math.random() * 6;
+    }
+    this.shelterTime -= dt;
+    if (this.shelterIndex >= 0 && this.shelterTime > 0) {
+      const at = tileCenter(this.shelters[this.shelterIndex]);
+      this.rustle.setVisible(true).setPosition(at.x + Math.sin(time / 30), at.y - 10);
+    } else {
+      this.rustle.setVisible(false);
+      this.shelterIndex = -1;
     }
   }
 

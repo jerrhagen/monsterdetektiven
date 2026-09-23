@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { CodePuzzle, OrderPuzzle, RevealPuzzle } from "../src/cases/types";
+import type { CodePuzzle, OrderPuzzle, RevealQuestion } from "../src/cases/types";
 import { cases } from "../src/cases";
 import { CaseState } from "../src/engine/caseState";
 import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../src/engine/puzzleCheck";
@@ -14,10 +14,8 @@ const order: OrderPuzzle = {
   answer: ["a", "b", "c"],
   gives: "x",
 };
-const reveal: RevealPuzzle = {
-  type: "reveal",
-  title: "",
-  text: [],
+const reveal: RevealQuestion = {
+  question: "Vem?",
   options: [{ id: "who", label: "Vem" }],
   answer: "who",
   proof: [
@@ -25,7 +23,6 @@ const reveal: RevealPuzzle = {
     ["b1", "b2"],
   ],
   why: { falskt: "Det där bevisar inget." },
-  gives: "x",
 };
 
 describe("kodlås", () => {
@@ -67,9 +64,24 @@ describe("bevis i avslöjandet", () => {
   it("i fall 1 räcker det inte att välja två sanna ledtrådar på måfå", () => {
     const p = cases[0].puzzles!.reveal;
     if (p.type !== "reveal") throw new Error("fel typ");
-    expect(checkEvidence(p, ["handprints", "drag"])).toBe(false);
-    expect(checkEvidence(p, ["thread", "poster"])).toBe(false);
-    expect(checkEvidence(p, ["handprints", "teddy"])).toBe(true);
+    const [what, whose] = p.questions;
+    expect(checkEvidence(what, ["dots", "teddy"])).toBe(false);
+    expect(checkEvidence(what, ["thread", "poster"])).toBe(false);
+    expect(checkEvidence(what, ["sandprints", "fladderSaw"])).toBe(true);
+    expect(checkEvidence(whose, ["poster", "sleeve"])).toBe(false);
+    expect(checkEvidence(whose, ["customerBook", "gift"])).toBe(true);
+  });
+
+  it("i fall 1 behövs ledtrådar från alla tre rummen för att lösa det", () => {
+    const p = cases[0].puzzles!.reveal;
+    if (p.type !== "reveal") throw new Error("fel typ");
+    const roomOf = (clue: string) =>
+      Object.entries(cases[0].rooms).find(([, r]) =>
+        [...Object.values(r.clues ?? {}), ...Object.values(r.things ?? {}).flatMap((t) => [t.clue, ...(t.talkIf ?? []).map((v) => v.clue)].flat()),
+          ...(r.monsters ?? []).flatMap((m) => ("thing" in m && m.thing ? [m.thing.clue, ...(m.thing.talkIf ?? []).map((v) => v.clue)].flat() : []))].includes(clue),
+      )?.[0];
+    const rooms = new Set(p.questions.flatMap((q) => q.proof.map((group) => roomOf(group[0]))));
+    expect([...rooms].sort()).toEqual(["store", "storeroom", "yard"]);
   });
 });
 
@@ -114,7 +126,7 @@ describe("slumpade pussel", () => {
     const register = state.puzzle("register");
     const riddle = state.puzzle("riddle");
     if (register?.type !== "code" || riddle?.type !== "choice") throw new Error("fel typ");
-    state.give(["talked-to-stina", "clue:handprints", "clue:thread", "clue:teddy", "clue:scales", "heard-about-register"]);
+    state.give(["talked-to-stina", "clue:dots", "clue:thread", "clue:teddy", "clue:customerBook", "heard-about-register"]);
     let sumHint = "";
     for (let i = 0; i < 5 && !/\d/.test(sumHint); i++) sumHint = state.nextHint()!;
     const [a, b] = sumHint.match(/\d+/g)!.map(Number);

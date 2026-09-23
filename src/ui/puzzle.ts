@@ -262,16 +262,22 @@ function choice(p: ChoicePuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
 
 function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEvent) => void {
   let keys: (e: KeyboardEvent) => void = () => {};
+  let step = 0;
+  const heading = document.createElement("p");
+  heading.className = "evidence-intro";
 
   const showWho = () => {
+    const q = p.questions[step];
     ui.body.innerHTML = "";
+    heading.textContent = `${p.questions.length > 1 ? `Fråga ${step + 1} av ${p.questions.length}: ` : ""}${q.question}`;
+    ui.body.append(heading);
     const options = document.createElement("div");
     options.className = "options";
     const pick = (o: PuzzleOption) => {
-      if (o.id === p.answer) showEvidence(o);
-      else ui.say(`Ester: "${p.whyNot?.[o.id] ?? `Hmm… var det verkligen ${o.label}? Titta i detektivboken!`}"`);
+      if (o.id === q.answer) showEvidence(o);
+      else ui.say(`Ester: "${q.whyNot?.[o.id] ?? `Hmm… var det verkligen ${o.label}? Titta i detektivboken!`}"`);
     };
-    const shown = shuffleOptions(p.options);
+    const shown = shuffleOptions(q.options);
     shown.forEach((o, i) => {
       const b = optionButton(o, i);
       b.addEventListener("click", () => pick(o));
@@ -285,12 +291,13 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
   };
 
   const showEvidence = (culprit: PuzzleOption) => {
+    const q = p.questions[step];
     playClick();
     ui.say("", true);
     ui.body.innerHTML = "";
     const intro = document.createElement("p");
     intro.className = "evidence-intro";
-    intro.textContent = `${culprit.label}! Visa ${p.proof.length === 2 ? "två" : p.proof.length} ledtrådar som bevisar det.`;
+    intro.textContent = `${culprit.label}! Visa ${q.proof.length === 2 ? "två" : q.proof.length} ledtrådar som bevisar det.`;
     const grid = document.createElement("div");
     grid.className = "evidence";
     const chosen = new Set<string>();
@@ -301,9 +308,9 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
     const toggle = (id: string, card: HTMLButtonElement) => {
       playClick();
       if (chosen.has(id)) chosen.delete(id);
-      else if (chosen.size < p.proof.length) chosen.add(id);
+      else if (chosen.size < q.proof.length) chosen.add(id);
       card.classList.toggle("chosen", chosen.has(id));
-      submit.disabled = chosen.size !== p.proof.length;
+      submit.disabled = chosen.size !== q.proof.length;
     };
     clueIds.forEach((id, i) => {
       const clue = state.data.clues[id];
@@ -315,8 +322,21 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
       grid.appendChild(card);
     });
     submit.addEventListener("click", () => {
-      if (checkEvidence(p, [...chosen])) ui.solved();
-      else ui.say(`Ester: "${explainEvidence(p, [...chosen])}"`);
+      if (!checkEvidence(q, [...chosen])) {
+        ui.say(`Ester: "${explainEvidence(q, [...chosen])}"`);
+        // Start over with nothing chosen.
+        chosen.clear();
+        grid.querySelectorAll(".chosen").forEach((c) => c.classList.remove("chosen"));
+        submit.disabled = true;
+      } else if (step < p.questions.length - 1) {
+        // On to the next question.
+        step++;
+        playSuccess();
+        showWho();
+        ui.say("Rätt! Nästa fråga…", true);
+      } else {
+        ui.solved();
+      }
     });
     ui.body.append(intro, grid, submit);
 

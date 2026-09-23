@@ -6,8 +6,8 @@ export interface Talk {
   talk: string[];
   /** Flags (or item ids) given when the dialog closes. */
   gives?: Flags;
-  /** Clue id added to the detective book when the dialog closes. */
-  clue?: string;
+  /** Clue id(s) added to the detective book when the dialog closes. */
+  clue?: string | string[];
 }
 
 /** Something in a room Nora can look at or talk to (a lowercase letter in the layout). */
@@ -89,19 +89,25 @@ export interface ChoicePuzzle extends PuzzleBase {
 }
 
 /**
- * The big reveal: point out who did it, then prove it with clues from the book.
+ * One question in the reveal: pick the answer, then prove it with clues from the book.
  * `proof` is a list of groups; Nora must pick one clue from each group – clues
  * that each show something different – so random pairs don't work.
  */
-export interface RevealPuzzle extends PuzzleBase {
-  type: "reveal";
+export interface RevealQuestion {
+  question: string;
   options: PuzzleOption[];
   answer: string;
   proof: string[][];
-  /** Ester's comment when a wrong suspect is picked (by option id). */
+  /** Ester's comment when a wrong answer is picked (by option id). */
   whyNot?: Record<string, string>;
   /** Ester's comment when a clue doesn't prove it (by clue id). */
   why?: Record<string, string>;
+}
+
+/** The big reveal: one or more questions, e.g. "What is it?" and then "Whose is it?". */
+export interface RevealPuzzle extends PuzzleBase {
+  type: "reveal";
+  questions: RevealQuestion[];
 }
 
 export type Puzzle = CodePuzzle | OrderPuzzle | ChoicePuzzle | RevealPuzzle;
@@ -141,6 +147,10 @@ export type MonsterDef =
       center: [col: number, row: number];
       /** Half the width and height of the flight path, in tiles. */
       size: [number, number];
+      /** Now and then it rests here (hanging, sprite `perchSprite`) and can be talked to. */
+      perch?: [col: number, row: number];
+      perchSprite?: string;
+      thing?: Thing;
     }
   | {
       /** Creeps closer while Nora looks away and freezes when she looks. Can be talked to. */
@@ -161,6 +171,8 @@ export type MonsterDef =
       /** When `catchWhen` is set it hides in one of these (e.g. shelf tiles) until Nora finds it. */
       shelters?: [col: number, row: number][];
       catchWhen?: Flags;
+      /** Until these flags are set it is never seen – only the toys in its shelters rustle now and then. */
+      unseenUntil?: Flags;
     };
 
 export interface Room {

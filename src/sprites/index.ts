@@ -16,6 +16,7 @@ import {
 } from "./case1";
 import { alertBubble, ester } from "./ester";
 import { magnifier, shadowEyes, trashBin, viskanGhost } from "./monsters";
+import { customerBook, fingerDots, fladderHang, gBlock, gCurly, gDotted, gThin, gift, sleeveScrap } from "./clues";
 import { fladder } from "./fladder";
 import { grymlan, monsterEgg, moonShard, rustle } from "./finale";
 import { nora } from "./nora";
@@ -79,6 +80,15 @@ export const sprites: Record<string, PixelSprite> = {
   moonShard,
   monsterEgg,
   rustle,
+  fingerDots,
+  gift,
+  sleeveScrap,
+  customerBook,
+  fladderHang,
+  gCurly,
+  gBlock,
+  gThin,
+  gDotted,
   hintBubble,
   questionBubble,
   alertBubble,

@@ -89,7 +89,12 @@ Titelskärm → Stadskartan (välj fall) → FALLET → Avslöjandet → Stjärn
 Varje fall är ett **komplett mysterium med en röd tråd**, inte bara en samling ledtrådar:
 
 1. **Problemet.** Något konstigt händer, och det är kroken som gör att man vill veta mer.
-2. **Utredningen.** Man hittar ledtrådar *och* löser klurigheter (pussel) som öppnar nya rum och ger nya ledtrådar. Minst ett falskt spår gör att man måste tänka själv.
+2. **Utredningen, en teoritrappa.** Man hittar ledtrådar *och* löser klurigheter (pussel) som öppnar nya rum och ger nya ledtrådar.
+   - **Varje rum ska ändra teorin.** Efter varje rum ska man tro något nytt eller förstå att man hade fel. Ett rum får inte bara vara en transportsträcka.
+   - **Det avgörande beviset kräver flera rum.** Inget enskilt rum ska räcka för att lösa fallet. Det finns tester som kontrollerar vilka rum bevisen kommer från.
+   - **Den skyldige syns inte förrän man kan förstå vad man ser.** Först syns bara spår av något, och tydliga glimtar kommer sent.
+   - **Gärna två frågor: vad och vem.** "Vad är det?" löses i mitten av fallet, "vems/vem är det?" i slutet, så att man själv listar ut den som dyker upp i slutscenen.
+   - Minst ett falskt spår per misstänkt gör att man måste tänka själv.
 3. **Faran.** Monster gör det svårt och spännande: de jagar, smyger och flyger iväg med Nora. Se avsnitt 5.
 4. **Avslöjandet.** Nora pekar ut den skyldige och **visar bevis** ur detektivboken. Det ska kräva att man tänker:
    - **Flera misstänkta med egna falska spår.** Varje misstänkt ska ha minst en ledtråd som pekar mot sig, och vissa ledtrådar ska passa flera misstänkta (till exempel grön tråd och Stinas gröna garn).
@@ -134,64 +139,57 @@ Tjuven är **Skuggan**, ett skuggmonster med glödande ögon som syns i utkanten
 | 5 | Månstenens plats i tornet är tom, och därför stannade klockan. Nora hittar en karta till Skuggans grotta. |
 | 6 | Skuggan avslöjas. Månstenen sätts ihop och det blir fest. |
 
-### Fall 1: Leksaksaffären (utkast)
-
-*Detta är ett utkast. Det byggs som testbana nu och designas om ordentligt i steg 6.*
+### Fall 1: Leksaksaffären
 
 Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig, mitt på dagen!* Det är första fallet och därmed inlärningsbanan: gå, prata, hoppa, första pusslet och första monstret.
 
-**Sanningen:** Monstret Grymlan kom till affären för att köpa en present till sin lillebror. I lagret skrämdes han av *en skugga med glödande ögon*, och då trillade hans vänstra arm av. Armen kryper nu omkring på egen hand och letar efter honom. Den har hittat en **månstensbit**, och det är magin i biten som får leksakerna att vakna.
+**Sanningen:** Monstret Grymlan kom till affären för att köpa en present till sin lillebror. I lagret skrämdes han av *en skugga med glödande ögon*, fastnade i en spik och tappade armen. Handen kryper nu omkring på egen hand och letar efter honom. Den har hittat en **månstensbit**, och det är magin i biten som får leksakerna att vakna.
+
+**Teoritrappan:** varje rum ändrar vad man tror.
+
+| Rum | Vad man tror efteråt | Ledtrådar |
+|---|---|---|
+| 🏪 **Butiken** | *"Leksakerna lever!? Eller är det Fladder?"* Inget syns, leksakerna skakar bara ibland. | Fem små prickar i dammet *(tvetydigt)*, grön tråd *(tvetydig: Stinas gröna garn)*, rosa fjäll *(falskt spår mot Fladder)*, Nallen har flyttat sig *(falskt spår mot Nallen)*, Nallens nervösa förklaring (han såg något som lyste), **Stinas kundbok** (Gunnar Gris, Gerda Groda, och Grymlan som letade present till sin lillebror) |
+| 📦 **Lagret** | *"Det är inte leksakerna. Någon 'G' har varit här och skadat sig, och något med fem ben kryper omkring."* | Fladder är vaken *(NO: fladdermöss sover på dagen)*, **Fladders vittnesmål** när hon vilar i taket (inga händer, väcktes av något lysande med fem ben), **paketet** "Till lillebror, från G." (snirkligt G), **tröjbiten** på en spik med blod, blodsdroppar, ögonen i hörnet *(röd tråd)* |
+| 🌳 **Bakgården** | *"Det är en HAND! Och den som saknar något grönt är samma G som lämnade paketet."* | **Handavtryck i den blöta sanden** (aha!), lappen "SAKNAS: Något grönt som är mitt. / G.", **jämför handstilen** (samma snirkliga G), **Viskans vittnesmål** efter gåtan |
+
+**Handen syns inte förrän man kan förstå vad man ser.** Före sandlådan skakar bara leksakerna på hyllorna ibland. Efter sandlådan syns korta glimtar av handen i butiken (långt från Nora), och på slutet gömmer den sig i en hylla.
 
 **Figurer och monster:**
-- **Stina Snurr** äger affären. Hon har grått hår i knut, glasögon, rosa kofta och gult förkläde.
-- **Nallen** är ett vittne bakom byggklossarna.
-- **Armen** *(krypare)* är en hand i grön tröjärm som springer på fingrarna. Den syns sällan (var 9–16:e sekund) och kilar då en kort sträcka vid den hylla som är **längst från Nora**, så att det känns som en glimt och inte som ett anfall. Den går inte att fånga förrän på slutet.
-- **Fladder** *(flygare)* är vaken i lagret mitt på dagen och flyger oroligt runt i en slinga. Om hon fångar Nora bär hon iväg henne till dörren, och Nora tappar en sak. Hon är ett falskt spår, men också en ledtråd: *"Fladdermöss sover ju på dagen. Varför är Fladder vaken? Något är fel i staden…"*
-- **Viskan** *(smygare)* bor i soptunnan på bakgården. När Nora knackar på tunnan hoppar hon fram en stund efteråt. Sedan glider hon närmare när Nora inte tittar och står stilla när hon tittar. Man vinner hennes vittnesmål genom att svara på en gåta.
-- **Grymlan** dyker upp i avslöjandet.
-
-**Rum:** Butiken → (höger dörr) → Lagret → (bakdörren) → Bakgården.
-
-**Stämning:** Leksaksbilar kör omkring av sig själva och stannar ibland. En burk leksaksslem har vält, och slemmet är det första man övar att hoppa över. I lagret flimrar lampan.
-
-**Ledtrådar:**
-| Var | Ledtråd |
-|---|---|
-| Butiken | Små handavtryck i dammet, men inga fotspår ✔ *bevis: händer utan fötter* |
-| Butiken | En grön ulltråd som fastnat i en hylla *(tvetydig: Stina stickar med grönt garn)* |
-| Butiken | Rosa fjäll vid hyllan *(falskt spår mot Fladder)* |
-| Butiken | Stina: nallen satt på hyllan i morse, nu sitter han bakom klossarna *(falskt spår mot Nallen)* |
-| Butiken | Stinas stickkorg med grönt garn *(frivillig, gör tråden tvetydig)* |
-| Butiken | Nallen såg något med fem ben och inget huvud kravla förbi ✔ *bevis: inget huvud* |
-| Lagret | Små droppar blod som leder mot bakdörren |
-| Lagret | Fladder är vaken mitt på dagen, fast fladdermöss är nattdjur *(röd tråd)* |
-| Lagret | Två glödande prickar och en kall skugga i hörnet *(röd tråd, Skuggan)* |
-| Bakgården | Släpspår i sandlådan, som om något kravlat fram med händerna ✔ *bevis: händer utan fötter* |
-| Bakgården | Lapp på anslagstavlan: *"SAKNAS: Något grönt som är mitt. Det kan inte sitta still! / G."* (antyder, avslöjar inte) |
-| Bakgården | Viskan såg något litet och grönt utan huvud krypa in i affären, och det höll i något som lyste ✔ *bevis: inget huvud* |
+- **Stina Snurr** äger affären. Hon har grått hår i knut, glasögon, rosa kofta och gult förkläde. Hon stickar med grönt garn.
+- **Nallen** är misstänkt, inte vittne.
+- **Fladder** *(flygare)* är vaken mitt på dagen och flyger runt i lagret. Man gömmer sig bakom lådor. **Ibland vilar hon upp och ner i taket, och då kan man prata med henne.**
+- **Viskan** *(smygare)* bor i soptunnan på bakgården och hoppar fram en stund efter att man knackat på. Man vinner hennes vittnesmål med en gåta.
+- **Handen** *(krypare)*: se ovan.
+- **Grymlan** kommer in först i slutscenen, men man har listat ut honom själv.
 
 **Klurigheter:**
-1. **Kassaapparaten** (butiken). Stina har låst in lagernyckeln och glömt koden. Kvittot visar två leksaker och deras priser, till exempel *"1 docka 6 kr, 1 raket 7 kr"*. Koden är summan. Leksaker och priser (2–9 kr) slumpas en gång per omgång och ger alltid ett tvåsiffrigt svar (10–18), så det finns hundratals olika kvitton. Inom samma omgång är kvittot detsamma, så man kan försöka igen på samma uppgift. *(Addition med pengar.)*
-2. **Bakdörrens formlås** (lagret). Lappen säger: *"Först den som rullar åt alla håll. Sedan den med sex fyrkantiga sidor. Sist den som liknar en burk."* Svaret är **klot, kub, cylinder**. *(Geometri.)*
-3. **Viskans gåta** (bakgården): *"Vad blir blötare ju mer det torkar?"* Svaret är **en handduk**, som väljs bland bilder. *(Logik och språk.)*
-4. **Avslöjandet**: *Vem flyttar på leksakerna?* Val: Fladder / Viskan / Stina Snurr / Nallen / **En lös hand**. Sedan väljer man två bevis: ett som visar *händer men inga fötter* (handavtrycken eller släpspåren) och ett som visar *inget huvud* (Nallens eller Viskans vittnesmål). Fel val får en förklaring av Ester, till exempel *"Grön tråd? Men Stina stickar ju med grönt garn…"*. Att det var Grymlans hand får man veta först i slutscenen.
-5. **Fånga den skyldige**: armen gömmer sig i en av hyllorna i butiken. Där skakar leksakerna ibland (små rörelsestreck), och ibland byter den hylla. Nora ska titta noga och undersöka rätt hylla med Ctrl. *(Iakttagelse.)*
+1. **Kassaapparaten** (butiken): addition med pengar. Kvittot slumpas: två leksaker för 2–9 kr, med en tvåsiffrig summa.
+2. **Formlåset** (lagret): tre av fyra former i slumpad ordning. *(Geometri.)*
+3. **Viskans gåta** (bakgården): en av fyra gåtor, med bildval. *(Språk och logik.)*
+4. **Jämför handstilen** (bakgården, när man har sett paketet): vilket av fyra G är det snirkliga G:et från paketet? *(Läsförståelse och iakttagelse.)*
+5. **Avslöjandet, i två frågor:**
+   - *Vad flyttar på leksakerna?* Val: Fladder, Viskan, Stina, Nallen, en lös hand. **Bevis:** avtrycken i sanden *och* ett vittnesmål om vad som kröp (Fladders eller Viskans).
+   - *Vems hand är det?* Val: Grymlan, Gunnar Gris, Gerda Groda, Stina Snurr (utan bilder). **Bevis:** kundboken *och* paketet eller samma G.
+   - Ester förklarar varje felval, till exempel *"Gerda Groda är grön – men hon köpte ett spel till sin mormor, inte till en lillebror."*
+   - **Det avgörande kräver alla tre rummen.** Det finns ett test som kontrollerar det.
+6. **Fånga den skyldige:** handen gömmer sig i en hylla där leksakerna skakar. Man undersöker rätt hylla med Ctrl. *(Iakttagelse.)*
 
-**Mål** (visas ett i taget och säger *vad* man ska göra, inte *hur*; det är Esters tips som visar vägen):
+**Mål** (säger *vad*, inte *hur*):
 1. Ta reda på vad som har hänt
 2. Leta efter ledtrådar i affären
-3. Ta dig in i lagret *(via kassaapparaten)*
+3. Ta dig in i lagret
 4. Undersök lagret
-5. Ta dig ut ur lagret *(bakdörrens formlås)*
+5. Ta dig ut ur lagret
 6. Vart leder spåren?
-7. Vem flyttar på leksakerna?
+7. Vad flyttar på leksakerna, och vems är det?
 8. Fånga den skyldige!
 
-**Intro:** Ett introkort ("Fall 1 – Leksaksaffären") berättar att Stina ringt och är rädd. När fallet börjar ser Ester en leksaksbil köra av sig själv.
+**Intro:** Ett introkort berättar att Stina ringt och är rädd. När fallet börjar ser Ester en leksaksbil köra av sig själv.
 
-**Slut** (spelas upp som en liten film, `finale` i fallet): armen kommer fram, Grymlan kommer in och berättar om skuggan i lagret, och Stina syr fast armen (vit blixt). Armen släpper en lysande **månstensbit** som Nora får. *"Det här mysteriet är inte slut än…"* Därefter kommer resultatskärmen med stjärnor, tid, monsterkort (Fladder, Viskan och Grymlan) och **Visste du att…?** *Fladdermöss sover upp och ner på dagen, jagar insekter på natten och hittar i mörkret med ekot av sina egna rop.*
+**Slut:** Handen kommer fram. Grymlan kommer in och berättar om skuggan i lagret och spiken. Stina syr fast armen. Handen släpper en lysande **månstensbit**, och Nora säger *"Det här mysteriet är inte slut än…"*. Därefter kommer resultatskärmen med stjärnor, tid, monsterkort (Fladder, Viskan och Grymlan) och **Visste du att…?** om fladdermöss.
 
-**Hemligt monsterägg:** bakom en låda i lagret.
+**Hemligt monsterägg:** bakom lådorna uppe till höger i lagret.
 
 ### Exempel på ett fall i detalj: "Vem tog bullarna?" (fall 2)
 
@@ -593,7 +591,7 @@ PNG från Piskel och liknande fungerar parallellt. Om barnet ritar en egen figur
 
 ### 11.7 Sparning
 
-Framstegen sparas i `localStorage` under nyckeln `monsterdetektiven-v1`: vilka fall som är klara, stjärnor, bästa tid, hittade ägg och inställningar (hjälpnivå, musik). Det fungerar även när den färdiga HTML-filen öppnas direkt från disk. Ett fall sparas inte mitt i. Fallen är korta, 5–15 minuter.
+Framstegen sparas i `localStorage` under nyckeln `monsterdetektiven-v2`. Det finns **fyra spelare**, och för varje spelare sparas namn, vilka fall som är klara, stjärnor, bästa tid, hittade ägg och monsterkort. På **titelskärmen** väljer man spelare (klicka, 1–4 eller pilarna, sedan mellanslag), byter namn (✏️) eller **rensar** en spelare (🗑️). Rensningen kräver att man klickar på "Ja, rensa" i en bekräftelseruta; Enter och Esc avbryter. Äldre framsteg (`-v1`) flyttas till spelare 1. Musikvalet sparas separat. Allt fungerar även när den färdiga HTML-filen öppnas direkt från disk. Ett fall sparas inte mitt i. Fallen är korta, 5–15 minuter.
 
 ### 11.8 Kommandon
 
@@ -624,7 +622,7 @@ Varje steg ska ge något som går att **spela och visa upp**.
 | 6 ✅ | **Fall 1 är ett komplett mysterium:** introkort, tre rum, nio ledtrådar varav två leder mot den röda tråden, fyra slumpade klurigheter, tre monster, avslöjande med bevis, jakt på den skyldige bland hyllorna, slutscen med månstensbiten, resultatskärm (stjärnor, tid, monsterkort, "Visste du att…?"), hemligt monsterägg och sparade framsteg (titelskärmen visar dem). **Nästa: det första riktiga speltestet med huvudarkitekten!** |
 | 7 | Egen grafik och egna ljud (om huvudarkitekten vill), ljudeffekter och musik. |
 | 8 | Fall 2–6 och fler pusseltyper. |
-| 9 | Titelskärm, stadskarta, inställningar och finputs. |
+| 9 | Stadskarta, inställningar och finputs. *(Titelskärmen med fyra spelare finns redan.)* |
 
 **Tips för speltest:** Titta utan att hjälpa till. Där man fastnar behöver ett tips bli bättre eller ett pussel bli lättare. Låt gärna kompisar testa.
 

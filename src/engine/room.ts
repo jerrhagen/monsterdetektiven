@@ -156,17 +156,17 @@ function givableFlags(c: Case): Set<string> {
   for (const step of c.finale) if ("give" in step) out.add(step.give);
   for (const room of Object.values(c.rooms)) {
     for (const clueId of Object.values(room.clues ?? {})) out.add(clueFlag(clueId));
-    const monsterThings = (room.monsters ?? []).flatMap((m) => (m.type === "sneaker" ? [m.thing] : []));
+    const monsterThings = (room.monsters ?? []).flatMap((m) => ("thing" in m && m.thing ? [m.thing] : []));
     for (const m of room.monsters ?? []) if (m.type === "sneaker" && m.hideUntil) out.add(emergedFlag(m.sprite));
     for (const thing of [...Object.values(room.things ?? {}), ...monsterThings]) {
       for (const t of [thing, ...(thing.talkIf ?? [])]) {
         flagList(t.gives).forEach((f) => out.add(f));
-        if (t.clue) out.add(clueFlag(t.clue));
+        flagList(t.clue).forEach((id) => out.add(clueFlag(id)));
       }
     }
     if (room.onEnter) {
       flagList(room.onEnter.gives).forEach((f) => out.add(f));
-      if (room.onEnter.clue) out.add(clueFlag(room.onEnter.clue));
+      flagList(room.onEnter.clue).forEach((id) => out.add(clueFlag(id)));
     }
   }
   return out;
@@ -215,7 +215,9 @@ export function validateCase(c: Case): string[] {
     for (const thing of Object.values(room.things ?? {})) {
       for (const t of thing.talkIf ?? []) need(t.when, `${thing.name} i ${where}`);
       for (const t of [thing, ...(thing.talkIf ?? [])]) {
-        if (t.clue && !c.clues[t.clue]) errors.push(`${thing.name}: ledtråden '${t.clue}' är inte beskriven.`);
+        for (const id of flagList(t.clue)) {
+          if (!c.clues[id]) errors.push(`${thing.name}: ledtråden '${id}' är inte beskriven.`);
+        }
       }
     }
     for (const door of room.doors ?? []) {
@@ -256,7 +258,11 @@ export function validateCase(c: Case): string[] {
     for (const thing of Object.values(room.things ?? {})) need(thing.puzzleWhen, `${thing.name} (pussel)`);
     for (const m of room.monsters ?? []) {
       const points =
-        m.type === "flyer" ? [m.center] : m.type === "sneaker" ? [m.home] : [...m.routes.flat(), ...(m.shelters ?? [])];
+        m.type === "flyer"
+          ? [m.center, ...(m.perch ? [m.perch] : [])]
+          : m.type === "sneaker"
+            ? [m.home]
+            : [...m.routes.flat(), ...(m.shelters ?? [])];
       for (const [col, row] of points) {
         if (col < 0 || col >= ROOM_COLS || row < 0 || row >= ROOM_ROWS) {
           errors.push(`I rummet '${room.name}': ett monster är utanför rummet (${col}, ${row}).`);
@@ -281,9 +287,11 @@ export function validateCase(c: Case): string[] {
     const optionSets =
       p.type === "choice" && p.variants
         ? p.variants.map((v) => ({ options: v.options, answers: [v.answer] }))
-        : rolled.type === "order" || rolled.type === "choice" || rolled.type === "reveal"
-          ? [{ options: rolled.options, answers: rolled.type === "order" ? rolled.answer : [rolled.answer] }]
-          : [];
+        : rolled.type === "reveal"
+          ? rolled.questions.map((q) => ({ options: q.options, answers: [q.answer] }))
+          : rolled.type === "order" || rolled.type === "choice"
+            ? [{ options: rolled.options, answers: rolled.type === "order" ? rolled.answer : [rolled.answer] }]
+            : [];
     for (const { options, answers } of optionSets) {
       const ids = options.map((o) => o.id);
       for (const a of answers) if (!ids.includes(a)) errors.push(`${where}: svaret '${a}' finns inte bland valen.`);
@@ -294,9 +302,11 @@ export function validateCase(c: Case): string[] {
       }
     }
     if (p.type === "reveal") {
-      if (p.proof.length < 2) errors.push(`${where}: behöver minst två grupper av bevis.`);
-      for (const e of [...p.proof.flat(), ...Object.keys(p.why ?? {})]) {
-        if (!c.clues[e]) errors.push(`${where}: '${e}' är ingen ledtråd.`);
+      for (const q of p.questions) {
+        if (q.proof.length < 2) errors.push(`${where}: '${q.question}' behöver minst två grupper av bevis.`);
+        for (const e of [...q.proof.flat(), ...Object.keys(q.why ?? {})]) {
+          if (!c.clues[e]) errors.push(`${where}: '${e}' är ingen ledtråd.`);
+        }
       }
     }
   }
