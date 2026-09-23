@@ -40,4 +40,5 @@ Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bar
 - All kod och alla datanycklar är på engelska. Fallen ligger i `src/cases/` och pixelgrafiken i `src/sprites/`. All text som visas i spelet är på svenska.
 - **Claude gör alla kartor och all grafik.** Barnet ändrar genom att berätta i chatten. Visa henne resultatet i spelet (förhandsvisning eller skärmbild), aldrig kod eller textkartor. Om hon fotar en teckning, bygg utifrån den.
 - Kommandon: `npm run dev`, `npm test`, `npm run build` (ger en fristående `dist/index.html`).
+- **Rör aldrig `localStorage` när du testar.** Där ligger spelarnas sparade framsteg (`monsterdetektiven-v2`). Om ett test måste spara, gör det med en egen testspelare och återställ efteråt.
 - **Provspela aldrig mysterier i den synliga förhandsvisningen.** Huvudarkitekten kan se rutan. Testa i en bakgrundsflik (`tabs_create` utan foreground) och visa henne bara början av fallet. I utvecklingsläge finns `window.game` så att man kan flytta Nora och läsa spelets tillstånd.

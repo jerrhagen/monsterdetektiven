@@ -38,6 +38,7 @@ describe("fallen", () => {
 
   it("hittar fel i en trasig karta", () => {
     const broken: Case = {
+      summary: [],
       id: "x",
       number: 0,
       title: "Trasig",

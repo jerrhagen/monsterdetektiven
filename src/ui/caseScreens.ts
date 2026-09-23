@@ -50,12 +50,40 @@ export function showCaseIntro(c: Case, onStart: () => void): void {
   open = el;
 }
 
+/** "Leave the case?" – going to the map means starting the case over next time. */
+export function showLeaveCase(onLeave: () => void): void {
+  close();
+  const el = document.createElement("div");
+  el.className = "case-screen leave-case";
+  el.innerHTML = `
+    <div class="title-dialog-box">
+      <p>Vill du gå till stadskartan?</p>
+      <p class="warning">Fallet börjar om från början nästa gång.</p>
+      <div class="buttons"><button class="cancel">Nej, spela vidare</button><button class="danger">Ja, till kartan</button></div>
+    </div>`;
+  const onKey = (e: KeyboardEvent) => {
+    if (e.key === "Escape" || e.key === "Enter") stay();
+  };
+  const stay = () => {
+    window.removeEventListener("keydown", onKey);
+    close();
+  };
+  el.querySelector(".cancel")!.addEventListener("click", stay);
+  el.querySelector(".danger")!.addEventListener("click", () => {
+    stay();
+    onLeave();
+  });
+  window.addEventListener("keydown", onKey);
+  uiRoot.appendChild(el);
+  open = el;
+}
+
 /** "Fallet är löst!" – stars, time, new monster cards and a fact. */
 export function showCaseResult(
   c: Case,
   result: Result,
   details: { hintsUsed: number },
-  actions: { again: () => void; title: () => void },
+  actions: { again: () => void; map: () => void },
 ): void {
   close();
   const star = (on: boolean) => `<span class="star ${on ? "on" : ""}">★</span>`;
@@ -90,16 +118,16 @@ export function showCaseResult(
       <div class="fact"><b>Visste du att…?</b> <span>${escape(c.fact)}</span></div>
       <div class="buttons">
         <button class="again">Spela igen</button>
-        <button class="to-title">Till titelskärmen</button>
+        <button class="to-map">Till stadskartan</button>
       </div>
     </div>`;
   el.querySelector(".again")!.addEventListener("click", () => {
     close();
     actions.again();
   });
-  el.querySelector(".to-title")!.addEventListener("click", () => {
+  el.querySelector(".to-map")!.addEventListener("click", () => {
     close();
-    actions.title();
+    actions.map();
   });
   uiRoot.appendChild(el);
   open = el;

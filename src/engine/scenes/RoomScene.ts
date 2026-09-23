@@ -1,8 +1,8 @@
 import * as Phaser from "phaser";
 import type { Edge, FinaleStep, Flags, Mover, Puzzle, Thing } from "../../cases/types";
-import { isCaseScreenOpen, showCaseIntro, showCaseResult } from "../../ui/caseScreens";
+import { isCaseScreenOpen, showCaseIntro, showCaseResult, showLeaveCase } from "../../ui/caseScreens";
 import { advanceDialog, isDialogOpen, openDialog } from "../../ui/dialog";
-import { hideHud, showHud, updateHud, updateMusicButton } from "../../ui/hud";
+import { hideHud, setHudRoomClues, showHud, updateHud, updateMusicButton } from "../../ui/hud";
 import { toggleMusic } from "../../ui/music";
 import { closeNotebook, isNotebookOpen, toggleNotebook } from "../../ui/notebook";
 import { closePuzzle, isPuzzleOpen, openPuzzle } from "../../ui/puzzle";
@@ -17,6 +17,7 @@ import { type Facing, Player } from "../Player";
 import {
   OPPOSITE,
   type ParsedRoom,
+  cluesInRoom,
   doorAt,
   entryPoint,
   isLowObstacle,
@@ -29,6 +30,9 @@ import { drawRoom } from "../roomRenderer";
 import { recordSolved, starsFor } from "../save";
 import { MAGNIFIER, newGame, session } from "../session";
 import { registerSprites } from "../textures";
+
+/** Pixels a thing on a counter is lifted, so it stands on the counter top. */
+const ON_TOP_LIFT = 6;
 
 type Target =
   | { kind: "ester" }
@@ -74,8 +78,10 @@ export class RoomScene extends Phaser.Scene {
   private esterOffset = { x: 0, y: 0 };
   private pickup: Phaser.GameObjects.GameObject[] = [];
   private thingShadows: Phaser.GameObjects.Ellipse[] = [];
-  /** Glowing outlines on things that still have a clue to give. */
+  /** Glowing outlines on things (not people) that have something new. */
   private thingGlows = new Map<number, Phaser.GameObjects.GameObject[]>();
+  /** Speech bubbles over people who have something new to say. */
+  private thingBubbles = new Map<number, Phaser.GameObjects.Image>();
   /** True while the ending plays – no walking, no monsters. */
   private cutscene = false;
   private keys!: {
@@ -106,6 +112,7 @@ export class RoomScene extends Phaser.Scene {
     this.pickup = [];
     this.cutscene = false;
     this.thingGlows = new Map();
+    this.thingBubbles = new Map();
   }
 
   create(): void {
@@ -129,15 +136,10 @@ export class RoomScene extends Phaser.Scene {
     this.thingSprites = this.room.things.map(({ col, row, thing }) => {
       const x = col * TILE + TILE / 2;
       const y = row * TILE + TILE;
-      this.thingShadows.push(this.add.ellipse(x, y - 1, 12, 4, 0x000000, 0.25).setDepth(y - 0.5));
-      return this.add.sprite(x, y, `${thing.sprite}-0`).setOrigin(0.5, 1).setDepth(y);
-    });
-    this.room.things.forEach(({ thing }, i) => {
-      if (!this.hasUnfoundClue(thing)) return;
-      const s = this.thingSprites[i];
-      const glow = this.addGlow(s.x, s.y - s.height / 2, `${thing.sprite}-0`);
-      glow.forEach((o) => (o as Phaser.GameObjects.Image).setDepth(s.depth - 0.1));
-      this.thingGlows.set(i, glow);
+      // Something standing on a counter or a shelf sits on its top surface, without a floor shadow.
+      const lift = thing.on ? ON_TOP_LIFT : 0;
+      this.thingShadows.push(this.add.ellipse(x, y - 1, 12, 4, 0x000000, thing.on ? 0 : 0.25).setDepth(y - 0.5));
+      return this.add.sprite(x, y - lift, `${thing.sprite}-0`).setOrigin(0.5, 1).setDepth(y);
     });
     this.updateHiddenThings();
 
@@ -205,7 +207,13 @@ export class RoomScene extends Phaser.Scene {
     kb.on("keydown-M", onMusicKey);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => kb.off("keydown-M", onMusicKey));
 
-    showHud(() => toggleNotebook(this.state));
+    showHud(
+      () => toggleNotebook(this.state),
+      () => {
+        if (!this.cutscene) showLeaveCase(() => this.scene.start("map"));
+      },
+    );
+    setHudRoomClues(cluesInRoom(this.state.data, roomId));
     updateHud(this.state);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       hideHud();
@@ -246,6 +254,11 @@ export class RoomScene extends Phaser.Scene {
     const bookPressed = JustDown(this.keys.book);
     const escPressed = JustDown(this.keys.escape);
 
+    // While someone talks (or a puzzle, the book or the ending is open), the bubbles keep quiet.
+    const quiet = isPuzzleOpen() || isCaseScreenOpen() || isNotebookOpen() || isDialogOpen() || this.cutscene;
+    this.thingBubbles.forEach((b) => b.setVisible(!quiet));
+    if (quiet) this.bubble.setVisible(false);
+
     if (isPuzzleOpen() || isCaseScreenOpen()) {
       this.idle(dt);
       return;
@@ -278,7 +291,9 @@ export class RoomScene extends Phaser.Scene {
 
     const dx = (this.keys.right.isDown ? 1 : 0) - (this.keys.left.isDown ? 1 : 0);
     const dy = (this.keys.down.isDown ? 1 : 0) - (this.keys.up.isDown ? 1 : 0);
-    this.player.update(dt, { dx, dy, jump: jumpPressed });
+    // Space does what makes sense: next to someone or something it talks or looks – otherwise Nora jumps.
+    const spaceUses = jumpPressed && this.target !== null && !this.player.airborne;
+    this.player.update(dt, { dx, dy, jump: jumpPressed && !spaceUses });
     this.ester.update(dt, time, this.player);
     for (const m of this.monsters) m.update(dt, time);
     if (this.carried) return;
@@ -289,7 +304,7 @@ export class RoomScene extends Phaser.Scene {
 
     this.target = this.player.airborne ? null : this.findTarget();
     this.showBubble(time);
-    if (usePressed && this.target) this.use(this.target);
+    if ((usePressed || spaceUses) && this.target) this.use(this.target);
   }
 
   /** A thin golden outline that pulses slowly on a clue that hasn't been found yet. */
@@ -445,13 +460,27 @@ export class RoomScene extends Phaser.Scene {
 
   /** The little "…" bubble above whatever Nora can use right now. */
   private showBubble(time: number): void {
+    const bob = Math.round(Math.sin(time / 200));
+    this.thingBubbles.forEach((b, i) => {
+      const s = this.thingSprites[i];
+      b.setPosition(s.x, s.y - s.height - 1 + bob);
+    });
     const target = this.target;
     if (!target) {
       this.bubble.setVisible(false);
       return;
     }
-    const bob = Math.round(Math.sin(time / 200));
     if (target.kind === "ester") {
+      this.bubble.setVisible(false);
+      return;
+    }
+    const looking =
+      target.kind === "clue" || target.kind === "shelf" || (target.kind === "thing" && !this.room.things[target.index].thing.person);
+    this.bubble.setTexture(looking ? "lookBubble-0" : "hintBubble-0");
+    const ownBubble =
+      (target.kind === "thing" && this.thingBubbles.has(target.index)) ||
+      (target.kind === "monster" && !!this.monsters[target.index].showsTalkHint?.());
+    if (ownBubble) {
       this.bubble.setVisible(false);
       return;
     }
@@ -471,7 +500,7 @@ export class RoomScene extends Phaser.Scene {
     if (target.kind === "ester") {
       this.talkToEster();
     } else if (target.kind === "thing") {
-      this.useThing(this.room.things[target.index].thing);
+      this.useThing(this.room.things[target.index].thing, this.thingKey(target.index));
     } else if (target.kind === "monster") {
       const thing = this.monsters[target.index].thing;
       if (thing) this.useThing(thing);
@@ -504,18 +533,29 @@ export class RoomScene extends Phaser.Scene {
   }
 
   /** Talk to a thing – or, if it has an unsolved puzzle that's ready, start that. */
-  private useThing(thing: Thing): void {
+  private useThing(thing: Thing, key?: string): void {
     const puzzle = this.openPuzzleFor(thing.puzzle);
     if (puzzle && this.state.has(thing.puzzleWhen)) {
       const intro = thing.puzzleIntro ?? this.state.talkFor(thing).talk;
       openDialog(thing.name, intro, () =>
         // Afterwards the thing says what it says now that the puzzle is solved.
-        this.startPuzzle(puzzle, () => this.useThing(thing)),
+        this.startPuzzle(puzzle, () => this.useThing(thing, key)),
       );
       return;
     }
     const talk = this.state.talkFor(thing);
-    openDialog(thing.name, talk.talk, () => this.reward(talk.gives, talk.clue));
+    openDialog(thing.name, talk.talk, () => {
+      this.reward(talk.gives, talk.clue);
+      // Remember what it said now, after its flags – so the bubble only comes back with news.
+      if (key) this.state.markHeard(key, thing);
+      this.updateHiddenThings();
+    });
+  }
+
+  /** Identifies a thing across visits to the room. */
+  private thingKey(index: number): string {
+    const { col, row } = this.room.things[index];
+    return `${this.room.id}:${col},${row}`;
   }
 
   private startPuzzle(puzzle: Puzzle, after: () => void): void {
@@ -551,21 +591,34 @@ export class RoomScene extends Phaser.Scene {
     return hideWhen !== undefined && this.state.has(hideWhen);
   }
 
-  private hasUnfoundClue(thing: Thing): boolean {
-    return flagList(thing.clue).some((id) => !this.state.hasClue(id));
-  }
-
-  /** Things with `hideWhen` disappear once it's true (e.g. a found egg); found clues stop glowing. */
+  /**
+   * Things with `hideWhen` disappear once it's true (e.g. a found egg). Things with something
+   * new glow softly – people instead get a speech bubble, and nothing glows once it's all heard.
+   */
   private updateHiddenThings(): void {
-    this.thingGlows.forEach((glow, i) => {
-      if (this.hasUnfoundClue(this.room.things[i].thing) && !this.isThingHidden(i)) return;
-      glow.forEach((o) => o.destroy());
-      this.thingGlows.delete(i);
-    });
     this.thingSprites.forEach((s, i) => {
       const hidden = this.isThingHidden(i);
       s.setVisible(!hidden);
       this.thingShadows[i]?.setVisible(!hidden);
+
+      const { thing } = this.room.things[i];
+      const news = !hidden && this.state.hasNews(this.thingKey(i), thing);
+      const bubble = this.thingBubbles.get(i);
+      const glow = this.thingGlows.get(i);
+      if (thing.person && news && !bubble) {
+        this.thingBubbles.set(i, this.add.image(s.x, s.y - s.height - 1, "hintBubble-0").setOrigin(0.5, 1).setDepth(9999));
+      } else if (!(thing.person && news) && bubble) {
+        bubble.destroy();
+        this.thingBubbles.delete(i);
+      }
+      if (!thing.person && news && !glow) {
+        const g = this.addGlow(s.x, s.y - s.height / 2, `${thing.sprite}-0`);
+        g.forEach((o) => (o as Phaser.GameObjects.Image).setDepth(s.depth - 0.1));
+        this.thingGlows.set(i, g);
+      } else if (!(!thing.person && news) && glow) {
+        glow.forEach((o) => o.destroy());
+        this.thingGlows.delete(i);
+      }
     });
   }
 
@@ -594,9 +647,9 @@ export class RoomScene extends Phaser.Scene {
     if (!crawler) return;
     const [sc, sr] = crawler.shelters[crawler.shelter];
     if (this.shelfGroup(col, row).has(`${sc},${sr}`)) {
-      void this.playFinale(crawler, sc, sr);
+      void this.playFinale({ crawler, col: sc, row: sr });
     } else {
-      openDialog("Nora", ["Ingenting här…", "Var skakar leksakerna?"]);
+      openDialog("Nora", ["Ingenting här…", "Var är det som skakar?"]);
     }
   }
 
@@ -608,28 +661,36 @@ export class RoomScene extends Phaser.Scene {
     return new Promise((done) => this.tweens.add({ targets: target, x, y, duration: ms, onComplete: () => done() }));
   }
 
-  /** The culprit is caught: play the case's ending, then show the result. */
-  private async playFinale(crawler: Crawler, col: number, row: number): Promise<void> {
+  /**
+   * The culprit is caught: play the case's ending, then show the result.
+   * Either Nora found a hiding crawler (it comes out as the actor "culprit"),
+   * or something else gave the "caught" flag (a puzzle, a talk…).
+   */
+  private async playFinale(hiding?: { crawler: Crawler; col: number; row: number }): Promise<void> {
+    if (this.cutscene) return;
     this.cutscene = true;
     this.bubble.setVisible(false);
-    this.reward(CAUGHT_FLAG);
-    crawler.vanish();
+    if (!this.state.has(CAUGHT_FLAG)) this.reward(CAUGHT_FLAG);
     playSuccess();
 
     const actors = new Map<string, Phaser.GameObjects.Sprite>([
       ["nora", this.player.sprite],
       ["ester", this.ester.sprite],
     ]);
-    // Out it comes!
-    const culprit = this.add
-      .sprite(col * TILE + TILE / 2, row * TILE + TILE / 2, crawler.sprite.texture.key)
-      .setDepth(9000);
-    culprit.play(crawler.sprite.texture.key.replace(/-\d+$/, ""), true);
-    actors.set("culprit", culprit);
-    await this.tweenTo(culprit, this.player.x + 14, this.player.y - 4, 600);
-    culprit.stop();
+    if (hiding) {
+      // Out it comes!
+      const { crawler, col, row } = hiding;
+      crawler.vanish();
+      const key = crawler.sprite.texture.key;
+      const culprit = this.add.sprite(col * TILE + TILE / 2, row * TILE + TILE / 2, key).setDepth(9000);
+      culprit.play(key.replace(/-\d+$/, ""), true);
+      actors.set("culprit", culprit);
+      await this.tweenTo(culprit, this.player.x + 14, this.player.y - 4, 600);
+      culprit.stop();
+    }
 
     for (const step of this.state.data.finale) await this.finaleStep(step, actors);
+    if (this.state.data.summary.length) await this.say("Ester", this.state.data.summary);
 
     this.cutscene = false;
     this.showResult();
@@ -685,13 +746,10 @@ export class RoomScene extends Phaser.Scene {
     );
     showCaseResult(state.data, result, { hintsUsed: state.hintsUsed }, {
       again: () => {
-        newGame();
+        newGame(session.caseIndex);
         this.scene.restart({});
       },
-      title: () => {
-        newGame();
-        this.scene.start("title");
-      },
+      map: () => this.scene.start("map"),
     });
   }
 
@@ -855,6 +913,11 @@ export class RoomScene extends Phaser.Scene {
         const clue = data.clues[flag.slice(5)];
         toast(`🔍 Ny ledtråd: ${clue.name}! <kbd>B</kbd>`);
       }
+    }
+
+    // Caught some other way than in a shelf (a puzzle, a talk…) – on to the ending.
+    if (added.includes(CAUGHT_FLAG) && !this.cutscene) {
+      window.setTimeout(() => void this.playFinale(), 300);
     }
 
     const goalAfter = this.state.currentGoalIndex();

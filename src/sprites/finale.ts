@@ -86,6 +86,21 @@ export const monsterEgg: PixelSprite = {
 };
 
 /** Motion marks over a shelf where something is hiding. */
+/** A little dust falling from a shelf – something moved in there (early in a case). */
+export const dustFall: PixelSprite = {
+  palette: { ".": null, g: "#b8aec8", d: "#8a8098" },
+  frames: [
+    [
+      "...g......",
+      "......d...",
+      ".d........",
+      ".....g..g.",
+      "..g.......",
+      "........d.",
+    ],
+  ],
+};
+
 export const rustle: PixelSprite = {
   palette: { ".": null, w: "#ffffff" },
   frames: [

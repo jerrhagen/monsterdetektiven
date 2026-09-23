@@ -18,6 +18,8 @@ export class CaseState {
   private readonly puzzles = new Map<string, Puzzle>();
   /** Values goal hints can show with {name}, e.g. the prices on a receipt. */
   private readonly vars: Record<string, string> = {};
+  /** Which talk Nora last heard from each thing (by a key like "store:4,5"). */
+  private readonly heard = new Map<string, number>();
 
   constructor(readonly data: Case) {
     for (const [id, p] of Object.entries(data.puzzles ?? {})) {
@@ -100,5 +102,26 @@ export class CaseState {
     const variant = thing.talkIf?.find((t) => this.has(t.when));
     if (!variant) return thing;
     return { ...variant, gives: [...flagList(thing.gives), ...flagList(variant.gives)] };
+  }
+
+  /** Index of the talk a thing uses right now (-1 = its own talk). */
+  private talkIndex(thing: Thing): number {
+    return thing.talkIf?.findIndex((t) => this.has(t.when)) ?? -1;
+  }
+
+  /** Nora has listened to a thing – remember what it said. */
+  markHeard(key: string, thing: Thing): void {
+    this.heard.set(key, this.talkIndex(thing));
+  }
+
+  /**
+   * Does the thing have something new: never used, it says something else now,
+   * it still has a clue to give, or its puzzle is ready and not solved?
+   */
+  hasNews(key: string, thing: Thing): boolean {
+    if (this.heard.get(key) !== this.talkIndex(thing)) return true;
+    if (flagList(thing.clue).some((id) => !this.hasClue(id))) return true;
+    const puzzle = thing.puzzle ? this.puzzles.get(thing.puzzle) : undefined;
+    return !!puzzle && !this.has(puzzle.gives) && this.has(thing.puzzleWhen);
   }
 }

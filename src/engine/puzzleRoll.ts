@@ -1,4 +1,4 @@
-import type { ChoicePuzzle, CodePuzzle, OrderPuzzle, Puzzle } from "../cases/types";
+import type { ChoicePuzzle, ClockPuzzle, CodePuzzle, OrderPuzzle, Puzzle } from "../cases/types";
 
 /** A rolled puzzle, plus values that goal hints may show with {name}. */
 export interface Rolled {
@@ -12,11 +12,27 @@ export function fillIn(text: string, vars: Record<string, string>): string {
   return text.replace(/\{([^{}]+)\}/g, (whole, name: string) => vars[name] ?? whole);
 }
 
-/** Evaluates "12", "{a}+{b}" or "{a}-{b}+3" once the numbers are filled in. */
+/** Evaluates "12", "{a}+{b}", "{a}-{b}+3" or "{a}*2" once the numbers are filled in. */
 export function evaluate(expression: string, vars: Record<string, string>): number {
-  const filled = fillIn(expression, vars).replace(/\s/g, "");
-  if (!/^\d+([+-]\d+)*$/.test(filled)) throw new Error(`Kan inte räkna ut '${expression}'.`);
-  return filled.match(/[+-]?\d+/g)!.reduce((sum, term) => sum + Number(term), 0);
+  const filled = fillIn(expression, vars).replace(/\s/g, "").replace(/×/g, "*");
+  if (!/^\d+([+*-]\d+)*$/.test(filled)) throw new Error(`Kan inte räkna ut '${expression}'.`);
+  // Multiplication first, then plus and minus.
+  return filled.match(/[+-]?[\d*]+/g)!.reduce((sum, term) => {
+    const sign = term.startsWith("-") ? -1 : 1;
+    const product = term.replace(/^[+-]/, "").split("*").reduce((p, f) => p * Number(f), 1);
+    return sum + sign * product;
+  }, 0);
+}
+
+const HOURS = ["tolv", "ett", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio", "tio", "elva", "tolv"];
+
+/** Swedish clock time: "tre", "kvart över tre", "halv fyra", "kvart i fyra". */
+export function timeText(hour: number, minute: number): string {
+  const h = (n: number) => HOURS[((n - 1) % 12) + 1];
+  if (minute === 0) return h(hour);
+  if (minute === 15) return `kvart över ${h(hour)}`;
+  if (minute === 30) return `halv ${h(hour + 1)}`;
+  return `kvart i ${h(hour + 1)}`;
 }
 
 function shuffled<T>(items: T[], random: () => number): T[] {
@@ -34,9 +50,14 @@ export function rollPuzzle(id: string, p: Puzzle, random: () => number = Math.ra
     case "code":
       return p.random ? rollCode(p, random) : { puzzle: p, vars: {} };
     case "order":
+      if (p.alphabetize) return rollAlphabet(p, random);
       return p.describe && p.pick ? rollOrder(p, random) : { puzzle: p, vars: {} };
     case "choice":
       return p.variants?.length ? rollChoice(id, p, random) : { puzzle: p, vars: {} };
+    case "match":
+      return { puzzle: { ...p, pairs: shuffled(p.pairs, random).slice(0, p.pick ?? p.pairs.length) }, vars: {} };
+    case "clock":
+      return rollClock(p, random);
     default:
       return { puzzle: p, vars: {} };
   }
@@ -51,6 +72,9 @@ function rollCode(p: CodePuzzle, random: () => number): Rolled {
     for (const [name, choices] of Object.entries(p.words ?? {})) {
       const unused = choices.filter((w) => !Object.values(vars).includes(w));
       vars[name] = unused[Math.floor(random() * unused.length)];
+    }
+    for (const [name, expression] of Object.entries(p.derive ?? {})) {
+      vars[name] = String(evaluate(expression, vars));
     }
     const answer = evaluate(p.answer, vars);
     const [low, high] = p.answerRange ?? [0, Infinity];
@@ -68,6 +92,39 @@ function rollOrder(p: OrderPuzzle, random: () => number): Rolled {
     return `${ordinal} ${p.describe![id]}.`;
   });
   return { puzzle: { ...p, text: [...p.text, ...lines], answer: chosen }, vars: {} };
+}
+
+function rollAlphabet(p: OrderPuzzle, random: () => number): Rolled {
+  const { words, pick, sprite } = p.alphabetize!;
+  const chosen = shuffled(words, random).slice(0, pick);
+  const options = chosen.map((w) => ({ id: w, label: w, sprite }));
+  const answer = [...chosen].sort((a, b) => a.localeCompare(b, "sv"));
+  return { puzzle: { ...p, options, answer }, vars: {} };
+}
+
+function rollClock(p: ClockPuzzle, random: () => number): Rolled {
+  const minutes = p.minutes ?? [0, 15, 30, 45];
+  const hour = 1 + Math.floor(random() * 12);
+  const minute = minutes[Math.floor(random() * minutes.length)];
+  const same = (a: { hour: number; minute: number }, b: { hour: number; minute: number }) =>
+    a.hour === b.hour && a.minute === b.minute;
+  const right = { hour, minute };
+  // Wrong clocks that are easy to mix up: an hour off, the other kind of time, and a random one.
+  const candidates = [
+    { hour: (hour % 12) + 1, minute },
+    { hour: ((hour + 10) % 12) + 1, minute },
+    { hour, minute: minutes[(minutes.indexOf(minute) + 1) % minutes.length] },
+    { hour: minute === 30 ? (hour % 12) + 1 : hour, minute: minute === 30 ? 0 : 30 },
+    { hour: 1 + Math.floor(random() * 12), minute: minutes[Math.floor(random() * minutes.length)] },
+  ];
+  const wrong: { hour: number; minute: number }[] = [];
+  for (const c of shuffled(candidates, random)) {
+    if (wrong.length < 3 && !same(c, right) && !wrong.some((w) => same(w, c))) wrong.push(c);
+  }
+  const times = shuffled([right, ...wrong], random).map((t, i) => ({ id: `t${i}`, ...t }));
+  const answer = times.find((t) => same(t, right))!.id;
+  const vars = { time: timeText(hour, minute) };
+  return { puzzle: { ...p, text: p.text.map((t) => fillIn(t, vars)), times, answer }, vars: {} };
 }
 
 function rollChoice(id: string, p: ChoicePuzzle, random: () => number): Rolled {

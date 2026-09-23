@@ -50,6 +50,21 @@ export const teddy: PixelSprite = {
   ],
 };
 
+/** Z's floating above a sleeping monster. */
+export const zzz: PixelSprite = {
+  palette: { ".": null, w: "#ffffff" },
+  frames: [
+    [
+      "wwww....",
+      "..w.....",
+      ".w......",
+      "wwww.www",
+      "......w.",
+      ".....www",
+    ],
+  ],
+};
+
 /** "?" – a monster that lost sight of Nora. */
 export const questionBubble: PixelSprite = {
   palette: { ".": null, o: "#1a1024", w: "#ffffff" },
@@ -68,7 +83,26 @@ export const questionBubble: PixelSprite = {
   ],
 };
 
-/** Small speech bubble shown above things Nora can use. */
+/** Shown over a clue or a thing Nora can look at. */
+export const lookBubble: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", r: "#ffd66b", l: "#bfe8ff", s: "#ffffff", h: "#8a5a2a" },
+  frames: [
+    [
+      "..oooo....",
+      ".orrrro...",
+      "orlsllro..",
+      "orslllro..",
+      "orllllro..",
+      "orllllro..",
+      ".orrrrohh.",
+      "..oooohhho",
+      ".......hho",
+      "........o.",
+    ],
+  ],
+};
+
+/** Small speech bubble shown above someone Nora can talk to. */
 export const hintBubble: PixelSprite = {
   palette: { ".": null, o: "#1a1024", w: "#ffffff" },
   frames: [

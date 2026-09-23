@@ -13,6 +13,11 @@ export interface Talk {
 /** Something in a room Nora can look at or talk to (a lowercase letter in the layout). */
 export interface Thing extends Talk {
   name: string;
+  /**
+   * Someone Nora talks to (a person, an animal, a monster, a teddy…). They never glow –
+   * instead a speech bubble shows when they have something new to say.
+   */
+  person?: boolean;
   /** Pixel sprite key, see src/sprites. */
   sprite: string;
   /** Layout character of what's drawn underneath, e.g. "K" for something standing on the counter. */
@@ -40,6 +45,8 @@ interface PuzzleBase {
   text: string[];
   /** Flag given when solved. */
   gives: string;
+  /** What is said after a wrong answer (there is a friendly default). */
+  wrong?: string;
 }
 
 /** Type a number, e.g. the code to a lock. */
@@ -54,6 +61,11 @@ export interface CodePuzzle extends PuzzleBase {
   random?: Record<string, [number, number]>;
   /** Random words, rolled once per case: `{ name: [choices] }`. Two names never get the same word. */
   words?: Record<string, string[]>;
+  /**
+   * Values worked out from the random ones, in order – e.g. a number sequence:
+   * `{ b: "{a}+{step}", c: "{b}+{step}" }`. Expressions may use + − and ×(*).
+   */
+  derive?: Record<string, string>;
   /** Roll again until the answer is inside this range, e.g. [11, 19] for a two-digit answer. */
   answerRange?: [number, number];
 }
@@ -69,6 +81,8 @@ export interface OrderPuzzle extends PuzzleBase {
    */
   describe?: Record<string, string>;
   pick?: number;
+  /** Alphabetical order: `pick` random words become the options, and the answer is A–Ö. */
+  alphabetize?: { words: string[]; pick: number; sprite?: string };
 }
 
 export interface ChoiceVariant {
@@ -86,22 +100,50 @@ export interface ChoicePuzzle extends PuzzleBase {
   answer: string;
   /** Several riddles to choose from: one is picked at random per case. */
   variants?: ChoiceVariant[];
+  /** Show the text in mirror writing. */
+  mirror?: boolean;
+}
+
+/** Match things in pairs, e.g. rhyming words or animals and their tracks. */
+export interface MatchPuzzle extends PuzzleBase {
+  type: "match";
+  /** Left and right item of each pair (text, or sprite keys with `sprites`). */
+  pairs: [string, string][];
+  /** How many of the pairs to use (random), default all. */
+  pick?: number;
+  /** Show the right-hand items as pictures (sprite keys) instead of words. */
+  rightSprites?: boolean;
 }
 
 /**
- * One question in the reveal: pick the answer, then prove it with clues from the book.
- * `proof` is a list of groups; Nora must pick one clue from each group – clues
- * that each show something different – so random pairs don't work.
+ * Which clock shows the time? The time is random; write {time} in the text
+ * ("halv fyra"). `minutes` limits the kinds of times, e.g. [0, 30] for hel and halv.
+ */
+export interface ClockPuzzle extends PuzzleBase {
+  type: "clock";
+  minutes?: number[];
+  /** Filled in when rolled. */
+  times?: { id: string; hour: number; minute: number }[];
+  answer?: string;
+}
+
+/**
+ * One question in the reveal: pick the answer, then mark EVERY clue in the book that shows it.
+ * Nora is told how many to mark. A clue that shows the answer must be in `proof`, and every
+ * other clue needs a `why` – so a player who reasons right is never told she's wrong.
  */
 export interface RevealQuestion {
   question: string;
   options: PuzzleOption[];
   answer: string;
-  proof: string[][];
+  /** All the clues that show the answer (from at least two rooms). */
+  proof: string[];
   /** Ester's comment when a wrong answer is picked (by option id). */
   whyNot?: Record<string, string>;
-  /** Ester's comment when a clue doesn't prove it (by clue id). */
+  /** Ester's comment when a marked clue doesn't show it (by clue id). */
   why?: Record<string, string>;
+  /** Ester's nudge when a proof clue is missing (by clue id) – points the way without giving it away. */
+  missing?: Record<string, string>;
 }
 
 /** The big reveal: one or more questions, e.g. "What is it?" and then "Whose is it?". */
@@ -110,7 +152,7 @@ export interface RevealPuzzle extends PuzzleBase {
   questions: RevealQuestion[];
 }
 
-export type Puzzle = CodePuzzle | OrderPuzzle | ChoicePuzzle | RevealPuzzle;
+export type Puzzle = CodePuzzle | OrderPuzzle | ChoicePuzzle | RevealPuzzle | MatchPuzzle | ClockPuzzle;
 
 export type Edge = "left" | "right" | "top" | "bottom";
 
@@ -126,7 +168,7 @@ export interface Door {
   puzzle?: string;
 }
 
-export type Theme = "shop" | "storage" | "yard";
+export type Theme = "shop" | "storage" | "yard" | "bakery" | "library" | "forest" | "tower" | "square";
 
 /** Something that moves around by itself, e.g. a toy car. Loops through its path (tile positions). */
 export interface Mover {
@@ -162,6 +204,23 @@ export type MonsterDef =
       calmWhen?: Flags;
       /** Hides at home until `when` is set, then jumps out after `delay` seconds. */
       hideUntil?: { when: Flags; delay: number };
+    }
+  | {
+      /** Walks back and forth along a path. Time it right to get past. */
+      type: "patroller";
+      /** Frame 0 (and 1 for walking, if there is one). Faces right; flipped when walking left. */
+      sprite: string;
+      path: [col: number, row: number][];
+      /** Pixels per second (default 32). */
+      speed?: number;
+    }
+  | {
+      /** Sleeps (frame 0). Wakes up (frame 1) and chases Nora if she JUMPS close by – so tiptoe past! */
+      type: "sleeper";
+      sprite: string;
+      at: [col: number, row: number];
+      /** How close a jump wakes it, in tiles (default 3). */
+      wakeRadius?: number;
     }
   | {
       /** Hidden most of the time; now and then scuttles along one of its short routes, far from Nora. */
@@ -247,6 +306,11 @@ export interface Case {
   finale: FinaleStep[];
   /** "Visste du att…?" at the end. */
   fact: string;
+  /**
+   * Ester sums up after the finale: how the clues fit together, step by step,
+   * including what the culprit didn't say – so it all makes sense even if the player guessed.
+   */
+  summary: string[];
   /** Monster cards earned by solving the case. */
   cards: MonsterCard[];
   startRoom: string;

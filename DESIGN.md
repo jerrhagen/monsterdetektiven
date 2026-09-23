@@ -17,8 +17,8 @@ Alla monster är inte elaka. Vissa är bara missförstådda. Men akta dig för n
 | Knapp | Vad händer |
 |---|---|
 | ⬆️ ⬇️ ⬅️ ➡️ | Gå |
-| Mellanslag | Hoppa |
-| Ctrl | Titta, prata, öppna |
+| Mellanslag | Titta, prata och öppna när man står vid något – annars hoppa |
+| Ctrl (eller E/Enter) | Titta, prata, öppna |
 
 **Du är chef över spelet!** Du bestämmer hur allt ska se ut och vad som ska hända. Längst ner finns frågor som bara du kan svara på.
 
@@ -50,13 +50,15 @@ Spelet ses uppifrån i 2D med pixelgrafik. Det är lugnt och utforskande och ska
 ## 2. Spelloopen
 
 ```
-Titelskärm → Stadskartan (välj fall) → FALLET → Avslöjandet → Stjärnor → tillbaka till kartan
+Titelskärm (välj spelare) → Stadskartan (välj fall) → Introkort → FALLET → Avslöjandet → Fånga den skyldige → Slutscen → Stjärnor och monsterkort → tillbaka till kartan
 ```
+
+På **stadskartan** finns sex platser. Nästa fall låses upp när det förra är löst. Kartan visar stjärnor per fall, hur många **månstensbitar** man har (◆), knappen **🃏 Monsterkort** (K) som visar hela samlingen (kort man inte har visas som svarta skuggor), **⚙️ Inställningar** (I) för hur snart Ester ger tips och för musiken, och **👥** för att byta spelare.
 
 **Inne i ett fall:**
 1. **Uppdraget.** Någon berättar vad som hänt ("Mina bullar är borta!").
 2. **Utforska.** Nora går mellan rum, pratar med personer och monster och undersöker saker med Ctrl.
-3. **Ledtrådar.** Det Nora hittar hamnar i **Detektivboken** med en bild och en kort mening.
+3. **Ledtrådar.** Det Nora hittar hamnar i **Detektivboken** med en bild och en kort mening. *(Påskägg: bläddrar man till nästa sida med ▶ eller högerpil finns ett foto på Nora och Ester, kind mot kind: "Jag och Ester ♥". Det ritas i `src/ui/photo.ts`.)*
 4. **Pussel.** De låser upp nya rum, föremål och ledtrådar (kodlås, gåtor, spår och så vidare).
 5. **Avslöjandet.** Nora samlar alla misstänkta och väljer vem som gjorde det. Svarar man fel säger Ester snällt: "Hmm, stämmer det? Titta i detektivboken!" och man får försöka igen.
 6. **Slut.** En kort avslutning, en *"Visste du att…?"*-fakta kopplad till fallet och stjärnor.
@@ -99,8 +101,10 @@ Varje fall är ett **komplett mysterium med en röd tråd**, inte bara en samlin
 4. **Avslöjandet.** Nora pekar ut den skyldige och **visar bevis** ur detektivboken. Det ska kräva att man tänker:
    - **Flera misstänkta med egna falska spår.** Varje misstänkt ska ha minst en ledtråd som pekar mot sig, och vissa ledtrådar ska passa flera misstänkta (till exempel grön tråd och Stinas gröna garn).
    - **Inga ledtrådar som säger svaret rakt ut.** En lapp får antyda men inte avslöja.
-   - **Bevisen måste passa ihop.** Man väljer en ledtråd ur varje *bevisgrupp* (`proof`), så att varje ledtråd visar något eget. Två sanna ledtrådar på måfå räcker inte.
+   - **Markera alla bevis.** Efter svaret markerar man *alla* ledtrådar som visar det (`proof`), och spelet säger hur många. Ledtrådar som inte visar det avmarkeras och Ester förklarar varför (`why`). Saknas något ger Ester en knuff åt rätt håll (`missing`) utan att säga svaret.
+   - **Inga motsägelser.** Den som resonerar rätt ska aldrig få höra att hon har fel. Varje ledtråd som ärligt visar svaret ska finnas i `proof`, och alla andra ledtrådar ska ha en övertygande förklaring. Det finns tester som kontrollerar att varje ledtråd och varje fel svar har en förklaring.
    - **Fel svar ger en förklaring, inte bara "fel".** Ester säger varför just den misstänkta (`whyNot`) eller ledtråden (`why`) inte håller. Det är här man tränar att resonera.
+   - **Ester sammanfattar.** Efter slutscenen går Ester igenom hur allt hängde ihop, steg för steg (`summary`), och berättar det som den skyldige inte sa. Då förstår man även om man chansade lite.
 5. **Målen avslöjar inget.** Målet uppe till höger säger *vad* man ska ta reda på ("Ta dig in i lagret"), aldrig *hur* ("Hämta nyckeln av Stina"). Hur man gör får man veta av ledtrådar, figurer och Esters tips.
 6. **Fallet tål olika ordning.** Spelaren gör sällan saker i den ordning vi tänkt, till exempel hittar ledtrådar innan hon pratat med den som berättar om brottet. Varje figur ger därför sina grundflaggor vad hon än säger, och det finns tester som spelar i "fel" ordning. Man får aldrig kunna fastna.
 7. **Slutet och kopplingen.** Man får en kort avslutning, en *"Visste du att…?"*, stjärnor och ett monsterkort. Dessutom hittar man en **bit av det stora mysteriet**, som gör att man vill spela nästa fall.
@@ -149,16 +153,16 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 
 | Rum | Vad man tror efteråt | Ledtrådar |
 |---|---|---|
-| 🏪 **Butiken** | *"Leksakerna lever!? Eller är det Fladder?"* Inget syns, leksakerna skakar bara ibland. | Fem små prickar i dammet *(tvetydigt)*, grön tråd *(tvetydig: Stinas gröna garn)*, rosa fjäll *(falskt spår mot Fladder)*, Nallen har flyttat sig *(falskt spår mot Nallen)*, Nallens nervösa förklaring (han såg något som lyste), **Stinas kundbok** (Gunnar Gris, Gerda Groda, och Grymlan som letade present till sin lillebror) |
+| 🏪 **Butiken** | *"Leksakerna lever!? Eller är det Fladder?"* Inget syns, det faller bara lite damm från hyllorna ibland. | Fem små prickar i dammet *(tvetydigt)*, grön tråd *(tvetydig: Stinas gröna garn)*, rosa fjäll *(falskt spår mot Fladder)*, Nallen har flyttat sig *(falskt spår mot Nallen)*, Nallens nervösa förklaring (han såg något som lyste), **Stinas kundbok** (Gunnar Gris, Gerda Groda, och Grymlan som letade present till sin lillebror) |
 | 📦 **Lagret** | *"Det är inte leksakerna. Någon 'G' har varit här och skadat sig, och något med fem ben kryper omkring."* | Fladder är vaken *(NO: fladdermöss sover på dagen)*, **Fladders vittnesmål** när hon vilar i taket (inga händer, väcktes av något lysande med fem ben), **paketet** "Till lillebror, från G." (snirkligt G), **tröjbiten** på en spik med blod, blodsdroppar, ögonen i hörnet *(röd tråd)* |
 | 🌳 **Bakgården** | *"Det är en HAND! Och den som saknar något grönt är samma G som lämnade paketet."* | **Handavtryck i den blöta sanden** (aha!), lappen "SAKNAS: Något grönt som är mitt. / G.", **jämför handstilen** (samma snirkliga G), **Viskans vittnesmål** efter gåtan |
 
-**Handen syns inte förrän man kan förstå vad man ser.** Före sandlådan skakar bara leksakerna på hyllorna ibland. Efter sandlådan syns korta glimtar av handen i butiken (långt från Nora), och på slutet gömmer den sig i en hylla.
+**Handen syns inte förrän man kan förstå vad man ser.** Före sandlådan faller det bara lite damm från en hylla ibland. Att en hylla **skakar** händer bara på slutet, när handen gömmer sig. Efter sandlådan syns korta glimtar av handen i butiken (långt från Nora), och på slutet gömmer den sig i en hylla.
 
 **Figurer och monster:**
 - **Stina Snurr** äger affären. Hon har grått hår i knut, glasögon, rosa kofta och gult förkläde. Hon stickar med grönt garn.
 - **Nallen** är misstänkt, inte vittne.
-- **Fladder** *(flygare)* är vaken mitt på dagen och flyger runt i lagret. Man gömmer sig bakom lådor. **Ibland vilar hon upp och ner i taket, och då kan man prata med henne.**
+- **Fladder** *(flygare)* är vaken mitt på dagen och flyger runt i lagret. Man gömmer sig bakom lådor. **När hon har missat Nora två gånger blir hon trött och vilar upp och ner i taket, och då kan man prata med henne.** (Om man aldrig blir attackerad vilar hon ändå efter en halv minut.)
 - **Viskan** *(smygare)* bor i soptunnan på bakgården och hoppar fram en stund efter att man knackat på. Man vinner hennes vittnesmål med en gåta.
 - **Handen** *(krypare)*: se ovan.
 - **Grymlan** kommer in först i slutscenen, men man har listat ut honom själv.
@@ -169,8 +173,8 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 3. **Viskans gåta** (bakgården): en av fyra gåtor, med bildval. *(Språk och logik.)*
 4. **Jämför handstilen** (bakgården, när man har sett paketet): vilket av fyra G är det snirkliga G:et från paketet? *(Läsförståelse och iakttagelse.)*
 5. **Avslöjandet, i två frågor:**
-   - *Vad flyttar på leksakerna?* Val: Fladder, Viskan, Stina, Nallen, en lös hand. **Bevis:** avtrycken i sanden *och* ett vittnesmål om vad som kröp (Fladders eller Viskans).
-   - *Vems hand är det?* Val: Grymlan, Gunnar Gris, Gerda Groda, Stina Snurr (utan bilder). **Bevis:** kundboken *och* paketet eller samma G.
+   - *Vad flyttar på leksakerna?* Val: Fladder, Viskan, Stina, Nallen, en lös hand. **Bevis (markera alla fyra):** fem prickar, avtrycken i sanden, Fladders och Viskans vittnesmål.
+   - *Vems hand är det?* Val: Grymlan, Gunnar Gris, Gerda Groda, Stina Snurr (utan bilder). **Bevis (markera alla fyra):** lappen, samma G, paketet och kundboken – en kedja från "G saknar något grönt" till "Grymlan letade present till lillebror".
    - Ester förklarar varje felval, till exempel *"Gerda Groda är grön – men hon köpte ett spel till sin mormor, inte till en lillebror."*
    - **Det avgörande kräver alla tre rummen.** Det finns ett test som kontrollerar det.
 6. **Fånga den skyldige:** handen gömmer sig i en hylla där leksakerna skakar. Man undersöker rätt hylla med Ctrl. *(Iakttagelse.)*
@@ -191,19 +195,57 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 
 **Hemligt monsterägg:** bakom lådorna uppe till höger i lagret.
 
-### Exempel på ett fall i detalj: "Vem tog bullarna?" (fall 2)
+### Fall 2: Vem tog bullarna? (`case2-bakery.ts`)
 
-- **Start:** Bagaren Berit är ledsen. Hon bakade 15 bullar i morse, och nu finns bara 9 kvar.
-- **Ledtrådar:**
-  1. Smulor på golvet som leder mot bakdörren.
-  2. Ett fotspår med **tre tår**. Vem har tre tår?
-  3. En tuss **blått fluff** i dörrspringan.
-  4. *(Röd tråd)* Svarta fotspår i mjölet som inte hör till någon i bageriet.
-- **Pussel:** Bakdörren har ett kodlås. Lappen bredvid säger: *"Koden är lika många som bullarna som försvann."* Svaret är 15 − 9 = **6**.
-- **På gården:** Följ smulspåret, hoppa över vattenpölar och smyg förbi en sovande gårdskatt. Om man hoppar precis bredvid den vaknar den och jagar Nora.
-- **Avslöjandet:** Vem tog bullarna: *Katten Måns / Grannen Gustav / Monstret Smulan / Bagaren själv?* Svaret är Smulan, som har tre tår och blå päls.
-- **Twist:** Smulan var hungrig, och en bulle lyste så lockande. Där fanns en månstensbit i degen! Smulan får hjälpa till i bageriet och får betalt i bullar.
-- **Visste du att…?** *Att räkna baklänges är samma sak som att ta minus.*
+**Rum:** Bageriet → Bakgården → Mjölkällaren. **Misstänkta:** katten Måns, grannen Gustav, Mjölspöket, Berit, Smulan.
+
+**Sanningen:** Smulan (snäll, frågar alltid) drogs till en bulle som lyste, eftersom en månstensbit var inbakad. Hen glömde fråga och bar hem bullar till sitt bo i källaren. Svarta fotspår i mjölet går in i väggen (Skuggan).
+
+**Teoritrappan:** katthår, Gustav i fönstret och smulor mot bakdörren (bageriet) → tretåiga spår i sanden, smulor i kattskålen, Gustavs spårpussel friar Måns (gården) → glödande smulor till ett bo av blått fluff med skylten SMULANS HEM (källaren).
+
+**Avslöjandet (Berit), markera alla:** *Vem tog bullarna?* Blått fluff, tretåiga spår, Gustavs vittnesmål, glödande smulor och boet. *Varför, fast hen brukar fråga?* Den lysande bullen, Gustavs vittnesmål och de glödande smulorna. (Bullarna bakades tidigt i morse medan det var mörkt; de svarta spåren i källaren är Skuggans, inte Gustavs stövlar.)
+
+**Klurigheter:** bullräkning (subtraktion till 20, bakdörren), djurspår (para ihop), receptet (ordning med beskrivningar, slutet). **Monster:** Smulan (krypare), Måns (sovare), Mjölspöket (patrullerare). **Fakta:** jäst. **Kort:** Smulan, Måns, Mjölspöket.
+
+### Fall 3: Spöket i biblioteket (`case3-library.ts`)
+
+**Rum:** Biblioteket → Läsrummet → Källaren. **Misstänkta:** Viskan, Pelle, bibliotekarien Bodil, Ugo (flygande uppslagsbok).
+
+**Sanningen:** Bokmalen Bläddra lånar lätta böcker på nätterna för att öva läsning ("B… O… K…" lät som ett spöke). Den blå lampan är en månstensbit. Pelle är ett opålitligt vittne som bara hört ryktet. Skuggans lapp i källarhörnet: "Jag behöver ljuset."
+
+**Avslöjandet (Bodil), markera alla:** *Vem flyttar böckerna?* Ugos vittnesmål (långt, mjukt, glasögon, inga fötter) och kryp-spåret. *Varför?* Bodils lista (bara lätta böcker), övningsbladet, bokborgen och Viskans vittnesmål (B… O… K…).
+
+**Klurigheter:** bokvagnen (ABC-ordning med Å Ä Ö), Ugos ord (stavning), rimlåset (para ihop), lappen i spegelskrift. **Monster:** Ugo (flygare), Viskan (smygare), Dammis (patrullerare), Bläddra (krypare, gömmer sig i en hylla). **Fakta:** boklöss. **Kort:** Bläddra, Ugo, Dammis.
+
+### Fall 4: Ljuden i skogen (`case4-forest.ts`)
+
+**Rum:** Skogsbrynet → Bäcken → Svampringen. **Misstänkta:** Trattis, vargen, Mossjätten, lysflugorna, ungen.
+
+**Sanningen:** Mossjättens unge hittade en månstensbit i Skuggans tomma gömställe, följde glittret och gick vilse. Hen gömmer sig under mossan och gråter. Mullret är föräldern som letar varje natt. De röda dropparna är lingon ur Trattis korg.
+
+**Avslöjandet (Trattis), markera alla:** *Vem är det som gråter?* Det tomma boet, de små spåren, Trattis vittnesmål och tårarna. *Varför gråter ungen?* Boet, cirkelspåren, de små spåren, Brunos vittnesmål (blått glitter på stenarna) och glittret. (Skuggan lämnade ett glitterspår från bäcken till sitt gömställe; ungen följde det, hittade stenen och gick vilse.)
+
+**Klurigheter:** spårtavlan (para ihop djurspår), Brunos mätning (kodlås, mäta i tassar), Trattis fråga (svampar, årstider, allemansrätt), vägen hem (väderstreck, ger fångsten). **Monster:** vargen (patrullerare), Mossjätten (sovare), lysflugorna (flygare). **Fakta:** svampar är varken växter eller djur. **Kort:** Trattis, Mossjätten, Mossungen.
+
+### Fall 5: Klocktornet har stannat (`case5-clocktower.ts`)
+
+**Rum:** Torget → Trappan i tornet → Urverket. **Misstänkta:** Kugg-trollet, turisten Mister Fluff, tornvakten Knut, Fladder, en skugga med gula ögon.
+
+**Sanningen:** Klockan stannade för att Månstenen är borta ur urverket (lodet hänger högt, så den är uppdragen). Skuggan kom in genom fönstret och tog stenen norrut. Kugg-trollet smorde bara kugghjulen och försökte laga klockan. Nora hittar en karta till Skuggans grotta.
+
+**Avslöjandet (Knut), markera alla:** *Varför stannade klockan?* Den tomma platsen och skylten (vikterna hänger högt och alla kugghjul sitter kvar). *Vem tog Månstenen?* De stora svarta spåren, Fladders och Mister Fluffs vittnesmål, ögonen i fönstret och kartan.
+
+**Klurigheter:** Mister Fluffs ordbok (engelska ord, para ihop), klocklåset (hel, halv, kvart), luckans talföljd, kugghjulslåset (hälften). **Monster:** Fladder (flygare), Urverksbaggen (patrullerare), Kugg-trollet (krypare, fångas i en kugghylla). **Fakta:** en meter lång pendel slår en sekund. **Kort:** Kugg-trollet, Mister Fluff, Urverksbaggen.
+
+### Fall 6: Monsterfesten (`case6-festival.ts`)
+
+**Rum:** Torget → Stadsparken → Skuggans grotta. **Misstänkta:** Fladder, Smulan, Kugg-trollet, malen Lysa Lyktmal.
+
+**Sanningen:** Skuggan tar ljusen för att han är mörkrädd: en skugga behöver ljus, annars försvinner han. Lappen "Förlåt… jag lämnar tillbaka dem när solen kommer upp. / S". I grottan står ljusen i en ring runt hans lilla mossbädd.
+
+**Avslöjandet (Stina), markera alla:** *Vem tar ljusen?* De svarta spåren, Grymlans och Fladders vittnesmål, lappen i spegelskrift och ljusringen. *Varför?* Sidan i Månstensboken, lappen, ljusringen och teckningen. (Skuggan tog Månstenen ur tornet, tappade den och den sprack – bitarna hamnade i fall 1–5.)
+
+**Klurigheter:** lyktorna (minus upp till 100), Bläddras skuggfråga (ljus och skugga), lappen i spegelskrift, Trattis svampar (talföljd till 100). **Slut:** Skuggan gömmer sig i ett stånd på torget. Månstenen sätts ihop, lyktorna tänds, Kugg-trollet ger honom ett nattljus: *alla är rädda för något, alla får vara med.* **Kort:** Skuggan, Lysa Lyktmal, Skuggkrypen.
 
 ---
 
@@ -216,10 +258,18 @@ Monster är både **faror**, **vittnen** och **delar av mysteriet**. Läskighet:
 | **Flygare** | Flyger i slingor. När Nora kommer nära tvekar hon en kort stund (darrar) och dyker sedan. | **Göm dig bakom en låda, hylla eller ett träd.** Då anfaller hon inte, och hinner man gömma sig under anfallet avbryter hon och blir förvirrad ("?"). Om hon fångar Nora **bär hon iväg henne** till rummets dörr. | Fladder |
 | **Smygare** | Gömmer sig först i sitt hem och hoppar fram en stund efter att Nora petat på gömstället. Glider sedan närmare när Nora tittar bort och fryser med stängda ögon när hon tittar. | Titta på monstret medan du går förbi eller fram till det. | Viskan |
 | **Krypare** | Kilar snabbt mellan gömställen och syns bara i korta glimtar. | Går inte att fånga förrän man vet hur. Det är en del av mysteriet. | Grymlans arm |
-| **Patrullerare** | Går fram och tillbaka längs en slinga. | Tajma när man går förbi. | Gårdskatten |
-| **Sovare** | Sover och vaknar om Nora hoppar nära. | Gå tyst förbi och hoppa inte. | Mossjätten |
+| **Patrullerare** | Går fram och tillbaka längs en väg och stannar en kort stund i varje ände. | Tajma när man går förbi. Efter en skrämsel står den still en stund. | (`patroller`) |
+| **Sovare** | Sover med "zzz". Vaknar med "GRRR!" om Nora **hoppar** nära, jagar en stund och somnar sedan om. | Gå tyst förbi och hoppa inte. | Mossjätten, gårdskatten (`sleeper`) |
 | **Vakter** | Står i vägen, till exempel ett brotroll. | Svara på en gåta eller ge något de vill ha. | Trattis vid svampringen |
 | **Vittnen** | Berättar vad de sett, men ibland först när man hjälpt dem. | Fråga ut dem och lös deras problem. | Nallen, Viskan |
+
+### Vad som lyser och vem som vill prata
+
+- **Saker** man inte har undersökt, eller som har något nytt (en ledtråd, ett pussel som är redo), har en tunn glödande kant.
+- **Personer, djur och monster** man pratar med (`person: true`) glöder aldrig. De får i stället en **pratbubbla** när de har något nytt att säga, till exempel när en ny replik blir aktuell eller när avslöjandet är redo.
+- När Nora står vid något hon kan använda syns ett **förstoringsglas** (ledtrådar och saker att undersöka) eller en **pratbubbla** (någon att prata med). Medan någon pratar syns inga andra bubblor.
+- Uppe till höger står **"Ledtrådar i rummet: 2 av 5"**, så att man vet om det finns mer att hitta. Ledtrådar som Ester ger när man kommer in räknas inte där. I detektivboken står hur många man har av alla.
+- Saker som står på en disk ritas uppe på diskens skiva, inte framför den.
 
 ### Regler för bra monster (lärdomar från speltesterna)
 
@@ -282,15 +332,16 @@ Varje fall slutar med en **"Visste du att…?"**-fakta kopplad till temat.
 | Pusseltyp | Hur det styrs | Exempel | Ämne |
 |---|---|---|---|
 | **Kodlås** ✅ | Siffror (tangentbord eller knappsats) | "Vad kostade allt tillsammans?" | Matte: + och − |
-| **Ordningslås** ✅ | Välj bilder i rätt ordning | Former, händelser i rätt ordning | Matte, logik |
+| **Talföljd, dubbelt/hälften** ✅ | Kodlås med uträknade tal (`derive`) | 3, 5, 7, __ | Matte: mönster |
+| **Ordningslås** ✅ | Välj bilder i rätt ordning | Former, väderstreck, händelser | Matte, logik, SO |
+| **ABC-ordning** ✅ | Ordningslås med slumpade ord (`alphabetize`) | Böcker i bokstavsordning (å ä ö sist) | Svenska |
 | **Bildval** ✅ | Klicka eller tryck 1–4 | Gåtor, "Vilket djur gjorde spåret?" | Svenska, NO |
-| **Avslöjande** ✅ | Välj skyldig och sedan två bevis | "Vem flyttar på leksakerna?" | Detektivtänkande |
+| **Spegelskrift** ✅ | Bildval med spegelvänd text (`mirror`) | Vad står det på lappen? | Svenska |
+| **Para ihop** ✅ | Klicka vänster, sedan höger (`match`) | Rimord, djur och spår | Svenska, NO |
+| **Vilken klocka?** ✅ | Välj bland fyra ritade klockor (`clock`) | "Klockan är halv fyra" | Matte: tid |
+| **Avslöjande** ✅ | Två frågor, var och en med bevisgrupper | "Vad …?" och "Vems …?" | Detektivtänkande |
 | **Skriv svaret** | Textruta | Anagram ("RMOETNS"), stava | Svenska |
-| **Sortera** | Dra med musen | Böcker i ABC-ordning | Svenska, logik |
-| **Para ihop** | Klicka par | Rimord, djur och spår, klockslag och urtavla | Svenska, NO, matte |
-| **Hemligt meddelande** | Läs och skriv | A=1, B=2 …, spegelskrift, baklänges | Svenska, matte |
-| **Talföljd** | Siffror | 2, 4, 6, __ | Matte: mönster |
-| **Ställ klockan** | Dra visarna | "Klockan är kvart över tre" | Matte: tid |
+| **Hemligt meddelande** | Läs och skriv | A=1, B=2 …, baklänges | Svenska, matte |
 | **Handla** | Välj mynt | "Det kostar 17 kr. Vilka mynt?" | Matte: pengar |
 | **Plattor på golvet** | Gå och trampa i rätt ordning | Följ kompassen: N, Ö, S, V | SO: väderstreck |
 | **Hitta skillnaden** | Klicka | Vad har ändrats i rummet? | Iakttagelse |
@@ -343,7 +394,7 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 | Tangent | Funktion |
 |---|---|
 | Piltangenter | Gå (fyra riktningar) |
-| Mellanslag | Hoppa över låga hinder: pölar, stockar, slem, låga staket |
+| Mellanslag | **Står Nora vid något** (förstoringsglas eller pratbubbla syns): använd det. **Annars:** hoppa över låga hinder som pölar, stockar och låga staket. Bläddrar också i dialog. |
 | Ctrl (även **E** och **Enter**) | Använd: prata, öppna, undersöka, plocka upp, bläddra i dialog |
 | **B** | Öppna Detektivboken |
 | **Esc** | Paus och meny |
@@ -620,9 +671,9 @@ Varje steg ska ge något som går att **spela och visa upp**.
 | 4 ✅ | Pussel: kodlås med knappsats (kassaapparaten), ordningslås med former (bakdörren), gåta med bildval (Viskan) och avslöjande där man väljer skyldig och två bevis (Stina). Rätt svar ger konfetti och en glad jingel. Fel svar skakar lite och säger "försök igen". Allt går med både mus och tangentbord (siffror, Enter, Esc). |
 | 5 ✅ | Monster: flygare (Fladder darrar, dyker och bär iväg Nora, och man gömmer sig bakom lådor), smygare (Viskan gömmer sig i tunnan, hoppar fram och smyger när man tittar bort), krypare (armen syns i korta glimtar långt från Nora), tappat förstoringsglas och bakgrundsmusik. |
 | 6 ✅ | **Fall 1 är ett komplett mysterium:** introkort, tre rum, nio ledtrådar varav två leder mot den röda tråden, fyra slumpade klurigheter, tre monster, avslöjande med bevis, jakt på den skyldige bland hyllorna, slutscen med månstensbiten, resultatskärm (stjärnor, tid, monsterkort, "Visste du att…?"), hemligt monsterägg och sparade framsteg (titelskärmen visar dem). **Nästa: det första riktiga speltestet med huvudarkitekten!** |
-| 7 | Egen grafik och egna ljud (om huvudarkitekten vill), ljudeffekter och musik. |
-| 8 | Fall 2–6 och fler pusseltyper. |
-| 9 | Stadskarta, inställningar och finputs. *(Titelskärmen med fyra spelare finns redan.)* |
+| 7 | *(Sparas till senare, kanske som en återkommande loop: egen grafik och egna ljud om huvudarkitekten vill.)* |
+| 8 ✅ | Fall 2–6 med nya miljöer (bageri, bibliotek, skog, klocktorn, torg), nya monstertyper (patrullerare och sovare) och nya pusseltyper (talföljd, ABC-ordning, spegelskrift, para ihop, klockan). |
+| 9 ✅ | Stadskarta där man väljer fall (nästa fall låses upp när det förra är löst), månstensbitar, monstersamling med alla kort (de man inte har är skuggor), inställningar (hjälpnivå och musik) och byte av spelare. |
 
 **Tips för speltest:** Titta utan att hjälpa till. Där man fastnar behöver ett tips bli bättre eller ett pussel bli lättare. Låt gärna kompisar testa.
 

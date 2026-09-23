@@ -3,7 +3,7 @@ import type { CodePuzzle, OrderPuzzle, RevealQuestion } from "../src/cases/types
 import { cases } from "../src/cases";
 import { CaseState } from "../src/engine/caseState";
 import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../src/engine/puzzleCheck";
-import { evaluate, fillIn, rollPuzzle } from "../src/engine/puzzleRoll";
+import { evaluate, fillIn, rollPuzzle, timeText } from "../src/engine/puzzleRoll";
 
 const code: CodePuzzle = { type: "code", title: "", text: [], answer: "15", gives: "x" };
 const order: OrderPuzzle = {
@@ -18,11 +18,9 @@ const reveal: RevealQuestion = {
   question: "Vem?",
   options: [{ id: "who", label: "Vem" }],
   answer: "who",
-  proof: [
-    ["a1", "a2"],
-    ["b1", "b2"],
-  ],
+  proof: ["a", "b", "c"],
   why: { falskt: "Det där bevisar inget." },
+  missing: { b: "Glömde du b?" },
 };
 
 describe("kodlås", () => {
@@ -47,29 +45,28 @@ describe("ordningslås", () => {
 });
 
 describe("bevis i avslöjandet", () => {
-  it("kräver en ledtråd från varje grupp", () => {
-    expect(checkEvidence(reveal, ["a1", "b2"])).toBe(true);
-    expect(checkEvidence(reveal, ["b1", "a2"])).toBe(true);
-    expect(checkEvidence(reveal, ["a1", "a2"])).toBe(false);
-    expect(checkEvidence(reveal, ["a1", "a1"])).toBe(false);
-    expect(checkEvidence(reveal, ["a1", "falskt"])).toBe(false);
-    expect(checkEvidence(reveal, ["a1"])).toBe(false);
+  it("kräver att man markerar alla ledtrådar som visar svaret, och inga andra", () => {
+    expect(checkEvidence(reveal, ["a", "b", "c"])).toBe(true);
+    expect(checkEvidence(reveal, ["c", "a", "b"])).toBe(true);
+    expect(checkEvidence(reveal, ["a", "b"])).toBe(false);
+    expect(checkEvidence(reveal, ["a", "b", "falskt"])).toBe(false);
+    expect(checkEvidence(reveal, ["a", "b", "c", "falskt"])).toBe(false);
   });
 
-  it("Ester förklarar varför bevisen inte håller", () => {
-    expect(explainEvidence(reveal, ["a1", "falskt"])).toBe("Det där bevisar inget.");
-    expect(explainEvidence(reveal, ["a1", "a2"])).toContain("samma sak");
+  it("Ester förklarar först det som är fel, sedan det som saknas", () => {
+    expect(explainEvidence(reveal, ["a", "falskt", "c"])).toBe("Det där bevisar inget.");
+    expect(explainEvidence(reveal, ["a", "c"])).toBe("Glömde du b?");
+    expect(explainEvidence(reveal, ["b"])).toContain("saknas");
   });
 
-  it("i fall 1 räcker det inte att välja två sanna ledtrådar på måfå", () => {
+  it("i fall 1 räcker det inte att välja sanna ledtrådar på måfå", () => {
     const p = cases[0].puzzles!.reveal;
     if (p.type !== "reveal") throw new Error("fel typ");
     const [what, whose] = p.questions;
-    expect(checkEvidence(what, ["dots", "teddy"])).toBe(false);
-    expect(checkEvidence(what, ["thread", "poster"])).toBe(false);
-    expect(checkEvidence(what, ["sandprints", "fladderSaw"])).toBe(true);
-    expect(checkEvidence(whose, ["poster", "sleeve"])).toBe(false);
-    expect(checkEvidence(whose, ["customerBook", "gift"])).toBe(true);
+    expect(checkEvidence(what, ["sandprints", "fladderSaw"])).toBe(false);
+    expect(checkEvidence(what, ["dots", "sandprints", "fladderSaw", "viskan"])).toBe(true);
+    expect(checkEvidence(whose, ["customerBook", "gift", "sleeve", "poster"])).toBe(false);
+    expect(checkEvidence(whose, ["poster", "sameG", "gift", "customerBook"])).toBe(true);
   });
 
   it("i fall 1 behövs ledtrådar från alla tre rummen för att lösa det", () => {
@@ -80,7 +77,7 @@ describe("bevis i avslöjandet", () => {
         [...Object.values(r.clues ?? {}), ...Object.values(r.things ?? {}).flatMap((t) => [t.clue, ...(t.talkIf ?? []).map((v) => v.clue)].flat()),
           ...(r.monsters ?? []).flatMap((m) => ("thing" in m && m.thing ? [m.thing.clue, ...(m.thing.talkIf ?? []).map((v) => v.clue)].flat() : []))].includes(clue),
       )?.[0];
-    const rooms = new Set(p.questions.flatMap((q) => q.proof.map((group) => roomOf(group[0]))));
+    const rooms = new Set(p.questions.flatMap((q) => q.proof.map(roomOf)));
     expect([...rooms].sort()).toEqual(["store", "storeroom", "yard"]);
   });
 });
@@ -132,5 +129,58 @@ describe("slumpade pussel", () => {
     const [a, b] = sumHint.match(/\d+/g)!.map(Number);
     expect(a + b).toBe(Number(register.answer));
     expect(state.fill("{riddle:hint}")).not.toContain("{");
+  });
+});
+
+describe("nya pusseltyper", () => {
+  it("räknar med gånger också", () => {
+    expect(evaluate("{a}*2", { a: "7" })).toBe(14);
+    expect(evaluate("2+3*4-1", {})).toBe(13);
+  });
+
+  it("skriver klockan på svenska", () => {
+    expect(timeText(3, 0)).toBe("tre");
+    expect(timeText(3, 15)).toBe("kvart över tre");
+    expect(timeText(3, 30)).toBe("halv fyra");
+    expect(timeText(12, 45)).toBe("kvart i ett");
+  });
+
+  it("klockpusslet har fyra olika klockor och en rätt", () => {
+    for (let i = 0; i < 100; i++) {
+      const { puzzle } = rollPuzzle("clock", { type: "clock", title: "", text: ["Klockan är {time}."], gives: "x", minutes: [0, 30] });
+      if (puzzle.type !== "clock") throw new Error("fel typ");
+      const keys = new Set(puzzle.times!.map((t) => `${t.hour}:${t.minute}`));
+      expect(keys.size).toBe(4);
+      const right = puzzle.times!.find((t) => t.id === puzzle.answer)!;
+      expect(puzzle.text[0]).toBe(`Klockan är ${timeText(right.hour, right.minute)}.`);
+    }
+  });
+
+  it("ABC-ordning sorterar som på svenska (å ä ö sist)", () => {
+    const { puzzle } = rollPuzzle("abc", {
+      type: "order",
+      title: "",
+      text: [],
+      options: [],
+      answer: [],
+      gives: "x",
+      alphabetize: { words: ["öga", "äpple", "bok", "ål"], pick: 4 },
+    });
+    if (puzzle.type !== "order") throw new Error("fel typ");
+    expect(puzzle.answer).toEqual(["bok", "ål", "äpple", "öga"]);
+  });
+
+  it("talföljder kan räknas fram ur slumpade tal", () => {
+    const { vars, puzzle } = rollPuzzle("seq", {
+      type: "code",
+      title: "",
+      text: ["{a}, {b}, {c}, ?"],
+      random: { a: [2, 5], step: [2, 3] },
+      derive: { b: "{a}+{step}", c: "{b}+{step}" },
+      answer: "{c}+{step}",
+      gives: "x",
+    });
+    if (puzzle.type !== "code") throw new Error("fel typ");
+    expect(Number(puzzle.answer)).toBe(Number(vars.c) + Number(vars.step));
   });
 });

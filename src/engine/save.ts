@@ -25,16 +25,28 @@ export interface Player {
   data: SaveData;
 }
 
+/** How quickly Ester offers a hint (see engine/hints.ts). */
+export type HelpLevel = "mycket" | "lagom" | "lite";
+
+export interface Settings {
+  help: HelpLevel;
+}
+
 interface Store {
   current: number;
   players: Player[];
+  settings: Settings;
 }
 
 const emptyData = (): SaveData => ({ cases: {}, cards: [] });
 const defaultName = (i: number) => `Spelare ${i + 1}`;
 
 function freshStore(): Store {
-  return { current: 0, players: Array.from({ length: PLAYER_COUNT }, (_, i) => ({ name: defaultName(i), data: emptyData() })) };
+  return {
+    current: 0,
+    players: Array.from({ length: PLAYER_COUNT }, (_, i) => ({ name: defaultName(i), data: emptyData() })),
+    settings: { help: "lagom" },
+  };
 }
 
 function readStore(): Store {
@@ -44,6 +56,7 @@ function readStore(): Store {
     if (raw) {
       const saved = JSON.parse(raw) as Partial<Store>;
       store.current = Math.min(Math.max(saved.current ?? 0, 0), PLAYER_COUNT - 1);
+      if (saved.settings?.help) store.settings.help = saved.settings.help;
       saved.players?.slice(0, PLAYER_COUNT).forEach((p, i) => {
         store.players[i] = { name: p.name || defaultName(i), data: { cases: p.data?.cases ?? {}, cards: p.data?.cards ?? [] } };
       });
@@ -95,6 +108,21 @@ export function clearPlayer(index: number): void {
   const store = readStore();
   store.players[index] = { name: defaultName(index), data: emptyData() };
   writeStore(store);
+}
+
+export function loadSettings(): Settings {
+  return readStore().settings;
+}
+
+export function saveSettings(settings: Settings): void {
+  const store = readStore();
+  store.settings = settings;
+  writeStore(store);
+}
+
+/** A case can be played when it's the first one or the one before it is solved. */
+export function isUnlocked(caseIds: string[], index: number, data: SaveData = loadSave()): boolean {
+  return index === 0 || !!data.cases[caseIds[index - 1]];
 }
 
 /** The current player's progress. */

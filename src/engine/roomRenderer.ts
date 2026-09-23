@@ -33,7 +33,17 @@ const THEMES: Record<Theme, { floor: number; seam: number; light: number; wallTo
   shop: { floor: 0xb98556, seam: 0x9c6a40, light: 0xc9956a, wallTop: 0x2a1a3a, wallEdge: 0x4a3266 },
   storage: { floor: 0x6f6a78, seam: 0x5f5a68, light: 0x807b8a, wallTop: 0x221a26, wallEdge: 0x3e3444 },
   yard: { floor: 0x4e9a3e, seam: 0x3f8a32, light: 0x6cc24a, wallTop: 0x5a3a1e, wallEdge: 0x7a4f2a },
+  bakery: { floor: 0xefe6d6, seam: 0x4a3a50, light: 0xffffff, wallTop: 0x5a3a2a, wallEdge: 0x8a5a3a },
+  library: { floor: 0x7a2a3a, seam: 0x5a1a2a, light: 0xa04a5a, wallTop: 0x2a1a14, wallEdge: 0x4a3020 },
+  forest: { floor: 0x2f6a2e, seam: 0x24522a, light: 0x4a8a3a, wallTop: 0x1a3a1c, wallEdge: 0x2a5a2a },
+  tower: { floor: 0x6a6470, seam: 0x4a4450, light: 0x8a8490, wallTop: 0x2a2630, wallEdge: 0x4a4450 },
+  square: { floor: 0x9a8a7a, seam: 0x6a5a4a, light: 0xb8a898, wallTop: 0x6a2a2a, wallEdge: 0x8a3a3a },
 };
+
+/** Outdoor themes have water in their puddles instead of slime. */
+const OUTDOORS: Theme[] = ["yard", "forest", "square"];
+
+const BOOK_COLOURS = [0x8a2346, 0x2d5f9e, 0x2a8a6a, 0xc9961e, 0x6a45a8, 0xa0643a, 0x3d3d50];
 
 const TOY_COLOURS = [0xe04848, 0x4a90e2, 0xf2d24b, 0x5cc46a, 0xff8ade, 0x9b6bd6, 0xf28c38];
 
@@ -129,6 +139,20 @@ class Painter {
       case "blocks":
         this.floor(col, row, x, y);
         return this.blocks(col, row, x, y);
+      case "water":
+        return this.water(col, row, x, y);
+      case "oven":
+        this.floor(col, row, x, y);
+        return this.oven(col, row, x, y);
+      case "gear":
+        this.floor(col, row, x, y);
+        return this.gear(col, row, x, y);
+      case "fountain":
+        this.floor(col, row, x, y);
+        return this.fountain(col, row, x, y);
+      case "rock":
+        this.floor(col, row, x, y);
+        return this.rock(col, row, x, y);
       default:
         return this.floor(col, row, x, y);
     }
@@ -155,8 +179,39 @@ class Painter {
       if (hash(col, row, 99) < 0.12) {
         g.fillStyle(t.seam).fillRect(x + 4, y + 6, 4, 1).fillRect(x + 8, y + 7, 3, 1).fillRect(x + 11, y + 8, 2, 1);
       }
+    } else if (this.theme === "bakery") {
+      // Black-and-white chequered tiles.
+      for (let cy = 0; cy < 2; cy++) {
+        for (let cx = 0; cx < 2; cx++) {
+          if ((cx + cy + col + row) % 2) g.fillStyle(0xd8ccb8).fillRect(x + cx * 8, y + cy * 8, 8, 8);
+        }
+      }
+    } else if (this.theme === "library") {
+      // Soft red carpet with a small diamond pattern.
+      g.fillStyle(t.seam).fillRect(x + 7, y + 3, 2, 2).fillRect(x + 5, y + 5, 2, 2).fillRect(x + 9, y + 5, 2, 2).fillRect(x + 7, y + 7, 2, 2);
+      g.fillStyle(t.light).fillRect(x + 7, y + 5, 2, 2);
+      if (row % 2 === 0) g.fillStyle(t.seam).fillRect(x, y + 14, TILE, 1);
+    } else if (this.theme === "tower") {
+      // Big stone blocks.
+      const offset = row % 2 ? 8 : 0;
+      g.fillStyle(t.seam).fillRect(x, y + 7, TILE, 1).fillRect(x, y + 15, TILE, 1);
+      g.fillRect(x + ((offset + 0) % 16), y, 1, 7).fillRect(x + ((offset + 8) % 16), y + 8, 1, 7);
+      if (hash(col, row) < 0.3) g.fillStyle(t.light).fillRect(x + 3, y + 2, 2, 1);
+    } else if (this.theme === "square") {
+      // Cobblestones.
+      for (let cy = 0; cy < 4; cy++) {
+        for (let cx = 0; cx < 4; cx++) {
+          const sx = x + cx * 4 + (cy % 2 ? 2 : 0);
+          g.fillStyle(hash(col * 4 + cx, row * 4 + cy) < 0.5 ? t.light : t.floor).fillRect(sx, y + cy * 4, 3, 3);
+        }
+      }
+      g.fillStyle(t.seam);
+      for (let cy = 0; cy < 4; cy++) g.fillRect(x, y + cy * 4 + 3, TILE, 1);
     } else {
-      // Grass tufts.
+      // Grass tufts (and in the forest the odd fallen leaf or tiny mushroom).
+      if (this.theme === "forest" && hash(col, row, 42) < 0.15) {
+        g.fillStyle(hash(col, row, 43) < 0.5 ? 0xc97a1e : 0xe04848).fillRect(x + 5 + Math.floor(hash(col, row, 44) * 6), y + 8, 2, 2);
+      }
       for (let i = 0; i < 5; i++) {
         const gx = x + Math.floor(hash(col, row, i) * 14);
         const gy = y + Math.floor(hash(col, row, i + 7) * 14);
@@ -169,6 +224,41 @@ class Painter {
     const { g, t } = this;
     const below = this.at(col, row + 1);
     const facesRoom = row < ROOM_ROWS - 1 && below !== "wall" && below !== "door";
+
+    if (this.theme === "forest") {
+      // The forest is walled in by dense trees.
+      this.floor(col, row, x, y);
+      const same = (dc: number, dr: number) => {
+        const k = this.at(col + dc, row + dr);
+        return k === "wall";
+      };
+      const r = { tl: 0, tr: 0, bl: 0, br: 0 };
+      if (!same(-1, 0) && !same(0, -1)) r.tl = 6;
+      if (!same(1, 0) && !same(0, -1)) r.tr = 6;
+      if (!same(-1, 0) && !same(0, 1)) r.bl = 6;
+      if (!same(1, 0) && !same(0, 1)) r.br = 6;
+      g.fillStyle(0x12301a).fillRoundedRect(x, y, TILE, TILE, r);
+      g.fillStyle(0x1f5426).fillRoundedRect(x + 1, y, TILE - 2, TILE - 3, r);
+      for (let i = 0; i < 3; i++) {
+        g.fillStyle(0x2f7a36).fillRect(x + 2 + Math.floor(hash(col, row, i) * 10), y + 1 + Math.floor(hash(col, row, i + 5) * 9), 3, 2);
+      }
+      return;
+    }
+
+    if (this.theme === "square" && facesRoom) {
+      // House fronts around the square, each in its own colour, with a window.
+      const colours = [0xc9855a, 0x8a6aa8, 0x5a8a9a, 0xb8a05a, 0xa05a5a];
+      const house = colours[Math.floor(col / 3) % colours.length];
+      g.fillStyle(house).fillRect(x, y, TILE, TILE);
+      g.fillStyle(C.outline, 0.3).fillRect(x, y + 15, TILE, 1);
+      if (col % 3 === 1) {
+        g.fillStyle(0x2a2030).fillRect(x + 4, y + 3, 8, 8);
+        g.fillStyle(hash(col, row) < 0.5 ? 0xffd66b : 0x4a4460).fillRect(x + 5, y + 4, 6, 6);
+        g.fillStyle(0x2a2030).fillRect(x + 7, y + 4, 2, 6).fillRect(x + 5, y + 6, 6, 1);
+      }
+      if (col % 3 === 0) g.fillStyle(C.outline, 0.25).fillRect(x, y, 1, TILE);
+      return;
+    }
 
     if (this.theme === "yard" && !(row === 0 && facesRoom)) {
       // Wooden fence around the yard, running sideways or up/down.
@@ -187,6 +277,21 @@ class Painter {
       return;
     }
 
+    if (facesRoom && this.theme === "bakery") {
+      // White tiles with a blue stripe.
+      g.fillStyle(0xf4f0e8).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0xc8c4d4).fillRect(x, y + 7, TILE, 1).fillRect(x + 7, y, 1, TILE);
+      g.fillStyle(0x4a90e2).fillRect(x, y + 11, TILE, 2);
+      g.fillStyle(C.outline, 0.3).fillRect(x, y + 15, TILE, 1);
+      return;
+    }
+    if (facesRoom && this.theme === "library") {
+      // Dark wooden panels.
+      g.fillStyle(0x4a2e1e).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0x5a3a26).fillRect(x + 2, y + 2, 12, 11);
+      g.fillStyle(0x3a2216).fillRect(x, y + 14, TILE, 2);
+      return;
+    }
     if (facesRoom) {
       if (this.theme === "shop") {
         // Wallpaper with stripes and a baseboard.
@@ -197,8 +302,9 @@ class Painter {
         g.fillStyle(C.woodMid).fillRect(x, y + 13, TILE, 1);
       } else {
         // Bricks.
-        const brick = this.theme === "storage" ? 0x6e3a3a : 0x9a4a3a;
-        const mortar = this.theme === "storage" ? 0x4a2626 : 0x6a3026;
+        const grey = this.theme === "tower";
+        const brick = grey ? 0x7a7484 : this.theme === "storage" ? 0x6e3a3a : 0x9a4a3a;
+        const mortar = grey ? 0x4a4450 : this.theme === "storage" ? 0x4a2626 : 0x6a3026;
         g.fillStyle(mortar).fillRect(x, y, TILE, TILE);
         for (let by = 0; by < 4; by++) {
           const offset = by % 2 ? 4 : 0;
@@ -264,6 +370,10 @@ class Painter {
     if (this.at(col - 1, row) !== "shelf") g.fillRect(x, y + 3, 1, 12);
     if (this.at(col + 1, row) !== "shelf") g.fillRect(x + TILE - 1, y + 3, 1, 12);
 
+    if (this.theme === "library" || this.theme === "bakery" || this.theme === "tower") {
+      this.shelfGoods(col, row, x, y);
+      return;
+    }
     // Two compartments full of different toys, standing on the planks.
     for (const [floorY, salt] of [[y + 9, 1], [y + 15, 2]] as const) {
       let tx = x + 1 + Math.floor(hash(col, row, salt) * 2);
@@ -278,6 +388,97 @@ class Painter {
         i++;
       }
     }
+  }
+
+  /** Books in the library, bread in the bakery, gears and tools in the clock tower. */
+  private shelfGoods(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    for (const [floorY, salt] of [[y + 9, 1], [y + 15, 2]] as const) {
+      let tx = x + 1;
+      let i = 0;
+      while (tx < x + TILE - 2) {
+        const r = hash(col, row, salt * 13 + i);
+        if (this.theme === "library") {
+          const w = 1 + Math.floor(r * 2);
+          const h = 4 + Math.floor(hash(col, row, salt + i * 3) * 2);
+          g.fillStyle(BOOK_COLOURS[Math.floor(r * BOOK_COLOURS.length)]).fillRect(tx, floorY - h, w, h);
+          g.fillStyle(0xffd66b, 0.6).fillRect(tx, floorY - h + 1, w, 1);
+          tx += w + (hash(col, row, i + 50) < 0.2 ? 1 : 0);
+        } else if (this.theme === "bakery") {
+          const bun = r < 0.5;
+          g.fillStyle(0x7a4526).fillRect(tx, floorY - 3, bun ? 3 : 5, 3);
+          g.fillStyle(0xc9854a).fillRect(tx, floorY - 3, bun ? 3 : 5, 2);
+          g.fillStyle(0xf4ecd8).fillRect(tx + 1, floorY - 3, 1, 1);
+          tx += (bun ? 3 : 5) + 1;
+        } else {
+          g.fillStyle(r < 0.5 ? 0x8a86a0 : 0xc97a3a).fillRect(tx, floorY - 4, 4, 4);
+          g.fillStyle(0x2a2630).fillRect(tx + 1, floorY - 3, 2, 2);
+          tx += 5;
+        }
+        i++;
+      }
+    }
+  }
+
+  private water(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    g.fillStyle(C.waterDark).fillRect(x, y, TILE, TILE);
+    g.fillStyle(C.water).fillRect(x, y + 1, TILE, TILE - 2);
+    g.fillStyle(C.waterLight);
+    for (let i = 0; i < 2; i++) {
+      const wx = x + Math.floor(hash(col, row, i) * 11);
+      const wy = y + 3 + i * 6 + Math.floor(hash(col, row, i + 4) * 2);
+      g.fillRect(wx, wy, 4, 1).fillRect(wx + 1, wy - 1, 2, 1);
+    }
+    // Banks where the water meets land.
+    g.fillStyle(0x6a5a3a);
+    if (this.at(col, row - 1) !== "water") g.fillRect(x, y, TILE, 2);
+    if (this.at(col, row + 1) !== "water") g.fillRect(x, y + TILE - 2, TILE, 2);
+  }
+
+  private oven(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    g.fillStyle(C.outline).fillRect(x, y + 1, TILE, 15);
+    g.fillStyle(0x9a4a3a).fillRect(x + 1, y + 2, 14, 13);
+    for (let by = 0; by < 3; by++) g.fillStyle(0x6a3026).fillRect(x + 1, y + 5 + by * 4, 14, 1);
+    g.fillStyle(0x1a1024).fillRect(x + 4, y + 7, 8, 7);
+    g.fillStyle(0xf28c38).fillRect(x + 5, y + 10, 6, 4);
+    g.fillStyle(0xffd66b).fillRect(x + 6 + Math.floor(hash(col, row) * 3), y + 11, 2, 3);
+  }
+
+  private gear(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    const cx = x + 8;
+    const cy = y + 8;
+    g.fillStyle(C.outline).fillCircle(cx, cy, 7);
+    g.fillStyle(0xc97a3a).fillCircle(cx, cy, 6);
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + hash(col, row);
+      g.fillStyle(0xc97a3a).fillRect(Math.round(cx + Math.cos(a) * 7) - 1, Math.round(cy + Math.sin(a) * 7) - 1, 3, 3);
+    }
+    g.fillStyle(0x7a4a2a).fillCircle(cx, cy, 3);
+    g.fillStyle(C.outline).fillCircle(cx, cy, 1);
+  }
+
+  private fountain(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    const same = (dc: number, dr: number) => this.at(col + dc, row + dr) === "fountain";
+    const r = { tl: 0, tr: 0, bl: 0, br: 0 };
+    if (!same(-1, 0) && !same(0, -1)) r.tl = 7;
+    if (!same(1, 0) && !same(0, -1)) r.tr = 7;
+    if (!same(-1, 0) && !same(0, 1)) r.bl = 7;
+    if (!same(1, 0) && !same(0, 1)) r.br = 7;
+    g.fillStyle(0x8a8490).fillRoundedRect(x, y, TILE, TILE, r);
+    g.fillStyle(C.water).fillRoundedRect(x + 2, y + 2, TILE - 4, TILE - 4, r);
+    g.fillStyle(C.waterLight).fillRect(x + 5 + Math.floor(hash(col, row) * 5), y + 6, 3, 1);
+  }
+
+  private rock(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    g.fillStyle(C.outline).fillRoundedRect(x + 1, y + 3, 14, 12, 5);
+    g.fillStyle(0x8a8490).fillRoundedRect(x + 2, y + 4, 12, 9, 4);
+    g.fillStyle(0xb8b4c4).fillRect(x + 4, y + 5, 4, 2);
+    if (hash(col, row) < 0.5) g.fillStyle(0x4ea84a).fillRect(x + 9, y + 11, 4, 2);
   }
 
   /** Draws a tiny pixel toy. `*` pixels get the toy's main colour. */
@@ -349,7 +550,7 @@ class Painter {
 
   private puddle(col: number, row: number, x: number, y: number): void {
     const { g } = this;
-    const outdoors = this.theme === "yard";
+    const outdoors = OUTDOORS.includes(this.theme);
     const [dark, mid, light] = outdoors ? [C.waterDark, C.water, C.waterLight] : [C.slimeDark, C.slime, C.slimeLight];
     const same = (dc: number, dr: number) => this.at(col + dc, row + dr) === "puddle";
     const radius = {

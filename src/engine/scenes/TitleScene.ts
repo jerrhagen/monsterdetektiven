@@ -2,7 +2,6 @@ import * as Phaser from "phaser";
 import { startMusic } from "../../ui/music";
 import { hideTitle, showTitle } from "../../ui/title";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config";
-import { newGame } from "../session";
 import { registerSprites } from "../textures";
 
 /** Small seeded random generator, so the town looks the same every time. */
@@ -39,14 +38,21 @@ export class TitleScene extends Phaser.Scene {
     this.launchFladder();
     this.drawTown(rand);
 
+    // Browsers only allow sound after a key press or click, so the music starts on the first one.
+    const firstTouch = () => startMusic();
+    const events = ["keydown", "pointerdown"] as const;
+    events.forEach((e) => window.addEventListener(e, firstTouch, { capture: true, once: true }));
+
     // The title is plain HTML (players, name boxes) – Phaser must not swallow keys like space.
     this.input.keyboard!.clearCaptures();
     showTitle(() => {
-      newGame();
       startMusic();
-      this.scene.start("room");
+      this.scene.start("map");
     });
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideTitle);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      events.forEach((e) => window.removeEventListener(e, firstTouch, { capture: true }));
+      hideTitle();
+    });
   }
 
   private drawSky(): void {
@@ -129,11 +135,11 @@ export class TitleScene extends Phaser.Scene {
 
     // Clock tower (case 5) in the middle of town.
     const tx = 150;
-    g.fillStyle(SILHOUETTE).fillRect(tx, ground - 80, 20, 80);
-    g.fillTriangle(tx - 3, ground - 80, tx + 23, ground - 80, tx + 10, ground - 100);
-    g.fillStyle(0xe8dcb0).fillCircle(tx + 10, ground - 66, 6);
-    g.lineStyle(1, SILHOUETTE).lineBetween(tx + 10, ground - 66, tx + 10, ground - 70);
-    g.lineBetween(tx + 10, ground - 66, tx + 13, ground - 66);
+    g.fillStyle(SILHOUETTE).fillRect(tx, ground - 78, 20, 78);
+    g.fillTriangle(tx - 3, ground - 78, tx + 23, ground - 78, tx + 10, ground - 100);
+    g.fillStyle(0xe8dcb0).fillCircle(tx + 10, ground - 64, 6);
+    g.lineStyle(1, SILHOUETTE).lineBetween(tx + 10, ground - 64, tx + 10, ground - 68);
+    g.lineBetween(tx + 10, ground - 64, tx + 13, ground - 64);
 
     for (const w of lit) g.fillStyle(WINDOW_LIT).fillRect(w.x, w.y, 3, 4);
     for (const w of dark) g.fillStyle(WINDOW_DARK).fillRect(w.x, w.y, 3, 4);

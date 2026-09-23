@@ -1,6 +1,7 @@
 import { cases } from "../cases";
 import { CaseState } from "./caseState";
 import { HELP_LEVELS, HintTimer } from "./hints";
+import { loadSettings } from "./save";
 
 /** Nora always starts a case with her magnifying glass. */
 export const MAGNIFIER = "magnifier";
@@ -13,6 +14,7 @@ function startCase(index: number): CaseState {
 
 /** The game in progress. Survives room changes (scene restarts). */
 export const session = {
+  caseIndex: 0,
   state: startCase(0),
   hintTimer: new HintTimer(HELP_LEVELS.lagom),
   /** Where the magnifying glass lies if Nora has dropped it. */
@@ -24,8 +26,9 @@ export const session = {
 
 /** Starts a case from the beginning (new random puzzles, new clock). */
 export function newGame(caseIndex = 0): void {
+  session.caseIndex = caseIndex;
   session.state = startCase(caseIndex);
-  session.hintTimer = new HintTimer(HELP_LEVELS.lagom);
+  session.hintTimer = new HintTimer(HELP_LEVELS[loadSettings().help]);
   session.dropped = null;
   session.started = false;
   session.startedAt = 0;

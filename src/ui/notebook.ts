@@ -1,8 +1,11 @@
 import type { CaseState } from "../engine/caseState";
 import { uiRoot } from "./layer";
+import { photoUrl } from "./photo";
+import { playClick } from "./sound";
 import { spriteUrl } from "./spriteImage";
 
 let el: HTMLDivElement | null = null;
+let onKey: ((e: KeyboardEvent) => void) | null = null;
 
 export function isNotebookOpen(): boolean {
   return el !== null;
@@ -14,6 +17,8 @@ export function toggleNotebook(state: CaseState): void {
 }
 
 export function closeNotebook(): void {
+  if (onKey) window.removeEventListener("keydown", onKey);
+  onKey = null;
   el?.remove();
   el = null;
 }
@@ -60,13 +65,38 @@ function openNotebook(state: CaseState): void {
           <div class="items">${itemList}</div>
         </section>
         <section>
-          <h3>Ledtrådar (${clues.length})</h3>
+          <h3>Ledtrådar (${clues.length} av ${Object.keys(data.clues).length})</h3>
           <div class="clues">${clueCards}</div>
         </section>
       </div>
+      <button class="turn next" title="Bläddra (→)">▶</button>
+    </div>
+    <div class="page photo-page" hidden>
+      <button class="close" title="Stäng (B)">✕</button>
+      <figure class="photo">
+        <span class="tape left"></span><span class="tape right"></span>
+        <img src="${photoUrl()}" alt="Nora och Ester, kind mot kind">
+        <figcaption>Jag och Ester <span class="heart">♥</span></figcaption>
+      </figure>
+      <button class="turn back" title="Bläddra tillbaka (←)">◀</button>
     </div>
   `;
-  el.querySelector(".close")!.addEventListener("click", closeNotebook);
+  // A secret last page: flip with the corner button or the arrow keys.
+  const [first, second] = el.querySelectorAll<HTMLDivElement>(".page");
+  const turn = (toPhoto: boolean) => {
+    if (second.hidden !== toPhoto) return;
+    first.hidden = toPhoto;
+    second.hidden = !toPhoto;
+    playClick();
+  };
+  el.querySelector(".next")!.addEventListener("click", () => turn(true));
+  el.querySelector(".back")!.addEventListener("click", () => turn(false));
+  onKey = (e) => {
+    if (e.key === "ArrowRight") turn(true);
+    else if (e.key === "ArrowLeft") turn(false);
+  };
+  window.addEventListener("keydown", onKey);
+  el.querySelectorAll(".close").forEach((b) => b.addEventListener("click", closeNotebook));
   el.addEventListener("click", (e) => {
     if (e.target === el) closeNotebook();
   });

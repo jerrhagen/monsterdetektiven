@@ -1,4 +1,13 @@
-import type { ChoicePuzzle, CodePuzzle, OrderPuzzle, Puzzle, PuzzleOption, RevealPuzzle } from "../cases/types";
+import type {
+  ChoicePuzzle,
+  ClockPuzzle,
+  CodePuzzle,
+  MatchPuzzle,
+  OrderPuzzle,
+  Puzzle,
+  PuzzleOption,
+  RevealPuzzle,
+} from "../cases/types";
 import type { CaseState } from "../engine/caseState";
 import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../engine/puzzleCheck";
 import { shuffleOptions } from "../engine/puzzleRoll";
@@ -48,6 +57,7 @@ export function openPuzzle(puzzle: Puzzle, state: CaseState, onSolved: () => voi
     p.textContent = line;
     text.appendChild(p);
   }
+  if (puzzle.type === "choice" && puzzle.mirror) text.classList.add("mirror");
   const body = el.querySelector<HTMLDivElement>(".puzzle-body")!;
   const feedback = el.querySelector<HTMLDivElement>(".puzzle-feedback")!;
   const card = el.querySelector<HTMLDivElement>(".card")!;
@@ -90,6 +100,12 @@ export function openPuzzle(puzzle: Puzzle, state: CaseState, onSolved: () => voi
       break;
     case "reveal":
       keyHandler = reveal(puzzle, state, ui);
+      break;
+    case "match":
+      keyHandler = match(puzzle, ui);
+      break;
+    case "clock":
+      keyHandler = clocks(puzzle, ui);
       break;
   }
 
@@ -155,7 +171,7 @@ function codeLock(p: CodePuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
     if (checkCode(p, typed)) {
       ui.solved();
     } else {
-      ui.say("Nej, det stämmer inte. Räkna en gång till!");
+      ui.say(p.wrong ?? "Nej, det stämmer inte. Räkna en gång till!");
       typed = "";
       render();
     }
@@ -197,7 +213,8 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   const render = () =>
     slotEls.forEach((s, i) => {
       const o = p.options.find((opt) => opt.id === picked[i]);
-      s.innerHTML = o ? `<img src="${spriteUrl(o.sprite ?? "")}" alt=""><span>${i + 1}. ${o.label}</span>` : `<span>${i + 1}.</span>`;
+      const img = o?.sprite ? `<img src="${spriteUrl(o.sprite)}" alt="">` : "";
+      s.innerHTML = o ? `${img}<span>${i + 1}. ${o.label}</span>` : `<span>${i + 1}.</span>`;
       s.classList.toggle("filled", !!o);
     });
   const pick = (o: PuzzleOption) => {
@@ -209,7 +226,7 @@ function orderLock(p: OrderPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
       window.setTimeout(() => {
         if (checkOrder(p, picked)) ui.solved();
         else {
-          ui.say("Låset rör sig inte. Läs lappen igen och försök en gång till!");
+          ui.say(p.wrong ?? "Låset rör sig inte. Läs lappen igen och försök en gång till!");
           picked.length = 0;
           render();
         }
@@ -243,7 +260,7 @@ function choice(p: ChoicePuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   options.className = "options";
   const pick = (o: PuzzleOption) => {
     if (o.id === p.answer) ui.solved();
-    else ui.say(`${o.label}? Nej… tänk en gång till!`);
+    else ui.say(p.wrong ?? `${o.label}? Nej… tänk en gång till!`);
   };
   const shown = shuffleOptions(p.options);
   shown.forEach((o, i) => {
@@ -292,42 +309,60 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
 
   const showEvidence = (culprit: PuzzleOption) => {
     const q = p.questions[step];
+    const need = q.proof.length;
     playClick();
     ui.say("", true);
     ui.body.innerHTML = "";
     const intro = document.createElement("p");
     intro.className = "evidence-intro";
-    intro.textContent = `${culprit.label}! Visa ${q.proof.length === 2 ? "två" : q.proof.length} ledtrådar som bevisar det.`;
+    intro.textContent = `${culprit.label}! Markera de ${need} ledtrådar som visar det.`;
     const grid = document.createElement("div");
     grid.className = "evidence";
     const chosen = new Set<string>();
     const clueIds = state.foundClues();
-    const submit = button("Visa bevisen!", "ok");
-    submit.disabled = true;
+    const cards = new Map<string, HTMLButtonElement>();
+    const submit = button("", "ok");
 
-    const toggle = (id: string, card: HTMLButtonElement) => {
+    const refresh = () => {
+      cards.forEach((card, id) => card.classList.toggle("chosen", chosen.has(id)));
+      submit.textContent = `Visa bevisen! (${chosen.size} av ${need})`;
+      submit.disabled = chosen.size !== need;
+    };
+    const toggle = (id: string) => {
       playClick();
       if (chosen.has(id)) chosen.delete(id);
-      else if (chosen.size < q.proof.length) chosen.add(id);
-      card.classList.toggle("chosen", chosen.has(id));
-      submit.disabled = chosen.size !== q.proof.length;
+      else if (chosen.size < need) chosen.add(id);
+      refresh();
     };
-    clueIds.forEach((id, i) => {
+    clueIds.forEach((id) => {
       const clue = state.data.clues[id];
       const card = document.createElement("button");
       card.className = "evidence-card";
-      card.innerHTML = `<span class="key">${i + 1}</span><img src="${spriteUrl(clue.sprite)}" alt=""><b></b>`;
+      card.title = clue.text;
+      card.innerHTML = `<img src="${spriteUrl(clue.sprite)}" alt=""><b></b>`;
       card.querySelector("b")!.textContent = clue.name;
-      card.addEventListener("click", () => toggle(id, card));
+      card.addEventListener("click", () => toggle(id));
+      cards.set(id, card);
       grid.appendChild(card);
     });
     submit.addEventListener("click", () => {
-      if (!checkEvidence(q, [...chosen])) {
-        ui.say(`Ester: "${explainEvidence(q, [...chosen])}"`);
-        // Start over with nothing chosen.
-        chosen.clear();
-        grid.querySelectorAll(".chosen").forEach((c) => c.classList.remove("chosen"));
-        submit.disabled = true;
+      const picked = [...chosen];
+      if (!checkEvidence(q, picked)) {
+        // Name the clue Ester talks about, so it's clear which one she means.
+        const wrong = picked.filter((id) => !q.proof.includes(id));
+        // …unless her explanation already says it.
+        const text = explainEvidence(q, picked);
+        const name = wrong[0] ? state.data.clues[wrong[0]].name : "";
+        const about = name && !text.toLowerCase().includes(name.toLowerCase()) ? `${name}: ` : "";
+        ui.say(`Ester: "${about}${text}"`);
+        // The ones that don't show it are unmarked (with a short red flash) – the good ones stay.
+        for (const id of wrong) {
+          chosen.delete(id);
+          const card = cards.get(id)!;
+          card.classList.add("rejected");
+          window.setTimeout(() => card.classList.remove("rejected"), 1200);
+        }
+        refresh();
       } else if (step < p.questions.length - 1) {
         // On to the next question.
         step++;
@@ -338,15 +373,134 @@ function reveal(p: RevealPuzzle, state: CaseState, ui: PuzzleUi): (e: KeyboardEv
         ui.solved();
       }
     });
+    refresh();
     ui.body.append(intro, grid, submit);
 
     keys = (e) => {
-      const i = optionIndex(e, clueIds.length);
-      if (i >= 0) toggle(clueIds[i], grid.children[i] as HTMLButtonElement);
-      else if (e.key === "Enter" && !submit.disabled) submit.click();
+      if (e.key === "Enter" && !submit.disabled) submit.click();
     };
   };
 
   showWho();
   return (e) => keys(e);
+}
+
+// ---------- Match the pairs ----------
+
+function match(p: MatchPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
+  const grid = document.createElement("div");
+  grid.className = "match";
+  const left = document.createElement("div");
+  const right = document.createElement("div");
+  grid.append(left, right);
+  let chosen: number | null = null;
+  let done = 0;
+
+  const leftItems = shuffleOptions(p.pairs.map((pair, i) => ({ i, label: pair[0] })));
+  const rightItems = shuffleOptions(p.pairs.map((pair, i) => ({ i, label: pair[1] })));
+  const leftButtons = new Map<number, HTMLButtonElement>();
+
+  for (const item of leftItems) {
+    const b = button(item.label, "match-item");
+    b.addEventListener("click", () => {
+      if (b.classList.contains("matched")) return;
+      playClick();
+      leftButtons.forEach((other) => other.classList.remove("chosen"));
+      b.classList.add("chosen");
+      chosen = item.i;
+    });
+    leftButtons.set(item.i, b);
+    left.appendChild(b);
+  }
+  for (const item of rightItems) {
+    const b = document.createElement("button");
+    b.className = "match-item";
+    if (p.rightSprites) b.innerHTML = `<img src="${spriteUrl(item.label)}" alt="">`;
+    else b.textContent = item.label;
+    b.addEventListener("click", () => {
+      if (b.classList.contains("matched")) return;
+      if (chosen === null) {
+        ui.say("Välj något i vänstra kolumnen först!");
+        return;
+      }
+      if (chosen === item.i) {
+        playClick();
+        b.classList.add("matched");
+        leftButtons.get(item.i)!.classList.remove("chosen");
+        leftButtons.get(item.i)!.classList.add("matched");
+        chosen = null;
+        done++;
+        if (done === p.pairs.length) ui.solved();
+      } else {
+        ui.say("De där två hör inte ihop. Försök igen!");
+      }
+    });
+    right.appendChild(b);
+  }
+  ui.body.append(grid);
+  return () => {};
+}
+
+// ---------- Which clock shows the time? ----------
+
+function drawClock(hour: number, minute: number): HTMLCanvasElement {
+  const size = 64;
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  const c = size / 2;
+  ctx.fillStyle = "#1a1024";
+  ctx.beginPath();
+  ctx.arc(c, c, 30, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#f4ecd8";
+  ctx.beginPath();
+  ctx.arc(c, c, 27, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#1a1024";
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2;
+    const r = i % 3 === 0 ? 3 : 2;
+    ctx.fillRect(Math.round(c + Math.sin(a) * 22 - r / 2), Math.round(c - Math.cos(a) * 22 - r / 2), r, r);
+  }
+  const hand = (angle: number, length: number, width: number, colour: string) => {
+    ctx.strokeStyle = colour;
+    ctx.lineWidth = width;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(c, c);
+    ctx.lineTo(c + Math.sin(angle) * length, c - Math.cos(angle) * length);
+    ctx.stroke();
+  };
+  hand((((hour % 12) + minute / 60) / 12) * Math.PI * 2, 13, 4, "#1a1024");
+  hand((minute / 60) * Math.PI * 2, 21, 2.5, "#c0182c");
+  ctx.fillStyle = "#1a1024";
+  ctx.beginPath();
+  ctx.arc(c, c, 3, 0, Math.PI * 2);
+  ctx.fill();
+  return canvas;
+}
+
+function clocks(p: ClockPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
+  const options = document.createElement("div");
+  options.className = "options";
+  const times = p.times ?? [];
+  const pick = (id: string) => {
+    if (id === p.answer) ui.solved();
+    else ui.say("Titta på visarna igen! Den korta visar timmen, den långa minuterna.");
+  };
+  times.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.className = "option";
+    b.innerHTML = `<span class="key">${i + 1}</span>`;
+    b.appendChild(drawClock(t.hour, t.minute));
+    b.addEventListener("click", () => pick(t.id));
+    options.appendChild(b);
+  });
+  ui.body.append(options);
+  return (e) => {
+    const i = optionIndex(e, times.length);
+    if (i >= 0) pick(times[i].id);
+  };
 }

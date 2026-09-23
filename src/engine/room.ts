@@ -15,6 +15,11 @@ export type TileKind =
   | "counter"
   | "crate"
   | "tree"
+  | "water"
+  | "oven"
+  | "gear"
+  | "fountain"
+  | "rock"
   | "thing";
 
 /** Layout characters. Lowercase letters are things and digits are clues, both defined in the room. */
@@ -29,6 +34,11 @@ export const TILE_CHARS: Record<string, TileKind> = {
   K: "counter",
   L: "crate",
   T: "tree",
+  W: "water", // deep water – can't be jumped
+  O: "oven",
+  G: "gear", // a big cogwheel
+  U: "fountain",
+  R: "rock",
   N: "floor", // Nora's start
   E: "floor", // Ester's spot
 };
@@ -59,6 +69,22 @@ export interface ParsedRoom {
   spawn: { col: number; row: number } | null;
   things: PlacedThing[];
   clues: PlacedClue[];
+}
+
+/** Every clue Nora can find in a room by looking: on the floor, or from things and monsters. */
+export function cluesInRoom(c: Case, id: string): string[] {
+  const room = c.rooms[id];
+  const things = [
+    ...Object.values(room.things ?? {}),
+    ...(room.monsters ?? []).flatMap((m) => ("thing" in m && m.thing ? [m.thing] : [])),
+  ];
+  const all = [
+    ...Object.values(room.clues ?? {}),
+    ...things.flatMap((t) => [t, ...(t.talkIf ?? [])].flatMap((v) => flagList(v.clue))),
+  ];
+  // A clue Ester gives on entering is found already – it doesn't count here.
+  const given = new Set(flagList(room.onEnter?.clue));
+  return [...new Set(all)].filter((id) => !given.has(id));
 }
 
 export function parseRoom(c: Case, id: string): ParsedRoom {
@@ -262,7 +288,11 @@ export function validateCase(c: Case): string[] {
           ? [m.center, ...(m.perch ? [m.perch] : [])]
           : m.type === "sneaker"
             ? [m.home]
-            : [...m.routes.flat(), ...(m.shelters ?? [])];
+            : m.type === "patroller"
+              ? m.path
+              : m.type === "sleeper"
+                ? [m.at]
+                : [...m.routes.flat(), ...(m.shelters ?? [])];
       for (const [col, row] of points) {
         if (col < 0 || col >= ROOM_COLS || row < 0 || row >= ROOM_ROWS) {
           errors.push(`I rummet '${room.name}': ett monster är utanför rummet (${col}, ${row}).`);
@@ -296,6 +326,10 @@ export function validateCase(c: Case): string[] {
       const ids = options.map((o) => o.id);
       for (const a of answers) if (!ids.includes(a)) errors.push(`${where}: svaret '${a}' finns inte bland valen.`);
     }
+    if (rolled.type === "clock" && (!rolled.times || rolled.times.length !== 4)) {
+      errors.push(`${where}: klockpusslet behöver fyra olika klockor.`);
+    }
+    if (rolled.type === "match" && rolled.pairs.length < 2) errors.push(`${where}: behöver minst två par.`);
     if (p.type === "order" && p.describe) {
       for (const key of Object.keys(p.describe)) {
         if (!p.options.some((o) => o.id === key)) errors.push(`${where}: '${key}' finns inte bland valen.`);
@@ -303,9 +337,15 @@ export function validateCase(c: Case): string[] {
     }
     if (p.type === "reveal") {
       for (const q of p.questions) {
-        if (q.proof.length < 2) errors.push(`${where}: '${q.question}' behöver minst två grupper av bevis.`);
-        for (const e of [...q.proof.flat(), ...Object.keys(q.why ?? {})]) {
+        if (q.proof.length < 2) errors.push(`${where}: '${q.question}' behöver minst två bevis.`);
+        for (const e of [...q.proof, ...Object.keys(q.why ?? {}), ...Object.keys(q.missing ?? {})]) {
           if (!c.clues[e]) errors.push(`${where}: '${e}' är ingen ledtråd.`);
+        }
+        for (const e of q.proof) {
+          if (q.why?.[e]) errors.push(`${where}: '${e}' är ett bevis men har ett 'why' (varför det inte bevisar).`);
+        }
+        for (const e of Object.keys(q.missing ?? {})) {
+          if (!q.proof.includes(e)) errors.push(`${where}: 'missing' för '${e}', som inte är ett bevis.`);
         }
       }
     }

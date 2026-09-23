@@ -5,7 +5,7 @@ import type { Facing } from "./Player";
 
 /** What a monster may know about and do to the rest of the room. */
 export interface MonsterWorld {
-  nora(): { x: number; y: number; facing: Facing };
+  nora(): { x: number; y: number; facing: Facing; airborne: boolean };
   /** False during a grace period after a scare, in dialogs, while carried, etc. */
   canCatch(): boolean;
   caught(by: Monster): void;
@@ -27,6 +27,8 @@ export interface Monster {
   readonly thing?: Thing;
   /** Can Nora talk to it right now? (Defaults to yes, if it has a `thing`.) */
   canTalk?(): boolean;
+  /** Is its own speech bubble showing right now? */
+  showsTalkHint?(): boolean;
   update(dt: number, time: number): void;
   /** After catching Nora: back off for a while. */
   retreat(): void;
@@ -48,12 +50,154 @@ export function createMonster(scene: Phaser.Scene, def: MonsterDef, world: Monst
       return new Sneaker(scene, def, world);
     case "crawler":
       return new Crawler(scene, def, world);
+    case "patroller":
+      return new Patroller(scene, def, world);
+    case "sleeper":
+      return new Sleeper(scene, def, world);
+  }
+}
+
+/** Moves (x, y) toward a point; returns the new position and whether it arrived. */
+function step(from: { x: number; y: number }, to: { x: number; y: number }, speed: number, dt: number) {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const dist = Math.hypot(dx, dy);
+  if (dist < 0.5) return { x: to.x, y: to.y, arrived: true, dx };
+  const s = Math.min(dist, speed * dt);
+  return { x: from.x + (dx / dist) * s, y: from.y + (dy / dist) * s, arrived: s >= dist, dx };
+}
+
+// ---------- Patroller: walks back and forth ----------
+
+class Patroller implements Monster {
+  readonly kind = "patroller";
+  readonly sprite: Phaser.GameObjects.Sprite;
+  private readonly shadow: Phaser.GameObjects.Ellipse;
+  private readonly path: { x: number; y: number }[];
+  private readonly speed: number;
+  private readonly walkAnim?: string;
+  private target = 1;
+  private direction = 1;
+  private restFor = 0;
+  x: number;
+  y: number;
+
+  constructor(
+    scene: Phaser.Scene,
+    def: Extract<MonsterDef, { type: "patroller" }>,
+    private readonly world: MonsterWorld,
+  ) {
+    this.path = def.path.map(([c, r]) => ({ x: c * TILE + TILE / 2, y: r * TILE + TILE - 2 }));
+    this.speed = def.speed ?? 32;
+    this.x = this.path[0].x;
+    this.y = this.path[0].y;
+    this.shadow = scene.add.ellipse(this.x, this.y, 12, 4, 0x000000, 0.3);
+    this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setOrigin(0.5, 1);
+    if (scene.anims.exists(def.sprite)) this.walkAnim = def.sprite;
+  }
+
+  update(dt: number): void {
+    if (this.restFor > 0) {
+      this.restFor -= dt;
+    } else {
+      const next = step(this, this.path[this.target], this.speed, dt);
+      this.x = next.x;
+      this.y = next.y;
+      if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
+      if (next.arrived) {
+        if (this.target === this.path.length - 1 || this.target === 0) {
+          this.direction *= -1;
+          this.restFor = 0.8;
+        }
+        this.target += this.direction;
+      }
+      if (this.walkAnim) this.sprite.play(this.walkAnim, true);
+    }
+    if (this.restFor > 0 && this.walkAnim) this.sprite.stop();
+
+    const nora = this.world.nora();
+    if (Math.hypot(nora.x - this.x, nora.y - this.y) < 10 && this.world.canCatch()) this.world.caught(this);
+    this.sprite.setPosition(Math.round(this.x), Math.round(this.y)).setDepth(this.y);
+    this.shadow.setPosition(Math.round(this.x), Math.round(this.y - 1)).setDepth(this.y - 0.5);
+  }
+
+  /** Stops for a moment after a scare, so Nora can get away. */
+  retreat(): void {
+    this.restFor = 2.5;
+  }
+}
+
+// ---------- Sleeper: wakes up if Nora jumps close by ----------
+
+class Sleeper implements Monster {
+  readonly kind = "sleeper";
+  readonly sprite: Phaser.GameObjects.Sprite;
+  private readonly zzz: Phaser.GameObjects.Image;
+  private readonly home: { x: number; y: number };
+  private readonly wakeRadius: number;
+  private readonly spriteKey: string;
+  private awakeFor = 0;
+  x: number;
+  y: number;
+
+  constructor(
+    scene: Phaser.Scene,
+    def: Extract<MonsterDef, { type: "sleeper" }>,
+    private readonly world: MonsterWorld,
+  ) {
+    this.home = { x: def.at[0] * TILE + TILE / 2, y: def.at[1] * TILE + TILE - 2 };
+    this.x = this.home.x;
+    this.y = this.home.y;
+    this.wakeRadius = (def.wakeRadius ?? 3) * TILE;
+    this.spriteKey = def.sprite;
+    scene.add.ellipse(this.x, this.y - 1, 14, 4, 0x000000, 0.3).setDepth(this.y - 0.5);
+    this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setOrigin(0.5, 1).setDepth(this.y);
+    this.zzz = scene.add.image(this.x + 8, this.y - 18, "zzz-0").setDepth(9000);
+  }
+
+  update(dt: number, time: number): void {
+    const nora = this.world.nora();
+    const toNora = Math.hypot(nora.x - this.x, nora.y - this.y);
+
+    if (this.awakeFor <= 0) {
+      // Asleep. A jump close by is too loud!
+      if (nora.airborne && toNora < this.wakeRadius && this.world.canCatch()) {
+        this.awakeFor = 3.5;
+        this.world.startle("GRRR!");
+      }
+      const next = step(this, this.home, 30, dt);
+      this.x = next.x;
+      this.y = next.y;
+    } else {
+      this.awakeFor -= dt;
+      const next = step(this, nora, 48, dt);
+      this.x = next.x;
+      this.y = next.y;
+      if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
+      if (toNora < 10 && this.world.canCatch()) this.world.caught(this);
+    }
+
+    const asleep = this.awakeFor <= 0 && Math.hypot(this.x - this.home.x, this.y - this.home.y) < 1;
+    this.sprite.setTexture(`${this.spriteKey}-${asleep ? 0 : 1}`);
+    this.sprite.setPosition(Math.round(this.x), Math.round(this.y)).setDepth(this.y);
+    this.zzz.setVisible(asleep).setPosition(this.x + 8, this.y - 20 - (time / 200) % 6).setAlpha(1 - ((time / 200) % 6) / 6);
+  }
+
+  /** After catching Nora it goes back to sleep. */
+  retreat(): void {
+    this.awakeFor = 0;
   }
 }
 
 // ---------- Flyer: loops around the room and swoops at Nora ----------
 
 const FLY_HEIGHT = 16;
+
+/** Seconds the dust takes to fall from a shelf. */
+const DUST_TIME = 1.2;
+
+/** Seconds a flyer keeps flying before resting, if she never misses Nora. */
+const TIRED_AFTER = 30;
 
 class Flyer implements Monster {
   readonly kind = "flyer";
@@ -69,8 +213,10 @@ class Flyer implements Monster {
   private readonly perchSprite?: string;
   private readonly talkHint: Phaser.GameObjects.Image;
   readonly thing?: Thing;
-  /** Seconds of flying left before the next rest on the perch. */
-  private flyFor = 8 + Math.random() * 4;
+  /** Missed attacks (Nora hid or got away). Two misses make her tired, and she rests on the perch. */
+  private misses = 0;
+  /** If Nora never gets attacked, she rests anyway after this many seconds of flying. */
+  private flyFor = TIRED_AFTER;
   private modeTime = 0;
   private t = Math.random() * Math.PI * 2;
   x: number;
@@ -100,6 +246,10 @@ class Flyer implements Monster {
     return this.mode === "perched";
   }
 
+  showsTalkHint(): boolean {
+    return this.talkHint.visible;
+  }
+
   /** A figure-eight around the centre of the room. */
   private loopPoint(): { x: number; y: number } {
     return { x: this.center.x + Math.sin(this.t) * this.size.x, y: this.center.y + Math.sin(this.t * 2) * this.size.y };
@@ -119,7 +269,7 @@ class Flyer implements Monster {
       const p = this.loopPoint();
       this.moveTo(p.x, p.y, 80, dt);
       if (toNora < 48 && !hidden && this.world.canCatch()) this.setMode("windup");
-      else if (this.perch && this.flyFor <= 0) this.setMode("toPerch");
+      else if (this.perch && (this.misses >= 2 || this.flyFor <= 0)) this.setMode("toPerch");
     } else if (this.mode === "toPerch") {
       if (this.moveTo(this.perch!.x, this.perch!.y, 60, dt) < 1) this.land();
     } else if (this.mode === "perched") {
@@ -134,7 +284,10 @@ class Flyer implements Monster {
       this.moveTo(nora.x, nora.y, 88, dt);
       if (hidden) this.giveUp();
       else if (toNora < 9 && this.world.canCatch()) this.world.caught(this);
-      else if (this.modeTime > 1.3) this.setMode("return");
+      else if (this.modeTime > 1.3) {
+        this.misses++;
+        this.setMode("return");
+      }
     } else if (this.mode === "return") {
       const p = this.loopPoint();
       if (this.moveTo(p.x, p.y, 60, dt) < 2) this.setMode("loop");
@@ -158,7 +311,8 @@ class Flyer implements Monster {
   }
 
   private takeOff(): void {
-    this.flyFor = 8 + Math.random() * 4;
+    this.flyFor = TIRED_AFTER;
+    this.misses = 0;
     this.sprite.play(this.spriteKey);
     this.setMode("return");
   }
@@ -166,6 +320,7 @@ class Flyer implements Monster {
   /** Nora hid behind something: "Huh? Where did she go?" */
   private giveUp(): void {
     this.puzzledFor = 1.2;
+    this.misses++;
     this.setMode("return");
   }
 
@@ -232,6 +387,10 @@ class Sneaker implements Monster {
 
   private isHiding(): boolean {
     return !!this.hideUntil && !this.world.has(emergedFlag(this.spriteKey));
+  }
+
+  showsTalkHint(): boolean {
+    return this.talkHint.visible;
   }
 
   /** Is Nora looking in the monster's direction? */
@@ -324,6 +483,8 @@ export class Crawler implements Monster {
   readonly kind = "crawler";
   readonly sprite: Phaser.GameObjects.Sprite;
   private readonly rustle: Phaser.GameObjects.Image;
+  /** Early in the case only a little dust falls from a shelf – the real shaking is for the end. */
+  private readonly dust: Phaser.GameObjects.Image;
   private readonly spriteKey: string;
   private readonly routes: { x: number; y: number }[][];
   readonly shelters: [number, number][];
@@ -350,12 +511,14 @@ export class Crawler implements Monster {
     this.y = this.routes[0][0].y;
     this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setVisible(false);
     this.rustle = scene.add.image(0, 0, "rustle-0").setDepth(9500).setVisible(false);
+    this.dust = scene.add.image(0, 0, "dustFall-0").setDepth(9500).setVisible(false);
   }
 
   /** Gone for good (caught): hide everything right away. */
   vanish(): void {
     this.sprite.setVisible(false);
     this.rustle.setVisible(false);
+    this.dust.setVisible(false);
   }
 
   /** The shelter it hides in right now (at the end of the case), or -1. */
@@ -373,16 +536,18 @@ export class Crawler implements Monster {
       return;
     }
     this.rustle.setVisible(false);
-    this.shelterIndex = -1;
     if (this.world.has(CAUGHT_FLAG)) {
       this.sprite.setVisible(false);
+      this.dust.setVisible(false);
       return;
     }
 
     if (this.unseenUntil !== undefined && !this.world.has(this.unseenUntil)) {
-      this.rustleSomewhere(dt, time);
+      this.rustleSomewhere(dt);
       return;
     }
+    this.dust.setVisible(false);
+    this.shelterIndex = -1;
 
     if (this.path.length === 0) {
       this.hiddenFor -= dt;
@@ -410,8 +575,8 @@ export class Crawler implements Monster {
     }
   }
 
-  /** Never seen yet: now and then the toys on a shelf far from Nora rustle. */
-  private rustleSomewhere(dt: number, time: number): void {
+  /** Never seen yet: now and then a little dust falls from a shelf far from Nora. */
+  private rustleSomewhere(dt: number): void {
     this.hiddenFor -= dt;
     if (this.hiddenFor <= 0) {
       const nora = this.world.nora();
@@ -420,15 +585,16 @@ export class Crawler implements Monster {
         return Math.hypot(p.x - nora.x, p.y - nora.y) > 64;
       });
       this.shelterIndex = far.length ? this.shelters.indexOf(far[Math.floor(Math.random() * far.length)]) : -1;
-      this.shelterTime = 1.2;
+      this.shelterTime = DUST_TIME;
       this.hiddenFor = 7 + Math.random() * 6;
     }
     this.shelterTime -= dt;
     if (this.shelterIndex >= 0 && this.shelterTime > 0) {
       const at = tileCenter(this.shelters[this.shelterIndex]);
-      this.rustle.setVisible(true).setPosition(at.x + Math.sin(time / 30), at.y - 10);
+      const fall = 1 - this.shelterTime / DUST_TIME;
+      this.dust.setVisible(true).setAlpha(1 - fall * 0.8).setPosition(at.x, at.y - 4 + Math.round(fall * 8));
     } else {
-      this.rustle.setVisible(false);
+      this.dust.setVisible(false);
       this.shelterIndex = -1;
     }
   }

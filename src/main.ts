@@ -7,6 +7,7 @@ import "./ui/ui.css";
 // Load the spooky title font right away, so the title doesn't flash in another font.
 void document.fonts.load("34px Creepster");
 import { GAME_HEIGHT, GAME_WIDTH } from "./engine/config";
+import { MapScene } from "./engine/scenes/MapScene";
 import { RoomScene } from "./engine/scenes/RoomScene";
 import { TitleScene } from "./engine/scenes/TitleScene";
 import { session } from "./engine/session";
@@ -23,7 +24,7 @@ const game = new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [TitleScene, RoomScene],
+  scene: [TitleScene, MapScene, RoomScene],
 });
 
 attachUiLayer(game);
