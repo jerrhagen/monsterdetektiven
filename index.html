@@ -2,13 +2,23 @@
 <html lang="sv">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#07040f" />
+    <!-- On a phone the game can be added to the home screen and run in full screen. -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Monsterdetektiven" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" href="/icon-192.png" />
     <title>Monsterdetektiven</title>
   </head>
   <body>
     <div id="game">
       <div id="ui"></div>
     </div>
+    <div class="rotate-hint"><div class="phone">📱</div>Vänd mobilen så spelar vi!</div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

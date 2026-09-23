@@ -401,6 +401,12 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 | Mus | I pussel och menyer |
 | Siffror och bokstäver | I kodlås och textrutor |
 
+**På mobil och surfplatta** (bara när spelet märker en pekskärm; på dator är allt som vanligt):
+- Ett **styrspak** nere till vänster för att gå, och en stor **åtgärdsknapp** nere till höger som gör samma sak som mellanslag. Knappen visar vad den gör: ⤒ hoppa, 💬 prata, 🔍 undersöka, ▶ nästa i dialog. Knapparna ligger i de mörka kanterna bredvid spelet när det finns plats.
+- Man trycker på pratbubblan, svaren och menyerna. Tangentbordstips döljs, och små texter och knappar blir större.
+- Håller man mobilen upprätt visas "Vänd mobilen så spelar vi!". På Android går spelet till helskärm i liggande läge när man startar.
+- Spelet kan läggas till på hemskärmen (manifest och ikon med Nora i `public/`, ikonerna görs med `node scripts/make-icons.ts`).
+
 **Tekniska fallgropar:** Ctrl+W och Ctrl+R stänger respektive laddar om fliken, och det kan man inte stänga av i webbläsaren. Därför finns E och Enter också som använd-knapp. Piltangenter och mellanslag måste ha `preventDefault` så att sidan inte scrollar. När en textruta är aktiv ska spelets tangenter vara avstängda.
 
 **Hoppet:** Nora lyfter i ungefär 0,5 s (figuren åker upp, skuggan stannar på marken) och kan då passera **en ruta** med lågt hinder. Väggar går inte att hoppa över.

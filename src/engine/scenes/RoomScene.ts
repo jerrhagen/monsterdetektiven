@@ -9,6 +9,15 @@ import { closePuzzle, isPuzzleOpen, openPuzzle } from "../../ui/puzzle";
 import { spriteUrl } from "../../ui/spriteImage";
 import { playClick, playScare, playSuccess } from "../../ui/sound";
 import { roomSign, toast } from "../../ui/toast";
+import {
+  type ActionIcon,
+  hideTouchControls,
+  setActionIcon,
+  setTouchControlsVisible,
+  showTouchControls,
+  takeAction,
+  touchInput,
+} from "../../ui/touch";
 import { clueFlag, flagList } from "../caseState";
 import { TILE } from "../config";
 import { Ester } from "../Ester";
@@ -215,10 +224,12 @@ export class RoomScene extends Phaser.Scene {
     );
     setHudRoomClues(cluesInRoom(this.state.data, roomId));
     updateHud(this.state);
+    showTouchControls();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       hideHud();
       closeNotebook();
       closePuzzle();
+      hideTouchControls();
     });
 
     const enter = () => {
@@ -250,7 +261,8 @@ export class RoomScene extends Phaser.Scene {
     const dt = Math.min(deltaMs / 1000, 0.05);
     const JustDown = Phaser.Input.Keyboard.JustDown;
     const usePressed = this.keys.use.some((k) => JustDown(k));
-    const jumpPressed = JustDown(this.keys.jump);
+    // The touch screen's action button works just like the space bar.
+    const jumpPressed = JustDown(this.keys.jump) || takeAction();
     const bookPressed = JustDown(this.keys.book);
     const escPressed = JustDown(this.keys.escape);
 
@@ -258,6 +270,8 @@ export class RoomScene extends Phaser.Scene {
     const quiet = isPuzzleOpen() || isCaseScreenOpen() || isNotebookOpen() || isDialogOpen() || this.cutscene;
     this.thingBubbles.forEach((b) => b.setVisible(!quiet));
     if (quiet) this.bubble.setVisible(false);
+    setTouchControlsVisible(!(isPuzzleOpen() || isCaseScreenOpen() || isNotebookOpen()));
+    if (isDialogOpen()) setActionIcon("next");
 
     if (isPuzzleOpen() || isCaseScreenOpen()) {
       this.idle(dt);
@@ -289,8 +303,9 @@ export class RoomScene extends Phaser.Scene {
 
     this.tickHintTimer(dt);
 
-    const dx = (this.keys.right.isDown ? 1 : 0) - (this.keys.left.isDown ? 1 : 0);
-    const dy = (this.keys.down.isDown ? 1 : 0) - (this.keys.up.isDown ? 1 : 0);
+    const clamp = (n: number) => Math.max(-1, Math.min(1, n));
+    const dx = clamp((this.keys.right.isDown ? 1 : 0) - (this.keys.left.isDown ? 1 : 0) + touchInput.dx);
+    const dy = clamp((this.keys.down.isDown ? 1 : 0) - (this.keys.up.isDown ? 1 : 0) + touchInput.dy);
     // Space does what makes sense: next to someone or something it talks or looks – otherwise Nora jumps.
     const spaceUses = jumpPressed && this.target !== null && !this.player.airborne;
     this.player.update(dt, { dx, dy, jump: jumpPressed && !spaceUses });
@@ -304,6 +319,7 @@ export class RoomScene extends Phaser.Scene {
 
     this.target = this.player.airborne ? null : this.findTarget();
     this.showBubble(time);
+    setActionIcon(this.actionIcon(this.target));
     if ((usePressed || spaceUses) && this.target) this.use(this.target);
   }
 
@@ -550,6 +566,14 @@ export class RoomScene extends Phaser.Scene {
       if (key) this.state.markHeard(key, thing);
       this.updateHiddenThings();
     });
+  }
+
+  /** What the touch screen's action button does next to this target. */
+  private actionIcon(target: Target | null): ActionIcon {
+    if (!target) return "jump";
+    if (target.kind === "ester" || target.kind === "monster") return "talk";
+    if (target.kind === "thing" && this.room.things[target.index].thing.person) return "talk";
+    return "look";
   }
 
   /** Identifies a thing across visits to the room. */

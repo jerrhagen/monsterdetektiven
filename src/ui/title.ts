@@ -10,6 +10,7 @@ import {
 } from "../engine/save";
 import { uiRoot } from "./layer";
 import { playClick } from "./sound";
+import { enterFullscreen, isTouch } from "./touch";
 
 let titleEl: HTMLDivElement | null = null;
 let onKey: ((e: KeyboardEvent) => void) | null = null;
@@ -44,7 +45,7 @@ export function showTitle(onStart: () => void): void {
     titleEl!.innerHTML = `
       <h1>Monsterdetektiven</h1>
       <p class="subtitle">Mysterier i Mystiska staden</p>
-      <p class="start-hint">Tryck på mellanslag för att starta</p>
+      <p class="start-hint">${isTouch() ? "Tryck här för att starta ▶" : "Tryck på mellanslag för att starta"}</p>
       <div class="players">
         ${players
           .map(
@@ -87,6 +88,7 @@ export function showTitle(onStart: () => void): void {
 
   const start = () => {
     if (busy) return;
+    enterFullscreen();
     selectPlayer(chosen);
     hideTitle();
     onStart();

@@ -12,6 +12,7 @@ import { RoomScene } from "./engine/scenes/RoomScene";
 import { TitleScene } from "./engine/scenes/TitleScene";
 import { session } from "./engine/session";
 import { attachUiLayer } from "./ui/layer";
+import { initTouch } from "./ui/touch";
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,
@@ -28,6 +29,7 @@ const game = new Phaser.Game({
 });
 
 attachUiLayer(game);
+initTouch();
 
 // Lets Claude inspect and test the game from the browser console while developing.
 if (import.meta.env.DEV) Object.assign(window, { game, session });

@@ -4,6 +4,7 @@ import { type HelpLevel, isUnlocked, loadSave, loadSettings, saveSettings } from
 import { uiRoot } from "./layer";
 import { isMusicOn, toggleMusic } from "./music";
 import { playClick } from "./sound";
+import { isTouch } from "./touch";
 import { spriteUrl } from "./spriteImage";
 
 /** Where each case lies on the town map (game pixels), in case order. */
@@ -69,7 +70,7 @@ export function showCityMap(selected: number, actions: MapActions): void {
       }).join("")}
       <div class="map-bottom">
         <span class="shards">Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}</span>
-        <span class="map-hint">Välj ett fall med pilarna och tryck på mellanslag</span>
+        <span class="map-hint">${isTouch() ? "Tryck två gånger på ett fall för att spela" : "Välj ett fall med pilarna och tryck på mellanslag"}</span>
       </div>`;
     el!.querySelectorAll<HTMLButtonElement>(".map-spot").forEach((b) => {
       const i = Number(b.dataset.i);
