@@ -78,3 +78,81 @@ body {
   0%, 100% { opacity: 0.55; }
   50% { opacity: 1; }
 }
+
+/* ---------- Key reminder ---------- */
+
+.controls {
+  position: absolute;
+  top: calc(var(--px) * 2);
+  left: calc(var(--px) * 3);
+  display: flex;
+  gap: calc(var(--px) * 5);
+  font-size: calc(var(--px) * 4.2);
+  color: #e6dcf5;
+  text-shadow: 0 calc(var(--px) * 0.4) 0 #14101c;
+  pointer-events: none;
+}
+
+.controls kbd {
+  font-family: inherit;
+  font-weight: 700;
+  padding: 0 calc(var(--px) * 1);
+  border-radius: calc(var(--px) * 1);
+  background: rgba(20, 16, 28, 0.7);
+  color: #ffd66b;
+}
+
+/* ---------- Speech bubble ---------- */
+
+.dialog {
+  position: absolute;
+  left: calc(var(--px) * 8);
+  right: calc(var(--px) * 8);
+  bottom: calc(var(--px) * 5);
+  min-height: calc(var(--px) * 30);
+  padding: calc(var(--px) * 5) calc(var(--px) * 7);
+  box-sizing: border-box;
+  background: #231736;
+  border: calc(var(--px) * 1) solid #f4ecff;
+  border-radius: calc(var(--px) * 4);
+  box-shadow: 0 calc(var(--px) * 1.5) 0 #0d0718;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dialog-name {
+  position: absolute;
+  top: calc(var(--px) * -5.5);
+  left: calc(var(--px) * 6);
+  padding: calc(var(--px) * 1) calc(var(--px) * 4);
+  background: #8fd14f;
+  color: #14101c;
+  font-weight: 700;
+  font-size: calc(var(--px) * 5.5);
+  border-radius: calc(var(--px) * 2);
+}
+
+.dialog-text {
+  margin: 0;
+  font-size: calc(var(--px) * 8);
+  line-height: 1.35;
+}
+
+.dialog-next {
+  position: absolute;
+  right: calc(var(--px) * 5);
+  bottom: calc(var(--px) * 2);
+  font-size: calc(var(--px) * 5);
+  color: #ffd66b;
+  opacity: 0;
+}
+
+.dialog.done .dialog-next {
+  opacity: 1;
+  animation: bounce 0.8s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(calc(var(--px) * 1.2)); }
+}

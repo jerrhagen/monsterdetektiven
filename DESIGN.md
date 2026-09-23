@@ -320,9 +320,11 @@ Tecknen i rutnätet:
 |---|---|
 | `#` | Vägg |
 | `.` | Golv |
-| `~` | Pöl (hoppa över) |
-| `=` | Lågt hinder (hoppa över) |
+| `~` | Pöl eller slem (hoppa över) |
+| `=` | Lågt hinder, till exempel byggklossar (hoppa över) |
 | `D` | Dörr (vart den leder anges i `doors`) |
+| `H` | Hylla med leksaker (fast) |
+| `K` | Disk med kassaapparat (fast) |
 | `N` | Noras startplats (bara i första rummet) |
 | `E` | Esters plats (valfritt) |
 | `1`–`9` | Ledtrådar |
@@ -456,7 +458,7 @@ Varje steg ska ge något som går att **spela och visa upp**.
 | Steg | Resultat |
 |---|---|
 | 0 ✅ | Projektet startar och visar "Monsterdetektiven" (titelskärm med staden på natten och Fladder som flyger förbi). Bygget till en fil fungerar. git är igång. |
-| 1 | Nora går runt i ett rum som ritats som textkarta, krockar med väggar, hoppar över pölar och läser en skylt med Ctrl. |
+| 1 ✅ | Nora går runt i leksaksaffären, krockar med väggar, hoppar över klossar och slem och läser en skylt och pratar med en nalle med Ctrl (eller E/Enter). En liten pratbubbla visar vad man kan använda. |
 | 2 | Flera rum och dörrar, flaggor, mål, ledtrådar och Detektivboken. |
 | 3 | Ester följer med och har fastnat-timer och tips. |
 | 4 | Pussel: kodlås, skriv svaret och flerval. |

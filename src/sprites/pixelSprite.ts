@@ -5,9 +5,13 @@
  */
 export interface PixelSprite {
   palette: Record<string, string | null>;
-  /** One or more animation frames, each a list of equally long rows. */
+  /** One or more frames, each a list of equally long rows. */
   frames: string[][];
-  /** Animation speed for multi-frame sprites. */
+  /**
+   * Named animations as lists of frame indices. Sprites with several frames
+   * and no `animations` get a single looping animation named after the sprite.
+   */
+  animations?: Record<string, { frames: number[]; frameRate: number }>;
   frameRate?: number;
 }
 
@@ -33,6 +37,14 @@ export function validatePixelSprite(name: string, sprite: PixelSprite): string[]
       }
     });
   });
+
+  for (const [anim, { frames }] of Object.entries(sprite.animations ?? {})) {
+    for (const i of frames) {
+      if (i < 0 || i >= sprite.frames.length) {
+        errors.push(`Figuren '${name}', animationen '${anim}': bild ${i} finns inte.`);
+      }
+    }
+  }
   return errors;
 }
 

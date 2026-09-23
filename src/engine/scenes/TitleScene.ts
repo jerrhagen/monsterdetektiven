@@ -36,6 +36,12 @@ export class TitleScene extends Phaser.Scene {
 
     showTitle();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideTitle);
+
+    const K = Phaser.Input.Keyboard.KeyCodes;
+    for (const key of [K.SPACE, K.ENTER, K.CTRL]) {
+      this.input.keyboard!.addKey(key).once("down", () => this.scene.start("room"));
+    }
+    this.input.once("pointerdown", () => this.scene.start("room"));
   }
 
   private drawSky(): void {

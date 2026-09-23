@@ -9,7 +9,7 @@ export function showTitle(): void {
   titleEl.innerHTML = `
     <h1>Monsterdetektiven</h1>
     <p class="subtitle">Mysterier i Mystiska staden</p>
-    <p class="soon">Kommer snart: Fall 1 – Leksaksaffären</p>
+    <p class="soon">Tryck på mellanslag för att börja!</p>
   `;
   uiRoot.appendChild(titleEl);
 }

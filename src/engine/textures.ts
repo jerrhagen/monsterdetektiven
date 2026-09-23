@@ -4,7 +4,8 @@ import { frameToCanvas, validatePixelSprite } from "../sprites/pixelSprite";
 
 /**
  * Turns every pixel sprite into Phaser textures. Frame textures are named
- * `<key>-0`, `<key>-1`, …; multi-frame sprites also get an animation `<key>`.
+ * `<key>-0`, `<key>-1`, …. Animations are named `<key>-<animation>`, or just
+ * `<key>` for sprites with frames but no named animations.
  */
 export function registerSprites(scene: Phaser.Scene): void {
   for (const [key, sprite] of Object.entries(sprites)) {
@@ -19,11 +20,19 @@ export function registerSprites(scene: Phaser.Scene): void {
       return frameKey;
     });
 
-    if (frameKeys.length > 1 && !scene.anims.exists(key)) {
+    const animations =
+      sprite.animations ??
+      (frameKeys.length > 1
+        ? { "": { frames: frameKeys.map((_, i) => i), frameRate: sprite.frameRate ?? 6 } }
+        : {});
+
+    for (const [name, anim] of Object.entries(animations)) {
+      const animKey = name ? `${key}-${name}` : key;
+      if (scene.anims.exists(animKey)) continue;
       scene.anims.create({
-        key,
-        frames: frameKeys.map((k) => ({ key: k })),
-        frameRate: sprite.frameRate ?? 6,
+        key: animKey,
+        frames: anim.frames.map((i) => ({ key: frameKeys[i] })),
+        frameRate: anim.frameRate,
         repeat: -1,
       });
     }
