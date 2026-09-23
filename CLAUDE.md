@@ -28,7 +28,8 @@ Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bar
 
 - Varje fall ska vara ett **komplett mysterium**: problem, utredning med ledtrådar **och** klurigheter (pussel), faror, avslöjande med bevis, och en koppling till **den röda tråden** genom alla fall (se avsnitt 4 i `DESIGN.md`).
 - Monstren ska vara **farliga och mystiska**, inte bara stå still och prata. De ska jaga, smyga, flyga iväg med Nora och vara en del av mysteriet.
-- Pedagogiken ska vävas in i klurigheterna. Claude får gärna hitta på eget innehåll, men Noras idéer och monster ska finnas med genom spelet.
+- Pedagogiken ska vävas in i klurigheterna enligt den pedagogiska planen (avsnitt 6 i `DESIGN.md`). Claude får gärna hitta på eget innehåll, men Noras idéer och monster ska finnas med genom spelet.
+- Det som byggts hittills är **test av byggstenar**, och fall 1 i koden är en testbana. De färdiga mysterierna, även fall 1, ska tänkas igenom ordentligt och får göras om från grunden (steg 6).
 
 ## Teknik i korthet
 

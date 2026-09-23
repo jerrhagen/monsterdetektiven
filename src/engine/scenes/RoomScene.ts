@@ -1,8 +1,9 @@
 import * as Phaser from "phaser";
-import type { Edge, Flags, Mover } from "../../cases/types";
+import type { Edge, Flags, Mover, Puzzle, Thing } from "../../cases/types";
 import { advanceDialog, isDialogOpen, openDialog } from "../../ui/dialog";
 import { hideHud, showHud, updateHud } from "../../ui/hud";
 import { closeNotebook, isNotebookOpen, toggleNotebook } from "../../ui/notebook";
+import { closePuzzle, isPuzzleOpen, openPuzzle } from "../../ui/puzzle";
 import { spriteUrl } from "../../ui/spriteImage";
 import { roomSign, toast } from "../../ui/toast";
 import { clueFlag } from "../caseState";
@@ -148,6 +149,7 @@ export class RoomScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       hideHud();
       closeNotebook();
+      closePuzzle();
     });
 
     roomSign(this.room.data.name);
@@ -166,6 +168,10 @@ export class RoomScene extends Phaser.Scene {
     const bookPressed = JustDown(this.keys.book);
     const escPressed = JustDown(this.keys.escape);
 
+    if (isPuzzleOpen()) {
+      this.idle(dt);
+      return;
+    }
     if (isNotebookOpen()) {
       if (bookPressed || escPressed || usePressed) closeNotebook();
       this.idle(dt);
@@ -364,9 +370,7 @@ export class RoomScene extends Phaser.Scene {
     if (target.kind === "ester") {
       this.talkToEster();
     } else if (target.kind === "thing") {
-      const { thing } = this.room.things[target.index];
-      const talk = this.state.talkFor(thing);
-      openDialog(thing.name, talk.talk, () => this.reward(talk.gives, talk.clue));
+      this.useThing(this.room.things[target.index].thing);
     } else if (target.kind === "clue") {
       const c = this.room.clues[target.index];
       openDialog(c.clue.name, [c.clue.text], () => {
@@ -376,8 +380,39 @@ export class RoomScene extends Phaser.Scene {
       });
     } else {
       const door = doorAt(this.room, target.col, target.row);
-      openDialog("Nora", [door?.lockedText ?? "Dörren är låst."]);
+      const puzzle = this.openPuzzleFor(door?.puzzle);
+      openDialog("Nora", [door?.lockedText ?? "Dörren är låst."], () => {
+        if (puzzle) this.startPuzzle(puzzle, () => toast("🔓 Dörren är öppen!"));
+      });
     }
+  }
+
+  /** A puzzle that hasn't been solved yet, or undefined. */
+  private openPuzzleFor(id?: string): Puzzle | undefined {
+    const puzzle = id ? this.state.data.puzzles?.[id] : undefined;
+    return puzzle && !this.state.has(puzzle.gives) ? puzzle : undefined;
+  }
+
+  /** Talk to a thing – or, if it has an unsolved puzzle that's ready, start that. */
+  private useThing(thing: Thing): void {
+    const puzzle = this.openPuzzleFor(thing.puzzle);
+    if (puzzle && this.state.has(thing.puzzleWhen)) {
+      const intro = thing.puzzleIntro ?? this.state.talkFor(thing).talk;
+      openDialog(thing.name, intro, () =>
+        // Afterwards the thing says what it says now that the puzzle is solved.
+        this.startPuzzle(puzzle, () => this.useThing(thing)),
+      );
+      return;
+    }
+    const talk = this.state.talkFor(thing);
+    openDialog(thing.name, talk.talk, () => this.reward(talk.gives, talk.clue));
+  }
+
+  private startPuzzle(puzzle: Puzzle, after: () => void): void {
+    openPuzzle(puzzle, this.state, () => {
+      this.reward(puzzle.gives);
+      after();
+    });
   }
 
   /** Ester gives a hint if Nora has been stuck long enough, otherwise she encourages her. */

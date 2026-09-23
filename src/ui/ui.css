@@ -375,3 +375,301 @@ body {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(calc(var(--px) * 1.2)); }
 }
+
+/* ---------- Puzzles ---------- */
+
+.puzzle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(7, 4, 15, 0.65);
+}
+
+.puzzle .card {
+  position: relative;
+  width: 78%;
+  max-height: 90%;
+  box-sizing: border-box;
+  overflow: auto;
+  padding: calc(var(--px) * 5) calc(var(--px) * 7);
+  background: #231736;
+  border: calc(var(--px) * 1) solid #ffd66b;
+  border-radius: calc(var(--px) * 4);
+  box-shadow: 0 calc(var(--px) * 2) 0 #0d0718;
+  text-align: center;
+}
+
+.puzzle .card.shake {
+  animation: shake 0.4s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(calc(var(--px) * -3)); }
+  40%, 80% { transform: translateX(calc(var(--px) * 3)); }
+}
+
+.puzzle h2 {
+  margin: 0 0 calc(var(--px) * 2);
+  font-size: calc(var(--px) * 8);
+  color: #ffd66b;
+}
+
+.puzzle-text p {
+  margin: 0 0 calc(var(--px) * 1);
+  font-size: calc(var(--px) * 6);
+  line-height: 1.3;
+}
+
+.puzzle-code .puzzle-text {
+  display: inline-block;
+  padding: calc(var(--px) * 2) calc(var(--px) * 5);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border-radius: calc(var(--px) * 1);
+  font-family: ui-monospace, "Courier New", monospace;
+  text-align: left;
+  box-shadow: 0 calc(var(--px) * 1) 0 #0d0718;
+}
+
+.puzzle-code .puzzle-text p {
+  font-size: calc(var(--px) * 5);
+}
+
+.puzzle .close {
+  position: absolute;
+  top: calc(var(--px) * 2);
+  right: calc(var(--px) * 3);
+  background: none;
+  border: none;
+  color: #f4ecff;
+  font-size: calc(var(--px) * 7);
+  cursor: pointer;
+}
+
+.puzzle button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.puzzle-feedback {
+  min-height: calc(var(--px) * 8);
+  margin-top: calc(var(--px) * 3);
+  font-size: calc(var(--px) * 6);
+  font-weight: 700;
+  color: #ff9a9a;
+}
+
+.puzzle-feedback.good {
+  color: #8fd14f;
+}
+
+/* Code lock */
+
+.code-slots {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 2);
+  margin: calc(var(--px) * 4) 0 calc(var(--px) * 3);
+}
+
+.code-slots span {
+  width: calc(var(--px) * 13);
+  height: calc(var(--px) * 16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0d0718;
+  border: calc(var(--px) * 0.7) solid #5cc46a;
+  border-radius: calc(var(--px) * 2);
+  color: #5cc46a;
+  font-size: calc(var(--px) * 11);
+  font-weight: 700;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, calc(var(--px) * 18));
+  gap: calc(var(--px) * 1.5);
+  justify-content: center;
+}
+
+.keypad button,
+.puzzle .ok {
+  padding: calc(var(--px) * 1.5) 0;
+  font-size: calc(var(--px) * 7);
+  font-weight: 700;
+  background: #3d3d50;
+  color: #f4ecff;
+  border: none;
+  border-radius: calc(var(--px) * 2);
+  box-shadow: 0 calc(var(--px) * 1) 0 #1a1024;
+}
+
+.keypad button:active,
+.option:active {
+  transform: translateY(calc(var(--px) * 0.8));
+  box-shadow: none;
+}
+
+.keypad .ok,
+.puzzle .ok {
+  background: #5cc46a;
+  color: #14101c;
+}
+
+.puzzle .ok:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Options with pictures */
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--px) * 3);
+  margin-top: calc(var(--px) * 3);
+}
+
+.option {
+  position: relative;
+  width: calc(var(--px) * 34);
+  padding: calc(var(--px) * 2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(var(--px) * 1);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border: none;
+  border-radius: calc(var(--px) * 3);
+  box-shadow: 0 calc(var(--px) * 1.2) 0 #0d0718;
+  font-size: calc(var(--px) * 5);
+  font-weight: 700;
+}
+
+.option:hover {
+  background: #fffaf0;
+  outline: calc(var(--px) * 0.7) solid #ffd66b;
+}
+
+.option img {
+  width: calc(var(--px) * 22);
+  height: calc(var(--px) * 22);
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.option .key,
+.evidence-card .key {
+  position: absolute;
+  top: calc(var(--px) * 1);
+  left: calc(var(--px) * 1.5);
+  font-size: calc(var(--px) * 3.5);
+  color: #8a7a8a;
+}
+
+.order-slots {
+  display: flex;
+  justify-content: center;
+  gap: calc(var(--px) * 3);
+  margin-top: calc(var(--px) * 4);
+}
+
+.slot {
+  width: calc(var(--px) * 30);
+  height: calc(var(--px) * 30);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #0d0718;
+  color: #8a7a9a;
+  border: calc(var(--px) * 0.7) dashed #6b4a8c;
+  border-radius: calc(var(--px) * 3);
+  font-size: calc(var(--px) * 4.5);
+}
+
+.slot.filled {
+  border-style: solid;
+  border-color: #ffd66b;
+  color: #f4ecff;
+}
+
+.slot img {
+  width: calc(var(--px) * 18);
+  height: calc(var(--px) * 18);
+  image-rendering: pixelated;
+}
+
+/* The reveal: evidence cards */
+
+.evidence-intro {
+  margin: calc(var(--px) * 2) 0;
+  font-size: calc(var(--px) * 6);
+  font-weight: 700;
+  color: #8fd14f;
+}
+
+.evidence {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: calc(var(--px) * 2);
+  margin-bottom: calc(var(--px) * 3);
+}
+
+.evidence-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: calc(var(--px) * 1.5);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border: calc(var(--px) * 0.8) solid transparent;
+  border-radius: calc(var(--px) * 2);
+  font-size: calc(var(--px) * 4);
+}
+
+.evidence-card img {
+  width: calc(var(--px) * 14);
+  height: calc(var(--px) * 14);
+  image-rendering: pixelated;
+}
+
+.evidence-card.chosen {
+  border-color: #5cc46a;
+  background: #eaffdc;
+}
+
+.puzzle-body > .ok {
+  padding: calc(var(--px) * 1.5) calc(var(--px) * 8);
+}
+
+/* ---------- Confetti ---------- */
+
+.confetti {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  top: -5%;
+  width: calc(var(--px) * 2.5);
+  height: calc(var(--px) * 4);
+  animation-name: confetti-fall;
+  animation-timing-function: ease-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes confetti-fall {
+  0% { transform: translate(0, 0) rotate(0); opacity: 1; }
+  100% { transform: translate(calc(var(--drift) * var(--px)), calc(var(--px) * 210)) rotate(var(--spin)); opacity: 0.8; }
+}

@@ -16,6 +16,18 @@ import { alertBubble, ester } from "./ester";
 import { fladder } from "./fladder";
 import { nora } from "./nora";
 import type { PixelSprite } from "./pixelSprite";
+import {
+  arm,
+  iceCream,
+  register,
+  shapeCone,
+  shapeCube,
+  shapeCylinder,
+  shapeSphere,
+  sun,
+  towel,
+  umbrella,
+} from "./puzzles";
 import { hintBubble, sign, teddy } from "./things";
 
 /** Every pixel sprite in the game, by texture key. */
@@ -37,6 +49,16 @@ export const sprites: Record<string, PixelSprite> = {
   slimeJar,
   toyCarRed,
   toyCarBlue,
+  register,
+  arm,
+  shapeSphere,
+  shapeCube,
+  shapeCylinder,
+  shapeCone,
+  towel,
+  umbrella,
+  iceCream,
+  sun,
   hintBubble,
   alertBubble,
 };

@@ -50,7 +50,10 @@ export interface PlacedClue {
 export interface ParsedRoom {
   id: string;
   data: Room;
+  /** What Nora collides with. */
   tiles: TileKind[][];
+  /** What is drawn (things stand on floor, or on e.g. the counter). */
+  base: TileKind[][];
   spawn: { col: number; row: number } | null;
   things: PlacedThing[];
   clues: PlacedClue[];
@@ -59,30 +62,38 @@ export interface ParsedRoom {
 export function parseRoom(c: Case, id: string): ParsedRoom {
   const data = c.rooms[id];
   const tiles: TileKind[][] = [];
+  const base: TileKind[][] = [];
   const things: PlacedThing[] = [];
   const clues: PlacedClue[] = [];
   let spawn: ParsedRoom["spawn"] = null;
 
   data.layout.forEach((line, row) => {
+    const baseLine: TileKind[] = [];
+    base.push(baseLine);
     tiles.push(
       [...line].map((ch, col) => {
         if (ch === "N") spawn = { col, row };
         const thing = data.things?.[ch];
+        const nextToSand = [line[col - 1], line[col + 1]].some((n) => TILE_CHARS[n] === "sand");
+        const ground: TileKind = nextToSand ? "sand" : "floor";
         if (thing) {
           things.push({ col, row, thing });
+          baseLine.push(thing.on ? (TILE_CHARS[thing.on] ?? ground) : ground);
           return "thing";
         }
         const clueId = data.clues?.[ch];
         if (clueId) {
           clues.push({ col, row, id: clueId, clue: c.clues[clueId] });
-          const nextToSand = [line[col - 1], line[col + 1]].some((n) => TILE_CHARS[n] === "sand");
-          return nextToSand ? "sand" : "floor";
+          baseLine.push(ground);
+          return ground;
         }
-        return TILE_CHARS[ch] ?? "wall";
+        const kind = TILE_CHARS[ch] ?? "wall";
+        baseLine.push(kind);
+        return kind;
       }),
     );
   });
-  return { id, data, tiles, spawn, things, clues };
+  return { id, data, tiles, base, spawn, things, clues };
 }
 
 export function tileAt(room: ParsedRoom, col: number, row: number): TileKind {
@@ -139,6 +150,7 @@ export const visitedFlag = (roomId: string) => `visited:${roomId}`;
 function givableFlags(c: Case): Set<string> {
   const out = new Set<string>(SYSTEM_FLAGS);
   for (const id of Object.keys(c.rooms)) out.add(visitedFlag(id));
+  for (const p of Object.values(c.puzzles ?? {})) out.add(p.gives);
   for (const room of Object.values(c.rooms)) {
     for (const clueId of Object.values(room.clues ?? {})) out.add(clueFlag(clueId));
     for (const thing of Object.values(room.things ?? {})) {
@@ -221,6 +233,30 @@ export function validateCase(c: Case): string[] {
     const starts = room.layout.join("").split("N").length - 1;
     if (id === c.startRoom && starts !== 1) {
       errors.push(`${where} är startrum och ska ha exakt ett N, har ${starts}.`);
+    }
+  }
+
+  for (const room of Object.values(c.rooms)) {
+    const usedPuzzles = [
+      ...Object.values(room.things ?? {}).map((t) => t.puzzle),
+      ...(room.doors ?? []).map((d) => d.puzzle),
+    ];
+    for (const id of usedPuzzles) {
+      if (id && !c.puzzles?.[id]) errors.push(`I rummet '${room.name}': pusslet '${id}' finns inte.`);
+    }
+    for (const thing of Object.values(room.things ?? {})) need(thing.puzzleWhen, `${thing.name} (pussel)`);
+  }
+  for (const [id, p] of Object.entries(c.puzzles ?? {})) {
+    const where = `Pusslet '${id}'`;
+    if (p.type === "code" && !/^\d+$/.test(p.answer)) errors.push(`${where}: svaret ska bara vara siffror.`);
+    if (p.type === "order" || p.type === "choice" || p.type === "reveal") {
+      const ids = p.options.map((o) => o.id);
+      const answers = p.type === "order" ? p.answer : [p.answer];
+      for (const a of answers) if (!ids.includes(a)) errors.push(`${where}: svaret '${a}' finns inte bland valen.`);
+    }
+    if (p.type === "reveal") {
+      if (p.evidence.length < 2) errors.push(`${where}: behöver minst två bevis.`);
+      for (const e of p.evidence) if (!c.clues[e]) errors.push(`${where}: beviset '${e}' är ingen ledtråd.`);
     }
   }
 

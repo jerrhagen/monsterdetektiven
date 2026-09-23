@@ -82,6 +82,8 @@ Titelskärm → Stadskartan (välj fall) → FALLET → Avslöjandet → Stjärn
 
 ## 4. Fallen
 
+> **Obs: allt som är byggt hittills (steg 0–5) är test av byggstenarna.** Fall 1 i koden är en *testbana* där rörelse, rum, ledtrådar, Ester, pussel och monster provas. När byggstenarna är klara designas de färdiga mysterierna ordentligt, **fall 1 också och från grunden om det behövs**, efter principerna nedan och den pedagogiska planen i avsnitt 6.
+
 ### Så är ett fall uppbyggt
 
 Varje fall är ett **komplett mysterium med en röd tråd**, inte bara en samling ledtrådar:
@@ -97,14 +99,14 @@ Fallen blir svårare efter hand: fler rum, svårare pussel (talområde 0–20 �
 
 ### Översikt
 
-| # | Fall | Plats | Monster | Skolinnehåll |
+| # | Fall | Plats | Monster | Skolinnehåll (se avsnitt 6) |
 |---|---|---|---|---|
 | 1 | **Leksaksaffären** ⭐ *huvudarkitektens idé* | Leksaksaffären, lagret och bakgården | **Fladder**, **Viskan**, **Grymlan** och en hemlis | Addition 0–20 med pengar (kronor), geometriska former (klot, kub, cylinder), gåtor, läsa lappar. NO: fladdermöss är nattdjur. |
 | 2 | **Vem tog bullarna?** | Bageriet och gården | Smulan, gårdskatten | Subtraktion 0–20, följa spår, läsa lappar |
 | 3 | **Spöket i biblioteket** | Biblioteket och källaren | Bokmalen Bläddra, Viskan igen | Alfabetisk ordning, rim, spegelskrift, stavning |
-| 4 | **Ljuden i skogen** | Skogen, bäcken och svampringen | **Trattis** ⭐, Mossjätten och hens unge | Djurspår, väderstreck och kompass, årstider, svampar |
-| 5 | **Klocktornet har stannat** | Torget och klocktornet | Kugg-trollet, Fladder | Klockan (hel, halv, kvart), talföljder |
-| 6 | **Monsterfesten** | Hela staden (final) | Skuggan, och alla monster från tidigare fall | Blandat, ett större slutfall |
+| 4 | **Ljuden i skogen** | Skogen, bäcken och svampringen | **Trattis** ⭐, Mossjätten och hens unge | Mäta med steg, tabeller, djurspår, årstider, svampar |
+| 5 | **Klocktornet har stannat** | Torget och klocktornet | Kugg-trollet, Fladder | Klockan, talföljder, dubbelt och hälften, väderstreck, några engelska ord |
+| 6 | **Monsterfesten** | Hela staden (final) | Skuggan, och alla monster från tidigare fall | Blandat upp till 100, ljus och skugga |
 
 Huvudarkitektens monster (Fladder, Viskan, Grymlan, Trattis) återkommer i flera fall.
 
@@ -127,7 +129,9 @@ Tjuven är **Skuggan**, ett skuggmonster med glödande ögon som syns i utkanten
 | 5 | Månstenens plats i tornet är tom, och därför stannade klockan. Nora hittar en karta till Skuggans grotta. |
 | 6 | Skuggan avslöjas. Månstenen sätts ihop och det blir fest. |
 
-### Fall 1: Leksaksaffären
+### Fall 1: Leksaksaffären (utkast)
+
+*Detta är ett utkast. Det byggs som testbana nu och designas om ordentligt i steg 6.*
 
 Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig, mitt på dagen!* Det är första fallet och därmed inlärningsbanan: gå, prata, hoppa, första pusslet och första monstret.
 
@@ -218,16 +222,50 @@ Monster är både **faror**, **vittnen** och **delar av mysteriet**. Läskighet:
 
 ---
 
-## 6. Pussel och pedagogik
+## 6. Pedagogisk plan
 
-Pusslen bygger på centralt innehåll i Lgr22 för årskurs 1–3. Svårigheten ökar mellan fallen.
+### 6.1 Grundidé
+
+Pedagogiken ska kännas som **detektivarbete, inte som ett prov**. Man räknar för att öppna ett lås, läser för att förstå en ledtråd och tänker logiskt för att peka ut den skyldige. Innehållet bygger på Lgr22, centralt innehåll för årskurs 1–3, och svårigheten ökar mellan fallen.
+
+### 6.2 Fyra spår genom hela spelet
+
+| Spår | Innehåll | Progression genom fallen |
+|---|---|---|
+| **Matte** | Tal, mönster, geometri, mätning, tid, pengar, tabeller | Addition 0–20 → subtraktion 0–20 → mätning och tabeller → klockan, talföljder, dubbelt och hälften → blandat upp till 100 |
+| **Svenska** | Läsa korta texter, gåtor, rim, alfabetisk ordning, stavning, spegelskrift | Läsa lappar och kvitton → gåtor → ordning och rim → skriva egna korta svar |
+| **NO/SO** | Djur och natur, ljus och skugga, tid, kartor och väderstreck | Ett tema per fall (se 6.3) |
+| **Detektivtänkande** | Iaktta → jämföra → ordna → dra slutsatser → **argumentera med bevis** → granska vittnen | I fall 1–2 är alla ledtrådar sanna. Från fall 3 kan vittnen ta fel eller ljuga, en första form av källkritik. |
+
+Detektivtänkandet knyter ihop allt: i varje avslöjande väljer man **två bevis** som stöder svaret. Det tränar det som Lgr22 kallar att *resonera och argumentera*.
+
+Lite **engelska** (också centralt innehåll i åk 1–3) kommer in i fall 5, där ett turistmonster bara kan några ord svenska och Nora måste förstå enkla engelska ord.
+
+### 6.3 Tema per fall
+
+| Fall | Matte och svenska | NO/SO | Värdegrund |
+|---|---|---|---|
+| 1 Leksaksaffären | Addition 0–20 med pengar, 3D-former (klot, kub, cylinder), gåta, läsa lappar | Fladdermöss är nattdjur | Döm inte någon efter utseendet |
+| 2 Bullarna | Subtraktion 0–20, följa spår, läsa recept | Mat och bakning | Fråga i stället för att ta, dela med sig |
+| 3 Biblioteket | Alfabetisk ordning, rim, spegelskrift, stavning | Böcker och bibliotek | Alla kan lära sig |
+| 4 Skogen | Mäta med steg, enkla tabeller (räkna djur) | Djurspår, årstider, svampar: **ät aldrig okända svampar** | Var rädd om naturen |
+| 5 Klocktornet | Klockan (hel, halv, kvart), talföljder, dubbelt och hälften, några engelska ord | Tid, kartor och väderstreck | Samarbete och tålamod |
+| 6 Monsterfesten | Blandat upp till 100 | Ljus och skugga: hur skuggor uppstår | Alla är rädda för något, och alla får vara med |
+
+Varje fall slutar med en **"Visste du att…?"**-fakta kopplad till temat.
+
+### 6.4 Pusseltyper
+
+✅ = finns byggd.
 
 | Pusseltyp | Hur det styrs | Exempel | Ämne |
 |---|---|---|---|
-| **Kodlås** | Siffror (tangentbord eller mus) | "Hur många bullar försvann?" | Matte: + och − inom 0–100 |
-| **Skriv svaret** | Textruta | Gåtor, anagram ("RMOETNS"), stava | Svenska |
-| **Flerval** | Mus eller pilar | "Vilket djur gjorde spåret?" | NO |
-| **Sortera** | Dra med musen | Böcker i ABC-ordning, händelser i rätt ordning | Svenska, logik |
+| **Kodlås** ✅ | Siffror (tangentbord eller knappsats) | "Vad kostade allt tillsammans?" | Matte: + och − |
+| **Ordningslås** ✅ | Välj bilder i rätt ordning | Former, händelser i rätt ordning | Matte, logik |
+| **Bildval** ✅ | Klicka eller tryck 1–4 | Gåtor, "Vilket djur gjorde spåret?" | Svenska, NO |
+| **Avslöjande** ✅ | Välj skyldig och sedan två bevis | "Vem flyttar på leksakerna?" | Detektivtänkande |
+| **Skriv svaret** | Textruta | Anagram ("RMOETNS"), stava | Svenska |
+| **Sortera** | Dra med musen | Böcker i ABC-ordning | Svenska, logik |
 | **Para ihop** | Klicka par | Rimord, djur och spår, klockslag och urtavla | Svenska, NO, matte |
 | **Hemligt meddelande** | Läs och skriv | A=1, B=2 …, spegelskrift, baklänges | Svenska, matte |
 | **Talföljd** | Siffror | 2, 4, 6, __ | Matte: mönster |
@@ -237,11 +275,19 @@ Pusslen bygger på centralt innehåll i Lgr22 för årskurs 1–3. Svårigheten 
 | **Hitta skillnaden** | Klicka | Vad har ändrats i rummet? | Iakttagelse |
 | **Logikpussel** | Klicka i rutnät | 4×4-sudoku med monsterbilder, "vem bor var" | Logik |
 
-**Regler för pussel:**
-- Varje pussel har ett **svar** och **tre tips** som blir tydligare och tydligare.
-- Svaren kontrolleras förlåtande. Stora och små bokstäver spelar ingen roll, inte heller mellanslag. `6` och `sex` godtas båda, utom när pusslet handlar om stavning.
+### 6.5 Regler för pussel
+
+- Varje pussel hör till ett mål, och Ester har **tre tips** för målet som blir tydligare och tydligare.
+- Svaren kontrolleras förlåtande. Stora och små bokstäver och mellanslag spelar ingen roll, och `6` och `sex` godtas båda, utom när pusslet handlar om stavning.
 - Svarar man fel blir det en vänlig reaktion ("Nästan! Försök igen."). Man straffas aldrig.
 - Så lite skrivande som möjligt när det inte är just stavning som tränas.
+
+### 6.6 Stöd för en 8-åring
+
+- **Kort text och stor text:** högst två rader per pratbubbla.
+- **Uppläsning** (🔊 på pratbubblor och pussel) med webbläsarens svenska talsyntes. Den byggs i steg 6, när fall 1 blir ett riktigt mysterium, så att läsningen aldrig blir ett hinder.
+- **Esters tips** i tre nivåer och en inställbar hjälpnivå.
+- **Mus och tangentbord** fungerar i alla pussel.
 
 ---
 
@@ -479,6 +525,8 @@ export const case1: Case = {
 };
 ```
 
+**Pussel** definieras i `puzzles` med typerna `code`, `order`, `choice` och `reveal`. En sak startar ett pussel med `puzzle` (och eventuellt `puzzleWhen` och `puzzleIntro`), och en dörr med `puzzle`. När pusslet är löst ges flaggan i `gives`, och saken säger sedan det den säger efter lösningen (via `talkIf`).
+
 **Hur spellogiken hänger ihop:** Allt drivs av **flaggor**, alltså enkla namn som `"backdoor-open"`. Saker, pussel och ledtrådar kan ge en flagga (`gives`) och kräva en (`requires`). Ett mål är klart när dess flagga finns. Det räcker för 95 % av alla fall. Behövs något specialbeteende för ett visst fall kan det få en egen liten funktion.
 
 ### 11.5 Validering, viktig när banor ändras ofta
@@ -540,18 +588,28 @@ Varje steg ska ge något som går att **spela och visa upp**.
 | 1 ✅ | Nora går runt i leksaksaffären, krockar med väggar, hoppar över klossar och slem och läser en skylt och pratar med en nalle med Ctrl (eller E/Enter). En liten pratbubbla visar vad man kan använda. |
 | 2 ✅ | Tre rum i fall 1 (butiken, lagret, bakgården) med dörrar, flaggor, mål, ledtrådar som glittrar, en nyckel och Detektivboken (B). Målet visas uppe till höger. |
 | 3 ✅ | Ester (efter huvudarkitektens teckning) håller sig i närheten, går ikapp när Nora är för långt bort, studsar med ett "!" och ropar när man fastnat. Hon ger tre nivåer av tips per mål, annars peppar hon. Rummets namn visas varje gång man går in. |
-| 4 | Pussel: kodlås (siffror), ordningslås (former), gåta med bildval, avslöjande med bevis. |
+| 4 ✅ | Pussel: kodlås med knappsats (kassaapparaten), ordningslås med former (bakdörren), gåta med bildval (Viskan) och avslöjande där man väljer skyldig och två bevis (Stina). Rätt svar ger konfetti och en glad jingel. Fel svar skakar lite och säger "försök igen". Allt går med både mus och tangentbord (siffror, Enter, Esc). |
 | 5 | Monster: flygare (Fladder), smygare (Viskan), krypare (armen) och regeln om att tappa saker. Slutscen, stjärnor, monsterkort och sparning. |
-| 6 | **Fall 1 (Leksaksaffären) är ett komplett mysterium från början till slut**, med röd tråd, pussel och monster. Första riktiga speltestet med huvudarkitekten! |
+| 6 | **Fall 1 (Leksaksaffären) designas om ordentligt**, från grunden om det behövs, och blir ett komplett mysterium med röd tråd, pussel, monster och pedagogik enligt avsnitt 6. Uppläsning (🔊) byggs här. Första riktiga speltestet med huvudarkitekten! |
 | 7 | Egen grafik och egna ljud (om huvudarkitekten vill), ljudeffekter och musik. |
 | 8 | Fall 2–6 och fler pusseltyper. |
-| 9 | Titelskärm, stadskarta, inställningar, uppläsning och finputs. |
+| 9 | Titelskärm, stadskarta, inställningar och finputs. |
 
 **Tips för speltest:** Titta utan att hjälpa till. Där man fastnar behöver ett tips bli bättre eller ett pussel bli lättare. Låt gärna kompisar testa.
 
 ---
 
-## 13. Frågor till huvudarkitekten 🕵️‍♀️
+## 13. Framtida idéer (att göra)
+
+Sådant som är bra men inte ingår i byggordningen än:
+
+- **Svårighetsgrad för matten:** en inställning för talområdet (till exempel 0–10, 0–20 eller 0–100), så att samma fall passar både nu och om ett år. Pusslen genererar då sina tal utifrån inställningen i stället för att ha fasta svar.
+- **Fler pusseltyper** ur tabellen i 6.4, när fallen behöver dem.
+- **Pekskärm och surfplatta.**
+
+---
+
+## 14. Frågor till huvudarkitekten 🕵️‍♀️
 
 *De här bestämmer du!*
 

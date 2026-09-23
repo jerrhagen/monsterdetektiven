@@ -15,9 +15,61 @@ export interface Thing extends Talk {
   name: string;
   /** Pixel sprite key, see src/sprites. */
   sprite: string;
+  /** Layout character of what's drawn underneath, e.g. "K" for something standing on the counter. */
+  on?: string;
   /** Alternative talks, checked in order – the first whose `when` flags are all set is used. */
   talkIf?: (Talk & { when: Flags })[];
+  /** A puzzle that starts when Nora uses the thing (until it's solved). */
+  puzzle?: string;
+  /** Flags needed before the puzzle is offered. */
+  puzzleWhen?: Flags;
+  /** Said just before the puzzle opens (defaults to the current talk). */
+  puzzleIntro?: string[];
 }
+
+export interface PuzzleOption {
+  id: string;
+  label: string;
+  sprite?: string;
+}
+
+interface PuzzleBase {
+  title: string;
+  text: string[];
+  /** Flag given when solved. */
+  gives: string;
+}
+
+/** Type a number, e.g. the code to a lock. */
+export interface CodePuzzle extends PuzzleBase {
+  type: "code";
+  answer: string;
+}
+
+/** Pick options in the right order. */
+export interface OrderPuzzle extends PuzzleBase {
+  type: "order";
+  options: PuzzleOption[];
+  answer: string[];
+}
+
+/** Pick the one right option. */
+export interface ChoicePuzzle extends PuzzleBase {
+  type: "choice";
+  options: PuzzleOption[];
+  answer: string;
+}
+
+/** The big reveal: point out who did it, then show two clues as evidence. */
+export interface RevealPuzzle extends PuzzleBase {
+  type: "reveal";
+  options: PuzzleOption[];
+  answer: string;
+  /** Clue ids that prove it – two of them must be chosen. */
+  evidence: string[];
+}
+
+export type Puzzle = CodePuzzle | OrderPuzzle | ChoicePuzzle | RevealPuzzle;
 
 export type Edge = "left" | "right" | "top" | "bottom";
 
@@ -29,6 +81,8 @@ export interface Door {
   /** Flag needed to open it. */
   requires?: string;
   lockedText?: string;
+  /** A puzzle on the lock – solving it should give the `requires` flag. */
+  puzzle?: string;
 }
 
 export type Theme = "shop" | "storage" | "yard";
@@ -80,5 +134,6 @@ export interface Case {
   rooms: Record<string, Room>;
   clues: Record<string, Clue>;
   items?: Record<string, Item>;
+  puzzles?: Record<string, Puzzle>;
   goals: Goal[];
 }

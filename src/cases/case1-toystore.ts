@@ -19,7 +19,7 @@ export const case1: Case = {
       layout: [
         "####################",
         "####################",
-        "#HHHH..HHHH....KKK.#",
+        "#HHHH..HHHH....rKK.#",
         "#...=........s.K...#",
         "#.b.=..a.......K...#",
         "#...=..............#",
@@ -43,23 +43,43 @@ export const case1: Case = {
           gives: "talked-to-stina",
           talkIf: [
             {
+              when: "solved",
+              talk: ["Du löste det, Nora!", "Men… var är den nu?"],
+            },
+            {
               when: "storeroom-key",
-              talk: ["Har du varit i lagret än?", "Dörren är till höger."],
+              talk: ["Du fick upp kassan! Så klok du är.", "Lagret är bakom dörren till höger."],
+            },
+            {
+              when: "heard-about-register",
+              talk: ["Koden… vad var det nu?", "Titta på kvittot i kassaapparaten!"],
             },
             {
               when: STORE_CLUES,
               talk: [
                 "Tre ledtrådar! Du är en riktig detektiv.",
-                "Spåren leder mot lagret.",
-                "Här är nyckeln till lagret. Var försiktig!",
+                "Spåren leder mot lagret. Nyckeln ligger inlåst i kassaapparaten…",
+                "…men jag har glömt koden! Kvittot sitter kvar i kassan.",
               ],
-              gives: "storeroom-key",
+              gives: "heard-about-register",
             },
             {
               when: "talked-to-stina",
               talk: ["Har du hittat några ledtrådar?", "Titta noga på golvet och vid hyllorna."],
             },
           ],
+          puzzle: "reveal",
+          puzzleWhen: YARD_CLUES,
+          puzzleIntro: ["Nora! Där är du!", "Vet du vem som flyttar på leksakerna?"],
+        },
+        r: {
+          name: "Kassaapparaten",
+          sprite: "register",
+          on: "K",
+          talk: ["Kassaapparaten är låst med en sifferkod."],
+          talkIf: [{ when: "storeroom-key", talk: ["Kassaapparaten är öppen och tom."] }],
+          puzzle: "register",
+          puzzleWhen: "heard-about-register",
         },
         a: {
           name: "Skylt",
@@ -123,7 +143,13 @@ export const case1: Case = {
       clues: { "1": "blood" },
       doors: [
         { at: "left", to: "store" },
-        { at: "bottom", to: "yard" },
+        {
+          at: "bottom",
+          to: "yard",
+          requires: "backdoor-open",
+          puzzle: "shape-lock",
+          lockedText: "Bakdörren har ett konstigt lås med former.",
+        },
       ],
     },
 
@@ -157,14 +183,79 @@ export const case1: Case = {
           talk: [
             "Psssst… Nooooraaaa…",
             "Jag är Viskan. Jag bor här i tunnan.",
-            "Jag såg en grön ärm krypa in i affären…",
-            "…helt själv. Hihihi…",
+            "Jag såg något… men jag berättar bara om du löser min gåta!",
           ],
-          clue: "viskan",
+          talkIf: [
+            {
+              when: "riddle-solved",
+              talk: [
+                "Rätt! Hihihi…",
+                "Jag såg en grön ärm krypa in i affären…",
+                "…helt själv. Och den höll i något som LYSTE.",
+              ],
+              clue: "viskan",
+            },
+          ],
+          puzzle: "riddle",
         },
       },
       clues: { "1": "drag" },
       doors: [{ at: "top", to: "storeroom" }],
+    },
+  },
+
+  puzzles: {
+    register: {
+      type: "code",
+      title: "Kassaapparaten",
+      text: ["Kvittot i kassan:", "1 boll ........ 7 kr", "1 bil .......... 8 kr", "Koden är vad allt kostade tillsammans."],
+      answer: "15",
+      gives: "storeroom-key",
+    },
+    "shape-lock": {
+      type: "order",
+      title: "Formlåset",
+      text: [
+        "På låset sitter en lapp:",
+        "Först den som rullar åt alla håll.",
+        "Sedan den med sex fyrkantiga sidor.",
+        "Sist den som ser ut som en burk.",
+      ],
+      options: [
+        { id: "cone", label: "Kon", sprite: "shapeCone" },
+        { id: "cylinder", label: "Cylinder", sprite: "shapeCylinder" },
+        { id: "sphere", label: "Klot", sprite: "shapeSphere" },
+        { id: "cube", label: "Kub", sprite: "shapeCube" },
+      ],
+      answer: ["sphere", "cube", "cylinder"],
+      gives: "backdoor-open",
+    },
+    riddle: {
+      type: "choice",
+      title: "Viskans gåta",
+      text: ["Vad blir blötare", "ju mer det torkar?"],
+      options: [
+        { id: "umbrella", label: "Paraply", sprite: "umbrella" },
+        { id: "sun", label: "Solen", sprite: "sun" },
+        { id: "towel", label: "Handduk", sprite: "towel" },
+        { id: "icecream", label: "Glass", sprite: "iceCream" },
+      ],
+      answer: "towel",
+      gives: "riddle-solved",
+    },
+    reveal: {
+      type: "reveal",
+      title: "Avslöjandet",
+      text: ["Vem flyttar på leksakerna?"],
+      options: [
+        { id: "fladder", label: "Fladder", sprite: "fladder" },
+        { id: "viskan", label: "Viskan", sprite: "viskanBin" },
+        { id: "stina", label: "Stina Snurr", sprite: "stina" },
+        { id: "arm", label: "Grymlans arm", sprite: "arm" },
+      ],
+      answer: "arm",
+      evidence: ["handprints", "thread", "teddy", "blood", "drag", "poster", "viskan"],
+      gives: "solved",
     },
   },
 
@@ -176,7 +267,11 @@ export const case1: Case = {
     fladder: { name: "Fladder sover", sprite: "fladderSleep", text: "Fladder sover på dagen. Kan hon ha flyttat leksakerna?" },
     drag: { name: "Släpspår", sprite: "dragMarks", text: "Spår i sanden, som om något kravlat fram med händerna." },
     poster: { name: "Lappen", sprite: "noticeboard", text: "\"SAKNAS: Min arm! Grön tröjärm. Kan krypa själv. / Grymlan\"" },
-    viskan: { name: "Viskans vittnesmål", sprite: "viskanBin", text: "Viskan såg en grön ärm krypa in i affären." },
+    viskan: {
+      name: "Viskans vittnesmål",
+      sprite: "viskanBin",
+      text: "Viskan såg en grön ärm krypa in i affären. Den höll i något som lyste!",
+    },
   },
 
   items: {
@@ -207,32 +302,45 @@ export const case1: Case = {
       doneWhen: "visited:storeroom",
       hints: [
         "Lagret är bakom dörren till höger. Men den är låst…",
-        "Stina vill nog höra vad du har hittat.",
-        "Gå tillbaka till Stina och prata med henne. Hon har nyckeln!",
+        "Stina vet var nyckeln är. Prata med henne!",
+        "Kassaapparaten! Räkna ihop det som står på kvittot. 7 + 8 = ?",
       ],
     },
     {
       text: "Undersök lagret",
       doneWhen: STOREROOM_CLUES,
       hints: [
-        "Lagret är bakom dörren till höger i affären.",
-        "Leta efter något som glöder på golvet i lagret.",
-        "Någon hänger i taket i lagret… prata med henne!",
+        "Leta efter något som glöder på golvet.",
+        "Titta upp! Någon hänger i taket…",
+        "Prata med Fladder. Hon hänger mitt i lagret.",
+      ],
+    },
+    {
+      text: "Ta dig ut ur lagret",
+      doneWhen: "visited:yard",
+      hints: [
+        "Dörren längst ner har ett konstigt lås.",
+        "Läs lappen på låset noga. Vilken form kan rulla åt alla håll?",
+        "Ett klot rullar åt alla håll. En kub har sex fyrkantiga sidor. En cylinder ser ut som en burk.",
       ],
     },
     {
       text: "Vart leder spåren?",
       doneWhen: YARD_CLUES,
       hints: [
-        "Spåren i lagret leder mot en dörr…",
-        "Gå ut genom dörren längst ner i lagret. Titta i sandlådan och på anslagstavlan.",
-        "Prata med soptunnan. Ja, verkligen!",
+        "Titta i sandlådan och på anslagstavlan.",
+        "Någon på bakgården viskar… prata med soptunnan!",
+        "Viskans gåta: vad torkar du dig med när du har duschat?",
       ],
     },
     {
       text: "Vem flyttar på leksakerna?",
       doneWhen: "solved",
-      hints: ["Läs alla ledtrådar i detektivboken. Tryck B!", "Snart kan vi avslöja vem det är…"],
+      hints: [
+        "Berätta för Stina vad du har kommit fram till.",
+        "Läs ledtrådarna i detektivboken (B). Vem har fem fingrar men inga fötter?",
+        "Titta på lappen från anslagstavlan!",
+      ],
     },
   ],
 };

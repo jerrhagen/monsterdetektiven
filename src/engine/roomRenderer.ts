@@ -1,7 +1,7 @@
 import type * as Phaser from "phaser";
 import type { Theme } from "../cases/types";
 import { ROOM_COLS, ROOM_ROWS, TILE } from "./config";
-import { type ParsedRoom, type TileKind, tileAt } from "./room";
+import type { ParsedRoom, TileKind } from "./room";
 
 type G = Phaser.GameObjects.Graphics;
 
@@ -82,7 +82,7 @@ export function drawRoom(scene: Phaser.Scene, room: ParsedRoom): G {
   const g = scene.add.graphics();
   const painter = new Painter(g, room);
   for (let row = 0; row < ROOM_ROWS; row++) {
-    for (let col = 0; col < ROOM_COLS; col++) painter.tile(col, row, tileAt(room, col, row));
+    for (let col = 0; col < ROOM_COLS; col++) painter.tile(col, row, room.base[row][col]);
   }
   return g;
 }
@@ -100,7 +100,7 @@ class Painter {
   }
 
   private at(col: number, row: number): TileKind {
-    return tileAt(this.room, col, row);
+    return this.room.base[row]?.[col] ?? "wall";
   }
 
   tile(col: number, row: number, kind: TileKind): void {
@@ -303,12 +303,7 @@ class Painter {
     g.fillStyle(C.woodLight);
     if (this.at(col - 1, row) !== "counter") g.fillRect(x, y, 1, TILE);
     if (this.at(col + 1, row) !== "counter") g.fillRect(x + TILE - 1, y, 1, TILE);
-    // Cash register on the top-left counter tile.
-    if (!counterAbove && this.at(col - 1, row) !== "counter") {
-      g.fillStyle(0x6a6a80).fillRect(x + 3, y + 1, 10, 7);
-      g.fillStyle(0x5cc46a).fillRect(x + 4, y + 2, 5, 2);
-      g.fillStyle(0x3d3d50).fillRect(x + 4, y + 5, 8, 2);
-    }
+    if (!counterAbove) g.fillStyle(C.outline, 0.25).fillRect(x, y, TILE, 1);
   }
 
   private crate(col: number, row: number, x: number, y: number): void {

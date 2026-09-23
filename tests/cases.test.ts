@@ -94,7 +94,9 @@ describe("detektivens anteckningar", () => {
     state.give("talked-to-stina");
     expect(state.talkFor(stina).gives).toBeUndefined();
     state.give(["clue:handprints", "clue:thread", "clue:teddy"]);
-    expect(state.talkFor(stina).gives).toBe("storeroom-key");
+    expect(state.talkFor(stina).gives).toBe("heard-about-register");
+    state.give("heard-about-register");
+    expect(state.talkFor(stina).gives).toBeUndefined();
     state.give("storeroom-key");
     expect(state.items()).toEqual(["storeroom-key"]);
   });
