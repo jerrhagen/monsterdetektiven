@@ -402,7 +402,7 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 | Siffror och bokstäver | I kodlås och textrutor |
 
 **På mobil och surfplatta** (bara när spelet märker en pekskärm; på dator är allt som vanligt):
-- **Håll fingret var som helst** på spelet så går Nora åt det hållet, sett från henne själv (åtta riktningar). Nära henne, eller när man släpper, stannar hon. Ingen synlig styrspak.
+- En **styrspak** nere till vänster, i den mörka kanten bredvid spelet när det finns plats. *(Vi testade att styra genom att hålla fingret var som helst på skärmen, men då skymde fingret för mycket.)*
 - En liten **åtgärdsknapp** nere till höger gör samma sak som mellanslag och visar vad den gör: ⤒ hoppa, 💬 prata, 🔍 undersöka, ▶ nästa i dialog.
 - **Boken, kartan och musiken** ligger i en kolumn till höger på mobil (i den mörka kanten bredvid spelet), och i en rad upptill på surfplattor där kanten är ovanför spelet.
 - Man trycker på pratbubblan, svaren och menyerna. Tangentbordstips döljs, och små texter och knappar blir större.

@@ -1447,6 +1447,32 @@ html.touch .player-tools button {
   display: none;
 }
 
+/* The joystick, bottom left – in the dark strip beside the game when there is room. */
+.touch-controls .stick {
+  position: absolute;
+  left: calc(env(safe-area-inset-left) + 14px);
+  bottom: calc(env(safe-area-inset-bottom) + 14px);
+  --side: max(84px, calc((100vw - 100vh * 5 / 3) / 2 - 22px));
+  width: min(34vh, 140px, var(--side));
+  height: min(34vh, 140px, var(--side));
+  border-radius: 50%;
+  background: rgba(244, 236, 255, 0.12);
+  border: 2px solid rgba(244, 236, 255, 0.35);
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.touch-controls .stick-knob {
+  position: absolute;
+  left: 30%;
+  top: 30%;
+  width: 40%;
+  height: 40%;
+  border-radius: 50%;
+  background: rgba(244, 236, 255, 0.55);
+  box-shadow: 0 2px 0 rgba(13, 7, 24, 0.6);
+}
+
 .touch-controls .action {
   position: absolute;
   right: calc(env(safe-area-inset-right) + 12px);

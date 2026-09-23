@@ -11,15 +11,15 @@ import { playClick, playScare, playSuccess } from "../../ui/sound";
 import { roomSign, toast } from "../../ui/toast";
 import {
   type ActionIcon,
-  fingerPosition,
   hideTouchControls,
   setActionIcon,
   setTouchControlsVisible,
   showTouchControls,
   takeAction,
+  touchInput,
 } from "../../ui/touch";
 import { clueFlag, flagList } from "../caseState";
-import { GAME_WIDTH, TILE } from "../config";
+import { TILE } from "../config";
 import { Ester } from "../Ester";
 import { CAUGHT_FLAG, Crawler, type Monster, createMonster } from "../monsters";
 import { type Facing, Player } from "../Player";
@@ -304,9 +304,8 @@ export class RoomScene extends Phaser.Scene {
     this.tickHintTimer(dt);
 
     const clamp = (n: number) => Math.max(-1, Math.min(1, n));
-    const steer = this.touchSteer();
-    const dx = clamp((this.keys.right.isDown ? 1 : 0) - (this.keys.left.isDown ? 1 : 0) + steer.dx);
-    const dy = clamp((this.keys.down.isDown ? 1 : 0) - (this.keys.up.isDown ? 1 : 0) + steer.dy);
+    const dx = clamp((this.keys.right.isDown ? 1 : 0) - (this.keys.left.isDown ? 1 : 0) + touchInput.dx);
+    const dy = clamp((this.keys.down.isDown ? 1 : 0) - (this.keys.up.isDown ? 1 : 0) + touchInput.dy);
     // Space does what makes sense: next to someone or something it talks or looks – otherwise Nora jumps.
     const spaceUses = jumpPressed && this.target !== null && !this.player.airborne;
     this.player.update(dt, { dx, dy, jump: jumpPressed && !spaceUses });
@@ -567,23 +566,6 @@ export class RoomScene extends Phaser.Scene {
       if (key) this.state.markHeard(key, thing);
       this.updateHiddenThings();
     });
-  }
-
-  /** On a touch screen: walk toward the finger, as seen from Nora. Close to her she stops. */
-  private touchSteer(): { dx: number; dy: number } {
-    const f = fingerPosition();
-    if (!f) return { dx: 0, dy: 0 };
-    const r = this.game.canvas.getBoundingClientRect();
-    const scale = r.width / GAME_WIDTH;
-    const vx = f.x - (r.left + this.player.x * scale);
-    const vy = f.y - (r.top + (this.player.y - 8) * scale);
-    const len = Math.hypot(vx, vy);
-    if (len < 8 * scale) return { dx: 0, dy: 0 };
-    // Eight directions: straight when the finger is almost straight, diagonal in between.
-    return {
-      dx: Math.abs(vx) > len * 0.38 ? Math.sign(vx) : 0,
-      dy: Math.abs(vy) > len * 0.38 ? Math.sign(vy) : 0,
-    };
   }
 
   /** What the touch screen's action button does next to this target. */
