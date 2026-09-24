@@ -408,7 +408,42 @@ export const aqPicStarfish: PixelSprite = drawSprite(16, 16, (d) => {
   );
 });
 
+const EMPTY = "................";
+
+/** A hermit crab in a borrowed shell – it scuttles across the floor now and then. Harmless. */
+export const aqHermitCrab: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", S: "#d8a878", s: "#a07048", r: "#e0603a", k: "#ffffff" },
+  frames: [
+    [
+      ...Array<string>(7).fill(EMPTY),
+      "......oooo......",
+      ".....oSSsSo.....",
+      "....oSsSSsSo....",
+      "....oSSsSSSo....",
+      "...ooSSSSsSo.o..",
+      "..orroooooooro..",
+      ".orrr.okok.orrr.",
+      "..oo.o.o.o.o.oo.",
+      EMPTY,
+    ],
+    [
+      ...Array<string>(7).fill(EMPTY),
+      "......oooo......",
+      ".....oSSsSo.....",
+      "....oSsSSsSo....",
+      "....oSSsSSSo....",
+      "...ooSSSSsSo.o..",
+      "..orroooooooro..",
+      ".orrr.okok.orrr.",
+      "..oo..o.o.o..oo.",
+      EMPTY,
+    ],
+  ],
+  frameRate: 10,
+};
+
 export const case10Sprites: Record<string, PixelSprite> = {
+  aqHermitCrab,
   s2Diver,
   s2Octopus,
   s2Seal,

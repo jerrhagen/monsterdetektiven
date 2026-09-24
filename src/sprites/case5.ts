@@ -183,12 +183,11 @@ export const touristSuitcase: PixelSprite = {
   ],
 };
 
-/** The crank used to wind up the tower clock. */
+/** The crank used to wind up the tower clock – next to a cold cup of coffee. */
 export const clockCrank: PixelSprite = {
-  palette: { ".": null, o: "#1a1024", b: "#a0643a", g: "#b8b4c4", G: "#6a6478" },
+  palette: { ".": null, o: "#1a1024", b: "#a0643a", g: "#b8b4c4", G: "#6a6478", w: "#f4f0e4", c: "#6a3a1a" },
   frames: [
     [
-      E,
       E,
       E,
       E,
@@ -200,10 +199,11 @@ export const clockCrank: PixelSprite = {
       "..oGgggggggggo..",
       "..oGoooooooooo..",
       "..ooo...........",
-      E,
-      E,
-      E,
-      E,
+      "........ooooo...",
+      "........owwwoo..",
+      "........owcwo.o.",
+      "........owwwoo..",
+      ".........ooo....",
     ],
   ],
 };
@@ -333,27 +333,52 @@ export const towerPlaque: PixelSprite = {
   ],
 };
 
-/** The clock's heavy weights, hanging high on their chains – the clock is wound up. */
+/** The clock's heavy weights, run all the way down to the floor on slack chains – nobody wound it up. */
 export const clockWeights: PixelSprite = {
-  palette: { ".": null, o: "#1a1024", g: "#8a86a0", D: "#4a4450", d: "#6a6470", L: "#7a4f2a" },
+  palette: { ".": null, o: "#1a1024", g: "#8a86a0", D: "#4a4450", d: "#6a6470", L: "#7a4f2a", w: "#f4f0e4", t: "#6a6470" },
   frames: [
     [
       "....g......g....",
+      "....g......g....",
+      ".....g......g...",
+      ".....g......g...",
+      "....g......g....",
+      "....g......g....",
+      ".....g......g...",
       "...ooo....ooo...",
       "..oDDDo..oDDDo..",
       "..oDdDo..oDdDo..",
       "..oDdDo..oDdDo..",
-      "..oDdDo..oDdDo..",
       "..oDDDo..oDDDo..",
       "...ooo....ooo...",
-      "....g......g....",
-      "....g......g....",
-      "....g......g....",
-      "....g......g....",
-      "....g......g....",
       "..oooooooooooo..",
       "..oLLLLLLLLLLo..",
       "..oooooooooooo..",
+    ],
+  ],
+};
+
+/** Knut's logbook on a little desk, open at this week's page. */
+export const towerLogbook: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", w: "#f4f0e4", W: "#d8d0c0", t: "#6a6470", b: "#2d5f9e", L: "#7a4f2a", l: "#a0643a" },
+  frames: [
+    [
+      E,
+      E,
+      E,
+      "..oooooo.oooooo.",
+      ".obwwwwwowwwwwbo",
+      ".obwttwwowttwwbo",
+      ".obwwwwwowwwwwbo",
+      ".obwtttwowwwwwbo",
+      ".obwwwwwowwwwwbo",
+      ".obWWWWWoWWWWWbo",
+      "..oooooooooooooo",
+      ".olllllllllllllo",
+      ".oLoooooooooooLo",
+      ".oLo.........oLo",
+      ".oLo.........oLo",
+      ".ooo.........ooo",
     ],
   ],
 };
@@ -605,6 +630,7 @@ export const case5Sprites: Record<string, PixelSprite> = {
   squareCompass,
   towerPlaque,
   clockWeights,
+  towerLogbook,
   clockOilPrints,
   clockBeetle,
   moonSlotHatch,

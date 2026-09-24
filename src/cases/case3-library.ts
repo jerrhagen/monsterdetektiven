@@ -313,6 +313,16 @@ export const case3: Case = {
             ],
           },
         },
+        // A booklouse scurries along the floor now and then. Harmless – but it IS something that crawls.
+        {
+          type: "crawler",
+          sprite: "libraryBooklouse",
+          routes: [
+            [[2, 5], [8, 5]],
+            [[9, 8], [16, 8]],
+            [[4, 10], [12, 10]],
+          ],
+        },
       ],
       onEnter: {
         name: "Ester",

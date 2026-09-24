@@ -1,33 +1,34 @@
 import type { Case } from "./types";
 
 // Case 5 – the clock tower has stopped, and the whole town is late for everything.
-// SPOILER: the Moonstone is gone from the clockwork. A big shadow with yellow eyes came in
-// through the clockwork window in the night, took it and slipped away north. Fladder was
-// hanging up there and dropped scales in fright, then fled down to the stairs. Kugg-trollet
-// (who everyone blames – he has yellow lamp eyes too, but he is tiny) ran after it down to the
-// square and dropped a spare gear there. Then he locked himself in, tried to fix the clock and
-// found one last shard in the empty slot (the glitter on his pillow). Nora finds a map to the
-// shadow's cave (→ case 6).
+// SPOILER: two things happened in the night. (1) Tornvakten Knut – who calls Nora in – never wound
+// the clock. He sat down at the kiosk with a coffee, fell asleep, and when he woke the clock had run
+// down. Ashamed, he says he wound it "as always" and blames Kugg-trollet. The weights lie on the
+// floor, his logbook is empty for last night, his crank lies by the kiosk next to a cold coffee, and
+// Fladder never heard him come up. (2) The Moonstone is gone from the clockwork: a big shadow with
+// yellow eyes came in through the window, took it and slipped away north. Fladder was hanging up
+// there and fled down to the stairs. Kugg-trollet (tiny, oily prints everywhere – the false lead)
+// ran after it to the square and dropped a spare gear, then locked himself in and tried to fix the
+// clock, finding one last shard in the empty slot. Nora finds a map to the shadow's cave (→ case 6).
 //
 // Theory ladder:
-//   Square:     "Did Knut forget to wind the clock? Did a gear fall out? Did the tourist take
-//                something glowing? Something with yellow eyes was up in the tower…"
-//   Stairs:     "The clock IS wound – it's not Knut. The Moonstone gives the clock power!
-//                Fladder saw something big with yellow eyes. Tiny oily prints lead up to a
-//                locked hatch – what is Kugg-trollet hiding?"
-//   Clockwork:  "All gears are in place, but the Moonstone's place is EMPTY! Big black footprints
-//                from the window. The troll is tiny and only wanted to help."
-// The reveal asks two questions – why did it stop, and who took it – with clues from all three rooms.
+//   Square:     "Knut wound the clock, he says. Did a gear fall out? The tourist has something glowing!
+//                His crank is by the kiosk, next to a cold coffee… Something with yellow eyes in the tower."
+//   Stairs:     "The weights are on the FLOOR – nobody wound it! The logbook is empty for last night,
+//                and Fladder never heard Knut. Knut blames the troll – tiny oily prints lead to its hatch."
+//   Clockwork:  "The troll only tried to fix it. And the Moonstone's place is EMPTY – big black prints
+//                from the window."
+// The reveal asks two questions – why did it stop, and who took the Moonstone.
 
 const SQUARE_CLUES = ["clue:crank", "clue:tinyGear", "clue:souvenir", "clue:touristSaw"];
-const STAIRS_CLUES = ["clue:weights", "clue:plaque", "clue:oilPrints", "clue:fladderSaw", "clue:shadow"];
+const STAIRS_CLUES = ["clue:weights", "clue:plaque", "clue:logbook", "clue:oilPrints", "clue:fladderSaw", "clue:shadow"];
 const TOP_CLUES = ["clue:emptySlot", "clue:blackPrints", "clue:trollNote", "clue:pendulum", "clue:caveMap"];
-/** Why did the clock stop? Its power source – and that it's gone. */
-const STOPPED_PROOF = ["emptySlot", "plaque"];
+/** Why did the clock stop? Nobody wound it – everything that shows it, from all three rooms. */
+const STOPPED_PROOF = ["weights", "logbook", "fladderSaw", "crank", "trollNote"];
 /** Who took it? Big prints from the window, three sightings of yellow eyes, and the map it left. */
 const TAKER_PROOF = ["blackPrints", "fladderSaw", "touristSaw", "shadow", "caveMap"];
 /** Exactly what the reveal's proof needs. */
-const REVEAL_NEEDS = [...STOPPED_PROOF, ...TAKER_PROOF].map((c) => `clue:${c}`);
+const REVEAL_NEEDS = [...new Set([...STOPPED_PROOF, ...TAKER_PROOF])].map((c) => `clue:${c}`);
 
 export const case5: Case = {
   id: "clocktower",
@@ -50,9 +51,9 @@ export const case5: Case = {
         "#TT.....k.........T#",
         "#T..........c.....T#",
         "#.......UUUU.......#",
-        "#..KK...UUUU....1..#",
+        "#..KK...UUUU.......#",
         "#..KK..sf......LL..#",
-        "#..............LL..#",
+        "#....1.........LL..#",
         "#.......2..........#",
         "#T.................#",
         "#TT..............TT#",
@@ -67,7 +68,7 @@ export const case5: Case = {
           talk: [
             "Hmpf! Ännu en som ska fråga vad klockan är?",
             "Tornklockan har STANNAT. I natt!",
-            "Jag drog upp den i går kväll, som jag alltid gör.",
+            "Jag drog upp den i går kväll, som jag alltid gör. Det kan du skriva upp!",
             "Nu kommer hela stan för sent. Bagaren, bussen, skolan… alla!",
           ],
           gives: "talked-to-keeper",
@@ -81,8 +82,8 @@ export const case5: Case = {
             {
               when: "clue:crank",
               talk: [
-                "Där är ju min vev! Jag tappade den när jag gick hem i går.",
-                "Men klockan hade jag redan dragit upp. Det lovar jag!",
+                "Min vev! Den… eh… tappade jag nog när jag gick hem i går.",
+                "EFTER att jag hade dragit upp klockan, förstås. Det lovar jag!",
               ],
               clue: "keeperSays",
             },
@@ -90,7 +91,7 @@ export const case5: Case = {
               when: "talked-to-keeper",
               talk: [
                 "Tornets dörr har ett klocklås. Man måste kunna klockan för att komma in.",
-                "Det är nog det där Kugg-trollet som har mixtrat. Eller den där turisten!",
+                "Det är det där Kugg-trollet som har mixtrat, tro mig. Det pilar runt överallt!",
               ],
               clue: "keeperSays",
             },
@@ -188,7 +189,7 @@ export const case5: Case = {
         "#.....GG.....HH..p.#",
         "#.....GG.....HH....#",
         "##.HH..............#",
-        "##.HH.......LL....k#",
+        "##.HH.......LL...lk#",
         "###.........LL....##",
         "######DD############",
       ],
@@ -210,8 +211,10 @@ export const case5: Case = {
             {
               when: "solved",
               talk: [
-                "Kugg-trollet gömmer sig i urverket. Han är rädd att alla ska skylla på honom…",
-                "…och det gjorde ju jag. Hitta honom, Nora!",
+                "Ja… det är sant. Jag satte mig vid kiosken med en kopp kaffe i går kväll.",
+                "Och så somnade jag. När jag vaknade hade klockan redan stannat.",
+                "Jag skämdes så att jag skyllde på Kugg-trollet. Nu gömmer han sig i urverket…",
+                "Hitta honom, Nora. Jag måste be om förlåtelse.",
               ],
             },
             {
@@ -220,6 +223,14 @@ export const case5: Case = {
                 "Du är nära, Nora! Men något fattas…",
                 "Har du undersökt allt, både i tornet och på torget?",
                 "Och pratat med Fladder och Mister Fluff?",
+              ],
+              clue: "keeperSays",
+            },
+            {
+              when: "clue:logbook",
+              talk: [
+                "Min loggbok? Eh… jag glömde nog bara att skriva i den.",
+                "Jag DROG upp klockan. Det var Kugg-trollet som mixtrade! Gå upp och titta, du!",
               ],
               clue: "keeperSays",
             },
@@ -239,15 +250,15 @@ export const case5: Case = {
           ],
           puzzle: "reveal",
           puzzleWhen: REVEAL_NEEDS,
-          puzzleIntro: ["Nora! Vad hittade du där uppe?", "Vet du varför klockan stannade?"],
+          puzzleIntro: ["Nora! Vad hittade du där uppe?", "Det var väl Kugg-trollet som stoppade klockan? Säg att det var han!"],
         },
         w: {
           name: "Klockvikterna",
           sprite: "clockWeights",
           talk: [
             "Klockans tunga vikter hänger i långa kedjor.",
-            "De hänger högt uppe. Då är klockan uppdragen!",
-            "Men den går ändå inte…",
+            "Men vikterna ligger ända nere på golvet!",
+            "En lapp på väggen: \"När vikterna når golvet stannar klockan. Dra upp den VARJE kväll!\"",
           ],
           clue: "weights",
         },
@@ -257,9 +268,19 @@ export const case5: Case = {
           talk: [
             "En gammal skylt av mässing:",
             "\"Högst upp i tornet bor MÅNSTENEN.\"",
-            "\"Den ger klockan kraft – och gör monstren snälla.\"",
+            "\"Den lyser över staden – och gör monstren snälla.\"",
           ],
           clue: "plaque",
+        },
+        l: {
+          name: "Knuts loggbok",
+          sprite: "towerLogbook",
+          talk: [
+            "Tornvaktens loggbok. Här skriver Knut varje gång han drar upp klockan.",
+            "\"Söndag kväll: dragit upp. /Knut\" \"Måndag kväll: dragit upp. /Knut\"",
+            "\"Tisdag kväll:\" …ingenting. Raden är tom! Och i går var det tisdag.",
+          ],
+          clue: "logbook",
         },
         x: {
           name: "Det smala fönstret",
@@ -286,6 +307,7 @@ export const case5: Case = {
               "I natt hängde jag uppe i urverket. Då smög något KALLT och MÖRKT förbi mig.",
               "Det var stort. Och det hade gula ögon.",
               "Jag blev så rädd att jag tappade fjäll och flög ner hit. Jag vågar inte gå upp igen!",
+              "Och Knut? Han kom aldrig upp i går kväll. Han brukar vissla när han vevar – men det var tyst.",
             ],
             clue: "fladderSaw",
           },
@@ -358,8 +380,8 @@ export const case5: Case = {
           talk: [
             "En pytteliten säng i en låda med kugghjul.",
             "Det glittrar blått på kudden, som damm från något som lyser.",
-            "En lapp: \"Jag har smort alla kugghjul. Men klockan går INTE!\"",
-            "\"Jag måste laga den. /K\"",
+            "En lapp: \"Klockan går INTE! Vikterna ligger på golvet. Ingen har dragit upp dem!\"",
+            "\"Jag är för liten för att veva, och veven är borta. Jag smörjer hjulen så länge. /K\"",
           ],
           clue: "trollNote",
         },
@@ -483,38 +505,42 @@ export const case5: Case = {
         {
           question: "Varför stannade klockan?",
           options: [
-            { id: "notWound", label: "Ingen drog upp den", sprite: "clockCrank" },
+            { id: "notWound", label: "Knut drog aldrig upp den", sprite: "clockKeeper" },
+            { id: "troll", label: "Kugg-trollet mixtrade med den", sprite: "kuggtroll" },
             { id: "gear", label: "Ett kugghjul fattas", sprite: "clockTinyGear" },
-            { id: "fladder", label: "Fladder hänger i pendeln", sprite: "fladderHang" },
             { id: "stone", label: "Månstenen är borta", sprite: "moonSlotEmpty" },
           ],
-          answer: "stone",
-          // What gives the clock its power – and that it's gone.
+          answer: "notWound",
+          // The weights on the floor, the empty line in the logbook, the silence Fladder heard, the crank
+          // left by the kiosk and the troll's own note all say the same: nobody wound it.
           proof: STOPPED_PROOF,
           missing: {
-            emptySlot: "Var ska Månstenen sitta? Har du tittat in där?",
-            plaque: "Vad ger klockan kraft? Det står skrivet någonstans i trappan.",
+            weights: "Vad driver klockan? Titta på det som hänger i kedjorna i trappan – var är det nu?",
+            logbook: "Knut skriver upp varje gång han drar upp klockan. Har du läst var?",
+            fladderSaw: "Någon bor i tornet och hör allt som händer där på kvällen. Vad sa hon om Knut?",
+            crank: "Man behöver något för att dra upp klockan. Var låg det i morse?",
+            trollNote: "Någon i urverket märkte också att klockan inte gick. Vad skrev han?",
           },
           whyNot: {
-            notWound: "Vikterna hänger högt uppe. Då är klockan uppdragen – precis som Knut sa.",
+            troll:
+              "Kugg-trollet smorde bara hjulen och ville laga klockan. Och klockan stannar när vikterna når golvet – ingen hade dragit upp dem!",
             gear: "Titta vid pendeln i urverket: alla kugghjul sitter på sin plats. Inget hjul fattas!",
-            fladder: "Pendeln är hel, och inget sitter fast i den. Fladder hänger inte där!",
+            stone:
+              "Månstenen ÄR borta – men skylten säger att den lyser över staden och gör monstren snälla. Det är vikterna som driver klockan, och de låg på golvet!",
           },
           why: {
-            keeperSays: "Bra att veta att Knut drog upp klockan! Men det säger inte VAD som fattas.",
-            crank: "Knut tappade veven på vägen hem. Men klockan var redan uppdragen.",
-            weights: "Bra tänkt! Vikterna visar att klockan ÄR uppdragen. Men de säger inte vad som fattas.",
+            keeperSays: "Knut SÄGER att han drog upp klockan. Men stämmer det med vikterna och loggboken?",
             tinyGear: "Kugghjulet låg på torget. Men i urverket sitter alla kugghjul på sin plats!",
-            pendulum: "Pendeln visar att kugghjulen är hela. Men den säger inte vad som fattas.",
             souvenir: "Det som lyser i väskan är en måne av plast. Den har inget med klockan att göra.",
-            oilPrints: "De små spåren visar att någon liten går i trappan. Men varför stannade klockan?",
-            trollNote: "Kugg-trollet har smort alla kugghjul. Men lappen säger inte vad som fattas.",
+            touristSaw: "Mister Fluff såg något i tornet i natt. Spara det till nästa fråga: vem tog Månstenen?",
+            plaque: "Skylten berättar om Månstenen: den lyser och gör monstren snälla. Den driver inte klockan.",
+            oilPrints: "De små spåren visar att Kugg-trollet går i trappan – han bor ju här. Men varför stannade klockan?",
+            pendulum: "Pendeln visar att allt i urverket är helt. Det är inget som gått sönder.",
             scalesTop: "Fjällen visar att Fladder har varit där uppe. Men varför stannade klockan?",
-            blackPrints: "Fotspåren visar att NÅGON har varit vid platsen. Spara dem till nästa fråga: vem?",
-            fladderSaw: "Fladder berättar vad hon såg. Spara det till nästa fråga: vem?",
-            touristSaw: "Mister Fluff berättar vad han såg. Spara det till nästa fråga: vem?",
-            shadow: "Ögonen i fönstret… det hör till nästa fråga: vem?",
-            caveMap: "Kartan visar vart någon gick. Spara den till nästa fråga: vem?",
+            emptySlot: "Den tomma platsen visar att Månstenen är borta. Men klockan drivs av vikterna!",
+            blackPrints: "Fotspåren visar att NÅGON har varit vid Månstenens plats. Spara dem till nästa fråga!",
+            shadow: "Ögonen i fönstret… det hör till nästa fråga: vem tog Månstenen?",
+            caveMap: "Kartan visar vart någon gick. Spara den till nästa fråga!",
           },
         },
         {
@@ -542,15 +568,16 @@ export const case5: Case = {
               "Kugg-trollet har också gula ögon – men han är pyttelitet. Det Fladder såg var STORT, och spåren vid Månstenen var stora.",
             tourist:
               "Mister Fluff har TRE ögon, och de är inte gula. Han är kvar på torget – det mörka gled iväg mot norr.",
-            knut: "Knut har inte gula ögon. Han drog upp klockan och gick hem – han tappade ju veven på vägen.",
+            knut: "Knut har inte gula ögon. Och han var inte ens uppe i tornet i går kväll – han somnade vid kiosken.",
             fladder: "Fladder är liten och har vita ögon. Hon var där och blev så rädd att hon tappade fjäll!",
           },
           why: {
             emptySlot: "Den tomma platsen visar att stenen är borta. Men inte VEM som tog den.",
             plaque: "Skylten berättar om Månstenen. Men inte vem som tog den.",
-            keeperSays: "Knut drog upp klockan. Men vem tog stenen?",
-            weights: "Vikterna visar bara att klockan är uppdragen.",
-            crank: "Veven är Knuts. Han tappade den när han gick hem i går kväll.",
+            keeperSays: "Det Knut säger handlar om klockan. Men vem tog stenen?",
+            weights: "Vikterna visar bara varför klockan stannade.",
+            logbook: "Loggboken handlar om Knut och klockan – inte om vem som tog stenen.",
+            crank: "Veven vid kiosken handlar om Knut och klockan – inte om Månstenen.",
             tinyGear: "Kugghjulet visar att någon från urverket har varit på torget. Men det säger inget om gula ögon.",
             oilPrints: "De små oljiga spåren är Kugg-trollets – han bor ju här. Spåren vid Månstenen var stora!",
             souvenir: "Det som lyser i väskan är en måne av plast!",
@@ -566,14 +593,14 @@ export const case5: Case = {
 
   clues: {
     keeperSays: {
-      name: "Knut drog upp klockan",
+      name: "Knut säger att han drog upp klockan",
       sprite: "clockKeeper",
-      text: "Tornvakten Knut drog upp klockan i går kväll. Ändå stannade den i natt.",
+      text: "Tornvakten Knut säger att han drog upp klockan i går kväll, som han alltid gör. Han tror att Kugg-trollet har mixtrat.",
     },
     crank: {
-      name: "Veven",
+      name: "Veven vid kiosken",
       sprite: "clockCrank",
-      text: "Veven som man drar upp tornklockan med. Den ligger här ute på torget! Har tornvakten slarvat?",
+      text: "Veven som man drar upp tornklockan med. Den ligger vid kiosken på torget, bredvid en kall kopp kaffe. Den har inte varit uppe i tornet!",
     },
     tinyGear: {
       name: "Ett litet kugghjul",
@@ -591,14 +618,19 @@ export const case5: Case = {
       text: "I natt såg Mister Fluff två GULA ÖGON högt uppe i tornet. Sen kröp något mörkt ut genom ett fönster och gled iväg mot norr. (Det som lyser i hans väska är en måne av plast.)",
     },
     weights: {
-      name: "Vikterna hänger högt",
+      name: "Vikterna ligger på golvet",
       sprite: "clockWeights",
-      text: "Klockans vikter hänger högt uppe. Klockan är alltså uppdragen – men den går ändå inte!",
+      text: "Klockans tunga vikter ligger ända nere på golvet. Lappen: \"När vikterna når golvet stannar klockan. Dra upp den VARJE kväll!\"",
     },
     plaque: {
       name: "Skylten om Månstenen",
       sprite: "towerPlaque",
-      text: "\"Högst upp i tornet bor MÅNSTENEN. Den ger klockan kraft – och gör monstren snälla.\"",
+      text: "\"Högst upp i tornet bor MÅNSTENEN. Den lyser över staden – och gör monstren snälla.\"",
+    },
+    logbook: {
+      name: "Knuts loggbok",
+      sprite: "towerLogbook",
+      text: "Knut skriver upp varje gång han drar upp klockan. Söndag och måndag står det \"dragit upp\". Men raden för tisdag – i går kväll – är tom!",
     },
     oilPrints: {
       name: "Små oljiga fotspår",
@@ -608,7 +640,7 @@ export const case5: Case = {
     fladderSaw: {
       name: "Fladders vittnesmål",
       sprite: "fladderHang",
-      text: "I natt hängde Fladder uppe i urverket. Då smög något KALLT och MÖRKT förbi henne. Det var stort och hade gula ögon. Hon blev så rädd att hon tappade fjäll.",
+      text: "I natt hängde Fladder uppe i urverket. Då smög något KALLT och MÖRKT förbi henne. Det var stort och hade gula ögon. Hon blev så rädd att hon tappade fjäll. Och Knut kom aldrig upp i går kväll – det var tyst, ingen visslade.",
     },
     shadow: {
       name: "Ögonen i fönstret",
@@ -638,7 +670,7 @@ export const case5: Case = {
     trollNote: {
       name: "Kugg-trollets lapp",
       sprite: "kuggtrollBed",
-      text: "En pytteliten säng med blått glitter på kudden. Lappen: \"Jag har smort alla kugghjul. Men klockan går INTE! Jag måste laga den. /K\"",
+      text: "En pytteliten säng med blått glitter på kudden. Lappen: \"Klockan går INTE! Vikterna ligger på golvet. Ingen har dragit upp dem! Jag är för liten för att veva, och veven är borta. /K\"",
     },
     caveMap: {
       name: "Kartan",
@@ -659,7 +691,7 @@ export const case5: Case = {
       say: "Kugg-trollet",
       lines: [
         "Pip! Snälla, bli inte arg!",
-        "Alla tror att jag tog Månstenen. Men det var inte jag!",
+        "Knut säger att jag stoppade klockan. Men det var inte jag!",
         "I natt kom en skugga in genom fönstret. Den hade gula ögon.",
         "Den tog Månstenen och försvann mot norr.",
         "Jag sprang efter den ända ner till torget. Men den var för snabb…",
@@ -668,7 +700,7 @@ export const case5: Case = {
     {
       say: "Kugg-trollet",
       lines: [
-        "Sen låste jag in mig och försökte laga klockan. Jag smorde alla hjul…",
+        "Sen låste jag in mig. Jag smorde alla hjul, men vikterna var för tunga för mig…",
         "…men där Månstenen satt hittade jag bara den här.",
       ],
     },
@@ -677,10 +709,17 @@ export const case5: Case = {
     { say: "Kugg-trollet", lines: ["Ta den, Nora. Du samlar ju på dem."] },
     { give: "moonshard" },
     { enter: "knut", sprite: "clockKeeper", from: [0, 10], to: [4, 10] },
-    { say: "Tornvakten Knut", lines: ["Kugg-trollet… förlåt. Jag trodde att det var du.", "Du ville ju bara hjälpa till."] },
+    {
+      say: "Tornvakten Knut",
+      lines: [
+        "Kugg-trollet… förlåt. Det var jag som glömde att dra upp klockan.",
+        "Jag somnade vid kiosken. Och sen skyllde jag på dig, fast du bara ville hjälpa till.",
+      ],
+    },
+    { say: "Ester", lines: ["Det är modigt att säga förlåt, Knut."] },
     {
       say: "Kugg-trollet",
-      lines: ["Kan vi få igång klockan tillsammans?", "Du drar i kedjan, och jag knuffar på pendeln!"],
+      lines: ["Kan vi få igång klockan tillsammans?", "Du vevar upp vikterna, och jag knuffar på pendeln!"],
     },
     { flash: true },
     { say: "Ester", lines: ["Tick… tack… BONG! BONG! BONG!", "Klockan går igen! Nu kommer ingen för sent."] },
@@ -696,12 +735,12 @@ export const case5: Case = {
 
   summary: [
     "Så här hängde allt ihop, Nora:",
-    "Vikterna hängde högt, så klockan VAR uppdragen. Och alla kugghjul satt på sin plats.",
-    "Skylten sa att Månstenen ger klockan kraft. Men bakom den runda luckan var platsen tom. Därför stannade klockan!",
-    "Vid den tomma platsen fanns stora svarta spår från fönstret. Kugg-trollet är alldeles för litet för så stora fötter.",
-    "Fladder såg något stort och mörkt med gula ögon. Mister Fluff såg gula ögon i tornet och något mörkt som gled mot norr. Och du såg själv ögonen i fönstret!",
-    "Kartan vid fönstret hade två gula prickar vid grottan. Dit tog skuggan nog Månstenen.",
-    "Kugghjulet på torget tappade Kugg-trollet när han sprang efter skuggan. Och glittret på hans kudde kom från biten han hittade.",
+    "Klockan drivs av tunga vikter. När de når golvet stannar den – och i trappan låg vikterna på golvet. Ingen hade dragit upp den!",
+    "Knut sa att han hade gjort det. Men loggboken var tom för i går, veven låg vid kiosken bredvid en kall kaffe, och Fladder hörde honom aldrig komma. Knut hade somnat!",
+    "Han skyllde på Kugg-trollet. Men trollet hade bara smort hjulen och skrev själv att vikterna var för tunga för honom.",
+    "Och Månstenen? Vid den tomma platsen fanns stora svarta spår från fönstret. Kugg-trollet är alldeles för litet för så stora fötter.",
+    "Fladder och Mister Fluff såg något stort och mörkt med gula ögon, och du såg själv ögonen i fönstret. Kartan vid fönstret leder till en grotta.",
+    "Kugghjulet på torget tappade Kugg-trollet när han sprang efter skuggan.",
   ],
 
   fact: "En pendel som är ungefär en meter lång svänger från ena sidan till den andra på precis en sekund. Därför har många gamla tornklockor en lång pendel som säger tick… tack… varje sekund!",
@@ -765,6 +804,7 @@ export const case5: Case = {
           skipWhen: "clue:fladderSaw",
         },
         { text: "Titta på de tunga vikterna vid väggen.", skipWhen: "clue:weights" },
+        { text: "Knut har en loggbok vid sin plats i trappan. Läs den!", skipWhen: "clue:logbook" },
         { text: "Det står en gammal skylt i trappan. Läs den!", skipWhen: "clue:plaque" },
         { text: "Uppe till vänster finns ett smalt fönster. Vad syns därute?", skipWhen: "clue:shadow" },
       ],
@@ -798,7 +838,7 @@ export const case5: Case = {
       doneWhen: "solved",
       hints: [
         "Berätta för Knut vad du har kommit fram till. Han väntar i trappan.",
-        "Vad ger klockan kraft? Och vad fattas i urverket?",
+        "Vad driver klockan – och stämmer det Knut säger? Titta på vikterna, loggboken och vad Fladder hörde.",
         "Vem var STOR och MÖRK och hade gula ögon? Leta i boken efter allt som passar.",
       ],
     },

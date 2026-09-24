@@ -447,7 +447,7 @@ export const case12: Case = {
           "Hoppa INTE nära den, Nora. Smyg förbi!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "museumGranit", at: [15, 6], cry: "DUNK!" }],
+      monsters: [{ type: "sleeper", sprite: "museumGranit", at: [15, 6], cry: "DUNK!", follows: true }],
       doors: [
         { at: "right", to: "gallery", stairs: "up" },
         { at: "left", to: "hall", stairs: "up" },

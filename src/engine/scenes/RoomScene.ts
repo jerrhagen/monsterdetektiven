@@ -21,7 +21,7 @@ import {
 import { clueFlag, flagList } from "../caseState";
 import { TILE } from "../config";
 import { Ester } from "../Ester";
-import { CAUGHT_FLAG, Crawler, type Monster, createMonster } from "../monsters";
+import { CAUGHT_FLAG, Crawler, type Monster, type MonsterWorld, Pursuer, createMonster } from "../monsters";
 import { type Facing, Player } from "../Player";
 import {
   OPPOSITE,
@@ -180,22 +180,26 @@ export class RoomScene extends Phaser.Scene {
     this.esterCalled = false;
     this.home = { x: this.player.x, y: this.player.y };
 
-    this.monsters = (this.room.data.monsters ?? []).map((def) =>
-      createMonster(this, def, {
-        nora: () => this.player,
-        canCatch: () => this.canBeCaught(),
-        caught: (m) => this.caughtBy(m),
-        has: (flags) => this.state.has(flags),
-        give: (flag) => this.state.give(flag),
-        startle: (text) => {
-          this.cameras.main.shake(200, 0.008);
-          playScare();
-          toast(text, 1200, "scare");
-        },
-        isNoraHiddenFrom: (x, y) => this.isNoraHiddenFrom(x, y),
-        isNoraSafe: () => this.isNoraNextToSomeone(),
-      }),
-    );
+    const world: MonsterWorld = {
+      nora: () => this.player,
+      canCatch: () => this.canBeCaught(),
+      caught: (m) => this.caughtBy(m),
+      has: (flags) => this.state.has(flags),
+      give: (flag) => this.state.give(flag),
+      startle: (text) => {
+        this.cameras.main.shake(200, 0.008);
+        playScare();
+        toast(text, 1200, "scare");
+      },
+      isNoraHiddenFrom: (x, y) => this.isNoraHiddenFrom(x, y),
+      isNoraSafe: () => this.isNoraNextToSomeone(),
+    };
+    this.monsters = (this.room.data.monsters ?? []).map((def) => createMonster(this, def, world));
+    // Something that chased Nora out of the last room comes in through the same door, a moment later.
+    if (session.pursuer && from) {
+      this.monsters.push(new Pursuer(this, session.pursuer, { x: this.player.x, y: this.player.y }, world));
+    }
+    session.pursuer = null;
 
     const dropped = session.dropped;
     if (dropped?.roomId === roomId) this.showPickup(dropped.x, dropped.y);
@@ -421,6 +425,7 @@ export class RoomScene extends Phaser.Scene {
     const door = doorAt(this.room, col, row);
     if (!door?.to || !this.isDoorOpen(col, row)) return false;
     this.leaving = true;
+    session.pursuer = this.monsters.map((m) => m.pursuit?.()).find((p) => p !== undefined) ?? null;
     this.cameras.main.fadeOut(180);
     this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
       this.scene.restart({ roomId: door.to, from: OPPOSITE[door.at] } satisfies RoomSceneData);

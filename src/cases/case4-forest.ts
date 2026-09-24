@@ -220,6 +220,7 @@ export const case4: Case = {
                 "Vargen? Nej, han snarkar i sin lya hela nätterna. Jag hör honom!",
                 "Men om nätterna glittrar något BLÅTT på stenarna i bäcken.",
                 "En lång rad av glitter. Den går mot svampringen.",
+                "Och jätten? Jag nynnar en bäversång för den. Nu sover den som en stock!",
               ],
               clue: "brunoSaw",
             },
@@ -240,10 +241,13 @@ export const case4: Case = {
         talk: [
           "Sch, Nora! Titta där borta…",
           "Något STORT sover vid bäcken!",
-          "Gå tyst förbi. Hoppa inte nära den!",
+          "Gå tyst förbi. Hoppa inte nära den – vaknar den kan den följa efter oss!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "mossjatte", at: [7, 9], wakeRadius: 3, cry: "VRÅÅÅL!" }],
+      // If it wakes it comes after Nora through the doors – until Bruno has hummed it back to sleep.
+      monsters: [
+        { type: "sleeper", sprite: "mossjatte", at: [7, 9], wakeRadius: 3, cry: "VRÅÅÅL!", follows: true, calmWhen: "measured" },
+      ],
       doors: [
         { at: "top", to: "edge" },
         {

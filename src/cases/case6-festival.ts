@@ -336,6 +336,7 @@ export const case6: Case = {
             "Jag lekte kurragömma med Smulan på torget i kväll.",
             "Hon gömde sig under lyktorna. Hon tappar blått fluff överallt, hihi!",
             "Sen smög något svart förbi. Då sprang jag hem.",
+            "Jag viskar till mamma att du är snäll. Du hjälpte ju mig hem!",
           ],
           clue: "smulanPlayed",
         },
@@ -389,7 +390,8 @@ export const case6: Case = {
             clue: "fladderGround",
           },
         },
-        { type: "sleeper", sprite: "mossjatte", at: [6, 6], cry: "VRÅÅÅL!" },
+        // Once the little one has told it that Nora helped it home, the giant sleeps on, calm.
+        { type: "sleeper", sprite: "mossjatte", at: [6, 6], cry: "VRÅÅÅL!", calmWhen: "clue:smulanPlayed" },
       ],
       doors: [
         { at: "bottom", to: "square" },

@@ -172,6 +172,16 @@ export const case2: Case = {
           shelters: [[5, 2], [11, 2], [3, 8], [14, 9]],
           unseenUntil: "clue:nest",
         },
+        // A little mouse that scurries across the floor now and then. It has nothing to do with it.
+        {
+          type: "crawler",
+          sprite: "bakeryMouse",
+          routes: [
+            [[3, 6], [8, 6]],
+            [[13, 7], [16, 7]],
+            [[5, 9], [12, 9]],
+          ],
+        },
       ],
       doors: [
         {

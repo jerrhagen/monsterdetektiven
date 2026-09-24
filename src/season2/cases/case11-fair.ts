@@ -511,7 +511,7 @@ export const case11: Case = {
           "Hoppa inte nära det. Smyg!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "fairVaddis", at: [11, 6], wakeRadius: 3 }],
+      monsters: [{ type: "sleeper", sprite: "fairVaddis", at: [11, 6], wakeRadius: 3, follows: true }],
       doors: [{ at: "left", to: "square", stairs: "down" }],
     },
   },

@@ -255,6 +255,16 @@ export const case10: Case = {
             clue: "glimSaw",
           },
         },
+        // A hermit crab scuttles across the floor now and then. Harmless.
+        {
+          type: "crawler",
+          sprite: "aqHermitCrab",
+          routes: [
+            [[2, 5], [8, 5]],
+            [[10, 9], [17, 9]],
+            [[4, 10], [12, 10]],
+          ],
+        },
       ],
       doors: [
         { at: "bottom", to: "entrance" },

@@ -240,7 +240,18 @@ export const case8: Case = {
               "Bänkarna? Jag har ju bara pinnarmar. Jag orkar inte ens lyfta en sudd.",
             ],
             clue: "kritanSaw",
-            talkIf: [{ when: "clue:kritanSaw", talk: ["Hmpf. Hitta den som skrubbar, Nora!", "Och säg åt den att sluta."] }],
+            talkIf: [
+              {
+                when: ["clue:kritanSaw", "visited:corridor"],
+                talk: [
+                  "Skramlade Benke åt dig i korridoren? Han är min kompis!",
+                  "Jag ritar en ruta på golvet åt honom. Då står han still och räknar kritstrecken.",
+                  "Hitta den som skrubbar, Nora!",
+                ],
+                gives: "benke-calm",
+              },
+              { when: "clue:kritanSaw", talk: ["Hmpf. Hitta den som skrubbar, Nora!", "Och säg åt den att sluta."] },
+            ],
           },
         },
       ],
@@ -360,6 +371,8 @@ export const case8: Case = {
           type: "patroller",
           sprite: "schoolSkeleton",
           cry: "SKRAMMEL!",
+          // Kritan can draw him a square to stand in.
+          calmWhen: "benke-calm",
           path: [
             [4, 6],
             [16, 6],

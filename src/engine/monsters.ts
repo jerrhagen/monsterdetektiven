@@ -36,6 +36,16 @@ export interface Monster {
   retreat(): void;
   /** What it shouts when it catches Nora (see MonsterDef.cry). */
   cry?: string;
+  /** If it is chasing Nora and will follow her out through a door: who comes after her. */
+  pursuit?(): PursuerInfo | undefined;
+}
+
+/** A monster on its way after Nora into the next room (kept in the session between rooms). */
+export interface PursuerInfo {
+  sprite: string;
+  cry?: string;
+  /** Seconds it keeps chasing once it's through the door. */
+  chaseFor: number;
 }
 
 /** Set when Nora catches the culprit at the end of a case. */
@@ -86,6 +96,7 @@ class Patroller implements Monster {
   private readonly path: { x: number; y: number }[];
   private readonly speed: number;
   private readonly walkAnim?: string;
+  private readonly calmWhen?: Flags;
   private target = 1;
   private direction = 1;
   private restFor = 0;
@@ -99,6 +110,7 @@ class Patroller implements Monster {
   ) {
     this.path = def.path.map(([c, r]) => ({ x: c * TILE + TILE / 2, y: r * TILE + TILE - 2 }));
     this.speed = def.speed ?? 32;
+    this.calmWhen = def.calmWhen;
     this.x = this.path[0].x;
     this.y = this.path[0].y;
     this.shadow = scene.add.ellipse(this.x, this.y, 12, 4, 0x000000, 0.3);
@@ -107,6 +119,18 @@ class Patroller implements Monster {
   }
 
   update(dt: number): void {
+    if (this.calmWhen !== undefined && this.world.has(this.calmWhen)) {
+      // Calmed down: it walks back to the start of its path and stays there, harmless.
+      const home = step(this, this.path[0], this.speed * 0.7, dt);
+      this.x = home.x;
+      this.y = home.y;
+      if (Math.abs(home.dx) > 0.5) this.sprite.setFlipX(home.dx < 0);
+      if (this.walkAnim && !home.arrived) this.sprite.play(this.walkAnim, true);
+      else this.sprite.stop();
+      this.sprite.setPosition(Math.round(this.x), Math.round(this.y)).setDepth(this.y);
+      this.shadow.setPosition(Math.round(this.x), Math.round(this.y - 1)).setDepth(this.y - 0.5);
+      return;
+    }
     if (this.restFor > 0) {
       this.restFor -= dt;
     } else {
@@ -151,6 +175,8 @@ class Sleeper implements Monster {
   private readonly wakeRadius: number;
   private readonly spriteKey: string;
   private readonly runAnim?: string;
+  private readonly calmWhen?: Flags;
+  private readonly follows: boolean;
   private awakeFor = 0;
   cry?: string;
   x: number;
@@ -166,6 +192,8 @@ class Sleeper implements Monster {
     this.y = this.home.y;
     this.wakeRadius = (def.wakeRadius ?? 3) * TILE;
     this.spriteKey = def.sprite;
+    this.calmWhen = def.calmWhen;
+    this.follows = def.follows ?? false;
     if (scene.anims.exists(`${def.sprite}-run`)) this.runAnim = `${def.sprite}-run`;
     scene.add.ellipse(this.x, this.y - 1, 14, 4, 0x000000, 0.3).setDepth(this.y - 0.5);
     this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setOrigin(0.5, 1).setDepth(this.y);
@@ -177,9 +205,12 @@ class Sleeper implements Monster {
     const toNora = Math.hypot(nora.x - this.x, nora.y - this.y);
     let moved = false;
 
+    const calm = this.calmWhen !== undefined && this.world.has(this.calmWhen);
+    if (calm) this.awakeFor = 0;
+
     if (this.awakeFor <= 0) {
       // Asleep. A jump close by is too loud!
-      if (nora.airborne && toNora < this.wakeRadius && this.world.canCatch()) {
+      if (!calm && nora.airborne && toNora < this.wakeRadius && this.world.canCatch()) {
         this.awakeFor = SLEEPER_AWAKE;
         this.world.startle(this.cry ?? "GRRR!");
       }
@@ -219,6 +250,91 @@ class Sleeper implements Monster {
   retreat(): void {
     this.awakeFor = 0;
   }
+
+  pursuit(): PursuerInfo | undefined {
+    const chasing = this.follows && this.awakeFor > 0 && this.awakeFor < SLEEPER_AWAKE - STARTLED_TIME;
+    return chasing ? { sprite: this.spriteKey, cry: this.cry, chaseFor: this.awakeFor + 1 } : undefined;
+  }
+}
+
+// ---------- Pursuer: a woken sleeper that followed Nora through a door ----------
+
+/** Seconds before the pursuer comes through the door after Nora. */
+const PURSUER_DELAY = 1;
+
+export class Pursuer implements Monster {
+  readonly kind = "sleeper";
+  readonly sprite: Phaser.GameObjects.Sprite;
+  private readonly shadow: Phaser.GameObjects.Ellipse;
+  private readonly door: { x: number; y: number };
+  private readonly runAnim?: string;
+  private wait = PURSUER_DELAY;
+  private chaseFor: number;
+  private gone = false;
+  cry?: string;
+  x: number;
+  y: number;
+
+  constructor(
+    scene: Phaser.Scene,
+    private readonly info: PursuerInfo,
+    door: { x: number; y: number },
+    private readonly world: MonsterWorld,
+  ) {
+    this.door = door;
+    this.x = door.x;
+    this.y = door.y;
+    this.chaseFor = info.chaseFor;
+    this.cry = info.cry;
+    if (scene.anims.exists(`${info.sprite}-run`)) this.runAnim = `${info.sprite}-run`;
+    this.shadow = scene.add.ellipse(this.x, this.y - 1, 14, 4, 0x000000, 0.3).setVisible(false);
+    this.sprite = scene.add.sprite(this.x, this.y, `${info.sprite}-1`).setOrigin(0.5, 1).setVisible(false);
+  }
+
+  update(dt: number): void {
+    if (this.gone) return;
+    if (this.wait > 0) {
+      this.wait -= dt;
+      if (this.wait <= 0) {
+        this.sprite.setVisible(true);
+        this.shadow.setVisible(true);
+        this.world.startle(this.cry ?? "GRRR!");
+      }
+      return;
+    }
+
+    const nora = this.world.nora();
+    if (this.chaseFor > 0 && this.world.isNoraSafe()) this.chaseFor = 0;
+    let target = this.door;
+    if (this.chaseFor > 0) {
+      this.chaseFor -= dt;
+      target = nora;
+    }
+    const next = step(this, target, this.chaseFor > 0 ? 48 : 36, dt);
+    this.x = next.x;
+    this.y = next.y;
+    if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
+    if (this.chaseFor > 0 && Math.hypot(nora.x - this.x, nora.y - this.y) < 10 && this.world.canCatch()) this.world.caught(this);
+    if (this.chaseFor <= 0 && next.arrived) {
+      // Back out through the door it came in by.
+      this.gone = true;
+      this.sprite.setVisible(false);
+      this.shadow.setVisible(false);
+      return;
+    }
+
+    if (this.runAnim) this.sprite.play(this.runAnim, true);
+    this.sprite.setPosition(Math.round(this.x), Math.round(this.y)).setDepth(this.y);
+    this.shadow.setPosition(Math.round(this.x), Math.round(this.y - 1)).setDepth(this.y - 0.5);
+  }
+
+  retreat(): void {
+    this.chaseFor = 0;
+  }
+
+  pursuit(): PursuerInfo | undefined {
+    return !this.gone && this.wait <= 0 && this.chaseFor > 0 ? { ...this.info, chaseFor: this.chaseFor + 1 } : undefined;
+  }
 }
 
 // ---------- Flyer: loops around the room and swoops at Nora ----------
@@ -244,6 +360,7 @@ class Flyer implements Monster {
   private readonly spriteKey: string;
   private readonly perchSprite?: string;
   private readonly talkHint: Phaser.GameObjects.Image;
+  private readonly calmWhen?: Flags;
   readonly thing?: Thing;
   /** Missed attacks (Nora hid or got away). Two misses make her tired, and she rests on the perch. */
   private misses = 0;
@@ -264,6 +381,7 @@ class Flyer implements Monster {
     this.perch = def.perch ? tileCenter(def.perch) : undefined;
     this.spriteKey = def.sprite;
     this.perchSprite = def.perchSprite;
+    this.calmWhen = def.calmWhen;
     this.thing = def.thing;
     const start = this.loopPoint();
     this.x = start.x;
@@ -293,20 +411,24 @@ class Flyer implements Monster {
     const toNora = Math.hypot(nora.x - this.x, nora.y - this.y);
 
     const hidden = this.world.isNoraHiddenFrom(this.x, this.y);
+    const calm = this.calmWhen !== undefined && this.world.has(this.calmWhen);
     let shake = 0;
+    // Calmed down: no more diving. With a perch she goes to rest there for good.
+    if (calm && (this.mode === "windup" || this.mode === "swoop")) this.setMode("return");
 
     if (this.mode === "loop") {
       this.t += dt * 0.6;
       this.flyFor -= dt;
       const p = this.loopPoint();
       this.moveTo(p.x, p.y, 80, dt);
-      if (toNora < 48 && !hidden && this.world.canCatch()) this.setMode("windup");
+      if (calm && this.perch) this.setMode("toPerch");
+      else if (!calm && toNora < 48 && !hidden && this.world.canCatch()) this.setMode("windup");
       else if (this.perch && (this.misses >= 2 || this.flyFor <= 0)) this.setMode("toPerch");
     } else if (this.mode === "toPerch") {
       if (this.moveTo(this.perch!.x, this.perch!.y, 60, dt) < 1) this.land();
     } else if (this.mode === "perched") {
       // Resting, hanging upside down – she won't attack now, and can be talked to.
-      if (this.modeTime > 7) this.takeOff();
+      if (this.modeTime > 7 && !calm) this.takeOff();
     } else if (this.mode === "windup") {
       // Hovers and shivers for a moment before diving – time to hide!
       shake = Math.sin(time / 25) * 1.5;

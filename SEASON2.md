@@ -302,6 +302,11 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
 - **Fall 11:** clownens vittnesmål är en lapp med spegelskrift, och karusellen är tre saker i rad.
 - **Fall 12:** vakten patrullerar och "pratar" genom sin loggbok. Vännerna från fall 7–11 nämns bara
   i repliker tills deras figurer finns i registret.
+- **Variation (tillagt efter speltest av säsong 1):** i fall 8 hjälper Kritan till – när Nora har mött
+  Benke i korridoren kan hon be Kritan rita en ruta åt honom, och då står han still (`calmWhen`). Vaddis
+  (fall 11) och statyn Granit (fall 12) **följer efter** Nora genom dörrarna om de vaknar (`follows`). I
+  stora tanken (fall 10) pilar en ofarlig eremitkräfta förbi som villospår. Fall 11 är säsongens fall där
+  den skyldige är en person man träffar direkt.
 - **Motorn:** klockpusslets slumpade tid kan inte användas i ledtrådstexter (`rollClock` ger inga
   `vars`). Det vore en liten förbättring att lägga till.
 

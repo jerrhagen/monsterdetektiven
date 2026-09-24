@@ -923,7 +923,38 @@ export const bakeryTrackShoe: PixelSprite = {
 };
 
 /** Every new sprite in case 2. */
+/** A little bakery mouse that scurries between the shelves – harmless, but it does look guilty. */
+export const bakeryMouse: PixelSprite = {
+  palette: { ".": null, o: O, g: "#9a8e84", k: "#1a1024", p: "#f08aa8" },
+  frames: [
+    [
+      E, E, E, E, E, E, E, E,
+      "..........o.o...",
+      ".........ogogo..",
+      "..oooo..ogggggo.",
+      ".o....ooggggkgpo",
+      "o....oggggggggo.",
+      ".....ogggggggo..",
+      "......oo.o.oo...",
+      E,
+    ],
+    [
+      E, E, E, E, E, E, E, E,
+      "..........o.o...",
+      ".........ogogo..",
+      "..oooo..ogggggo.",
+      ".o....ooggggkgpo",
+      "o....oggggggggo.",
+      ".....ogggggggo..",
+      ".....o.oo.oo....",
+      E,
+    ],
+  ],
+  frameRate: 10,
+};
+
 export const case2Sprites: Record<string, PixelSprite> = {
+  bakeryMouse,
   berit,
   gustav,
   smulan,

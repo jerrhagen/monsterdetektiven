@@ -225,17 +225,17 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 
 **Avslöjandet (Trattis), markera alla:** *Vem är det som gråter?* Det tomma boet, de små spåren, Trattis vittnesmål och tårarna. *Varför gråter ungen?* Boet, cirkelspåren, de små spåren, Brunos vittnesmål (blått glitter på stenarna) och glittret. (Skuggan lämnade ett glitterspår från bäcken till sitt gömställe; ungen följde det, hittade stenen och gick vilse.)
 
-**Klurigheter:** spårtavlan (para ihop djurspår), Brunos mätning (kodlås, mäta i tassar), Trattis fråga (svampar, årstider, allemansrätt), vägen hem (väderstreck, ger fångsten). **Monster:** vargen (patrullerare), Mossjätten (sovare), lysflugorna (flygare). **Fakta:** svampar är varken växter eller djur. **Kort:** Trattis, Mossjätten, Mossungen.
+**Klurigheter:** spårtavlan (para ihop djurspår), Brunos mätning (kodlås, mäta i tassar), Trattis fråga (svampar, årstider, allemansrätt), vägen hem (väderstreck, ger fångsten). **Monster:** vargen (patrullerare), Mossjätten (sovare som **följer efter** genom dörrarna, tills Bruno har nynnat den till sömns efter mätningen), lysflugorna (flygare). **Fakta:** svampar är varken växter eller djur. **Kort:** Trattis, Mossjätten, Mossungen.
 
 ### Fall 5: Klocktornet har stannat (`case5-clocktower.ts`)
 
 **Rum:** Torget → Trappan i tornet → Urverket. **Misstänkta:** Kugg-trollet, turisten Mister Fluff, tornvakten Knut, Fladder, en skugga med gula ögon.
 
-**Sanningen:** Klockan stannade för att Månstenen är borta ur urverket (lodet hänger högt, så den är uppdragen). Skuggan kom in genom fönstret och tog stenen norrut. Kugg-trollet smorde bara kugghjulen och försökte laga klockan. Nora hittar en karta till Skuggans grotta.
+**Sanningen (med en vändning):** Det är **tornvakten Knut**, han som ringde efter Nora, som ligger bakom att klockan stannade. Han satte sig vid kiosken med en kopp kaffe, somnade och drog aldrig upp klockan. Han skäms och skyller på Kugg-trollet, och trollets små oljiga spår pekar först åt det hållet. Samma natt kom Skuggan in genom fönstret och tog Månstenen norrut (den lyser över staden och gör monstren snälla, men driver inte klockan). Kugg-trollet smorde bara kugghjulen och försökte laga klockan. Nora hittar en karta till Skuggans grotta.
 
-**Avslöjandet (Knut), markera alla:** *Varför stannade klockan?* Den tomma platsen och skylten (vikterna hänger högt och alla kugghjul sitter kvar). *Vem tog Månstenen?* De stora svarta spåren, Fladders och Mister Fluffs vittnesmål, ögonen i fönstret och kartan.
+**Avslöjandet (Knut), markera alla:** *Varför stannade klockan?* Knut drog aldrig upp den: vikterna ligger på golvet, loggboken är tom för i går, Fladder hörde honom aldrig, veven låg vid kiosken och trollets lapp. *Vem tog Månstenen?* De stora svarta spåren, Fladders och Mister Fluffs vittnesmål, ögonen i fönstret och kartan. I slutet ber Knut Kugg-trollet om förlåtelse.
 
-**Klurigheter:** Mister Fluffs ordbok (engelska ord, para ihop), klocklåset (hel, halv, kvart), luckans talföljd, kugghjulslåset (hälften). **Monster:** Fladder (flygare), Urverksbaggen (patrullerare), Kugg-trollet (krypare, fångas i en kugghylla). **Fakta:** en meter lång pendel slår en sekund. **Kort:** Kugg-trollet, Mister Fluff, Urverksbaggen.
+**Klurigheter:** Mister Fluffs ordbok (engelska ord, para ihop), klocklåset (hel, halv, kvart), luckans talföljd, kugghjulslåset (hälften). **Monster:** Fladder (flygare), Urverksbaggen (patrullerare), Kugg-trollet (krypare, oskyldig, fångas i en kugghylla så att Knut kan be om förlåtelse). **Fakta:** en meter lång pendel slår en sekund. **Kort:** Kugg-trollet, Mister Fluff, Urverksbaggen.
 
 ### Fall 6: Monsterfesten (`case6-festival.ts`)
 
@@ -262,6 +262,12 @@ Monster är både **faror**, **vittnen** och **delar av mysteriet**. Läskighet:
 | **Sovare** | Sover med "zzz". Vaknar om Nora **hoppar** nära: först står den still ett ögonblick (varningen), sedan springer den efter henne en stund och somnar om. Om sprite:n har animationen `run` springer den med benen. | Gå tyst förbi och hoppa inte. **Hinner Nora fram till en person** (någon man kan prata med) ger den upp och lägger sig igen. | Mossjätten, gårdskatten Måns (`sleeper`) |
 | **Vakter** | Står i vägen, till exempel ett brotroll. | Svara på en gåta eller ge något de vill ha. | Trattis vid svampringen |
 | **Vittnen** | Berättar vad de sett, men ibland först när man hjälpt dem. | Fråga ut dem och lös deras problem. | Nallen, Viskan |
+
+Två saker gör att monstren inte blir förutsägbara:
+- **Ett monster kan följa efter** (`follows: true` på en sovare). Springer Nora ut genom en dörr medan den jagar henne kommer den efter en sekund senare genom samma dörr, jagar en stund till och går sedan tillbaka.
+- **Någon kan hjälpa till** (`calmWhen`). När flaggan finns lugnar monstret ner sig för gott: en patrullerare står still, en sovare sover vidare, en flygare vilar på sin plats och en smygare stannar hemma. Det kan vara ett annat monster som hjälper Nora, till exempel en unge som viskar till sin förälder att Nora är snäll.
+
+**Variera upplägget mellan fallen.** Den skyldige ska inte alltid vara "det lilla okända som smyger i slutet". Därför finns det ofarliga småkryp som pilar förbi (en mus, en boklus, en eremitkräfta) och är villospår, rum helt utan monster, och minst ett fall per säsong där den skyldige är en **person man träffar redan i början**, medan spåren först pekar mot ett misstänkt monster.
 
 Varje monster kan ha ett eget **rop** (`cry`) som syns när det vaknar, hoppar fram eller fångar Nora, till exempel "FRÄÄÄS!" för katten och "GRRRR!" för vargen. Utan rop blir det "BUUU!" (och "IIIIIK!" när en flygare bär iväg Nora).
 

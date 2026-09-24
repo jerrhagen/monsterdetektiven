@@ -298,8 +298,8 @@ export function validateCase(c: Case): string[] {
           errors.push(`I rummet '${room.name}': ett monster är utanför rummet (${col}, ${row}).`);
         }
       }
+      need(m.calmWhen, `${m.type === "sneaker" ? m.thing.name : m.sprite} (lugn)`);
       if (m.type === "sneaker") {
-        need(m.calmWhen, `${m.thing.name} (lugn)`);
         need(m.hideUntil?.when, `${m.thing.name} (gömd)`);
         if (m.thing.puzzle && !c.puzzles?.[m.thing.puzzle]) errors.push(`${m.thing.name}: pusslet '${m.thing.puzzle}' finns inte.`);
       }

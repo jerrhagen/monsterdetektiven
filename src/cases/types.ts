@@ -270,8 +270,6 @@ export type MonsterDef = (
       sprite: string;
       home: [col: number, row: number];
       thing: Thing;
-      /** When these flags are set, the monster stops hunting and stays at home. */
-      calmWhen?: Flags;
       /** Hides at home until `when` is set, then jumps out after `delay` seconds. */
       hideUntil?: { when: Flags; delay: number };
     }
@@ -294,6 +292,8 @@ export type MonsterDef = (
       at: [col: number, row: number];
       /** How close a jump wakes it, in tiles (default 3). */
       wakeRadius?: number;
+      /** If Nora runs out through a door while it chases her, it comes after her into the next room. */
+      follows?: boolean;
     }
   | {
       /** Hidden most of the time; now and then scuttles along one of its short routes, far from Nora. */
@@ -309,6 +309,11 @@ export type MonsterDef = (
 ) & {
   /** What it shouts when it wakes up, jumps out or catches Nora, e.g. "FRÄÄÄS!" for a cat (default "BUUU!"). */
   cry?: string;
+  /**
+   * When these flags are set the monster calms down for good – someone has helped Nora. A sneaker
+   * stays at home, a patroller stands still, a sleeper sleeps on and a flyer rests on its perch.
+   */
+  calmWhen?: Flags;
 };
 
 export interface Room {

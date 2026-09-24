@@ -1,4 +1,5 @@
 import { cases } from "../cases";
+import type { PursuerInfo } from "./monsters";
 import { CaseState } from "./caseState";
 import { HELP_LEVELS, HintTimer } from "./hints";
 import { loadSettings } from "./save";
@@ -22,6 +23,8 @@ export const session = {
   /** The intro card has been shown and the clock is running. */
   started: false,
   startedAt: 0,
+  /** A monster that chased Nora out through a door, and is coming after her into the next room. */
+  pursuer: null as PursuerInfo | null,
 };
 
 /** Starts a case from the beginning (new random puzzles, new clock). */
@@ -30,6 +33,7 @@ export function newGame(caseIndex = 0): void {
   session.state = startCase(caseIndex);
   session.hintTimer = new HintTimer(HELP_LEVELS[loadSettings().help]);
   session.dropped = null;
+  session.pursuer = null;
   session.started = false;
   session.startedAt = 0;
 }

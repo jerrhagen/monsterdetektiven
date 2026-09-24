@@ -606,7 +606,36 @@ export const towerWindow: PixelSprite = {
   ],
 };
 
+const EMPTY = "................";
+
+/** A booklouse – a tiny pale bug that lives in old books. Harmless, and it scurries off fast. */
+export const libraryBooklouse: PixelSprite = {
+  palette: { ".": null, o: "#5a4a3a", w: "#e8dcc4", W: "#c8b894", k: "#1a1024" },
+  frames: [
+    [
+      ...Array<string>(10).fill(EMPTY),
+      "...........o.o..",
+      "....oooooooo.o..",
+      "...owWwWwWwwoo..",
+      "..owwwwwwwwwkwo.",
+      "...oooooooooooo.",
+      "....o.o.o.o.o...",
+    ],
+    [
+      ...Array<string>(10).fill(EMPTY),
+      "...........o.o..",
+      "....oooooooo.o..",
+      "...owWwWwWwwoo..",
+      "..owwwwwwwwwkwo.",
+      "...oooooooooooo.",
+      ".....o.o.o.o.o..",
+    ],
+  ],
+  frameRate: 12,
+};
+
 export const case3Sprites: Record<string, PixelSprite> = {
+  libraryBooklouse,
   bodil,
   pelle,
   bladdra,
