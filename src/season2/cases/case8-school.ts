@@ -359,6 +359,7 @@ export const case8: Case = {
           // Rattles up and down the corridor. Slip past when he turns.
           type: "patroller",
           sprite: "schoolSkeleton",
+          cry: "SKRAMMEL!",
           path: [
             [4, 6],
             [16, 6],

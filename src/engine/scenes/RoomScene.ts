@@ -193,6 +193,7 @@ export class RoomScene extends Phaser.Scene {
           toast(text, 1200, "scare");
         },
         isNoraHiddenFrom: (x, y) => this.isNoraHiddenFrom(x, y),
+        isNoraSafe: () => this.isNoraNextToSomeone(),
       }),
     );
 
@@ -803,6 +804,16 @@ export class RoomScene extends Phaser.Scene {
     });
   }
 
+  /** Is Nora standing right next to a person (someone to talk to, who is there right now)? */
+  private isNoraNextToSomeone(): boolean {
+    return this.room.things.some(
+      ({ col, row, thing }, i) =>
+        thing.person &&
+        !this.isThingHidden(i) &&
+        Math.hypot(this.player.x - (col * TILE + TILE / 2), this.player.y - (row * TILE + TILE / 2)) < TILE * 1.6,
+    );
+  }
+
   /** Is there a crate, shelf, counter or tree on the straight line between (x, y) and Nora? */
   private isNoraHiddenFrom(x: number, y: number): boolean {
     const nx = this.player.x;
@@ -837,7 +848,7 @@ export class RoomScene extends Phaser.Scene {
     this.graceUntil = this.time.now + 4000;
     this.cameras.main.shake(300, 0.012);
     playScare();
-    toast(monster.kind === "flyer" ? "IIIIIK!" : "BUUU!", 1400, "scare");
+    toast(monster.cry ?? (monster.kind === "flyer" ? "IIIIIK!" : "BUUU!"), 1400, "scare");
     const at = { x: this.player.x, y: this.player.y };
     this.dropMagnifier(at);
 

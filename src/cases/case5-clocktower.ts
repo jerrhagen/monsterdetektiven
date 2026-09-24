@@ -396,7 +396,7 @@ export const case5: Case = {
       clues: { "1": "blackPrints", "2": "scalesTop" },
       monsters: [
         // A clockwork beetle that marches back and forth like a pendulum – wait for it to pass.
-        { type: "patroller", sprite: "clockBeetle", path: [[1, 6], [18, 6]], speed: 30 },
+        { type: "patroller", sprite: "clockBeetle", path: [[1, 6], [18, 6]], speed: 30, cry: "KNIPS!" },
         // Something small scuttles between the shelves, holding something that glows…
         {
           type: "crawler",

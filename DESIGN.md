@@ -259,9 +259,11 @@ Monster är både **faror**, **vittnen** och **delar av mysteriet**. Läskighet:
 | **Smygare** | Gömmer sig först i sitt hem och hoppar fram en stund efter att Nora petat på gömstället. Glider sedan närmare när Nora tittar bort och fryser med stängda ögon när hon tittar. | Titta på monstret medan du går förbi eller fram till det. | Viskan |
 | **Krypare** | Kilar snabbt mellan gömställen och syns bara i korta glimtar. | Går inte att fånga förrän man vet hur. Det är en del av mysteriet. | Grymlans arm |
 | **Patrullerare** | Går fram och tillbaka längs en väg och stannar en kort stund i varje ände. | Tajma när man går förbi. Efter en skrämsel står den still en stund. | (`patroller`) |
-| **Sovare** | Sover med "zzz". Vaknar med "GRRR!" om Nora **hoppar** nära, jagar en stund och somnar sedan om. | Gå tyst förbi och hoppa inte. | Mossjätten, gårdskatten (`sleeper`) |
+| **Sovare** | Sover med "zzz". Vaknar om Nora **hoppar** nära: först står den still ett ögonblick (varningen), sedan springer den efter henne en stund och somnar om. Om sprite:n har animationen `run` springer den med benen. | Gå tyst förbi och hoppa inte. **Hinner Nora fram till en person** (någon man kan prata med) ger den upp och lägger sig igen. | Mossjätten, gårdskatten Måns (`sleeper`) |
 | **Vakter** | Står i vägen, till exempel ett brotroll. | Svara på en gåta eller ge något de vill ha. | Trattis vid svampringen |
 | **Vittnen** | Berättar vad de sett, men ibland först när man hjälpt dem. | Fråga ut dem och lös deras problem. | Nallen, Viskan |
+
+Varje monster kan ha ett eget **rop** (`cry`) som syns när det vaknar, hoppar fram eller fångar Nora, till exempel "FRÄÄÄS!" för katten och "GRRRR!" för vargen. Utan rop blir det "BUUU!" (och "IIIIIK!" när en flygare bär iväg Nora).
 
 ### Vad som lyser och vem som vill prata
 
@@ -533,7 +535,8 @@ Tecknen i rutnätet:
 |---|---|
 | `#` | Vägg |
 | `.` | Golv |
-| `~` | Pöl eller slem (hoppa över) |
+| `~` | Pöl eller slem (hoppa över). Utomhus är det grunt, ljusare vatten, så ett vadställe i en bäck syns. |
+| `W` | Djupt vatten (går inte att hoppa över) |
 | `=` | Lågt hinder, till exempel byggklossar (hoppa över) |
 | `D` | Dörr (vart den leder anges i `doors`) |
 | `H` | Hylla med leksaker (fast) |
@@ -623,6 +626,8 @@ export const case1: Case = {
 
 Alla fall har tre rum som man går igenom i ordning (fall 3 har ett frivilligt fjärde), men dörrarna sitter på olika ställen i varje fall så att det inte blir upprepande. Rummen ska stämma med hur byggnaden ser ut på stadskartan: bageriet är smalt med bakgården på baksidan, klocktornet och bibliotekstornet har trappor uppåt, källare och grottor nås med trappor nedåt. En dörr kan ritas som **trappa** (`stairs: "up" | "down"`), och i skogen är öppningarna grusstigar. Ett fall har en **genväg** som öppnas först när man har förstått något.
 
+**Vatten och slem** ritas efter alla rutor med mjuka, lite ojämna kanter (inga skarpa hörn där två pölar möts), och djupt vatten får en lerig strand. Formen följer rutorna, så det man ser stämmer med var Nora kan gå. Bakgården i fall 2 är en **slingrande bäck**: det snabba sättet är att hoppa över vattnet, men det väcker Måns. Det säkra sättet är att gå runt längs bäcken, och det finns ett test som ser till att den vägen alltid finns.
+
 ### 11.5 Validering, viktig när banor ändras ofta
 
 Ett test (`npm test`), och en kontroll när spelet startar i utvecklingsläge, går igenom alla fall:
@@ -636,7 +641,7 @@ Ett test (`npm test`), och en kontroll när spelet startar i utvecklingsläge, g
 Fel visas **på svenska i spelet**, till exempel: *"Rad 4 i rummet 'Bageriet' har 19 tecken, den ska ha 20."*
 
 
-`tests/reachable.test.ts` kontrollerar att Nora kan gå eller hoppa från varje ingång till varje sak, ledtråd och dörr i varje rum – viktigt när dörrar flyttas.
+`tests/caseChecks.ts` kontrollerar (för båda säsongerna) att Nora kan gå eller hoppa från varje ingång till varje sak, ledtråd och dörr i varje rum – viktigt när dörrar flyttas.
 ### 11.6 Hur pixelgrafiken skapas
 
 Claude gör pixelgrafiken som färgrutnät i koden (`src/sprites/`). De görs om till vanliga bilder när spelet startar. Det gör att Claude kan rita, ändra färger och justera figurer direkt när barnet ber om det ("gör Smulan rundare", "ge Nora en röd hatt").

@@ -280,7 +280,7 @@ export const case7: Case = {
       clues: { "1": "feathers" },
       monsters: [
         // Scuttles back and forth across the shed and pinches – wait until it has passed.
-        { type: "patroller", sprite: "s2Crab", path: [[1, 6], [18, 6]], speed: 34 },
+        { type: "patroller", sprite: "s2Crab", path: [[1, 6], [18, 6]], speed: 34, cry: "KNIP!" },
       ],
       onEnter: {
         name: "Ester",

@@ -389,7 +389,7 @@ export const case6: Case = {
             clue: "fladderGround",
           },
         },
-        { type: "sleeper", sprite: "mossjatte", at: [6, 6] },
+        { type: "sleeper", sprite: "mossjatte", at: [6, 6], cry: "VRÅÅÅL!" },
       ],
       doors: [
         { at: "bottom", to: "square" },

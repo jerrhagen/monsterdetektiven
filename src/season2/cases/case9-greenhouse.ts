@@ -312,7 +312,7 @@ export const case9: Case = {
           "Gå tyst förbi. Hoppa inte nära den!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "s2Flytrap", at: [10, 5], wakeRadius: 3 }],
+      monsters: [{ type: "sleeper", sprite: "s2Flytrap", at: [10, 5], wakeRadius: 3, cry: "SNAPP!" }],
       doors: [
         { at: "bottom", to: "garden" },
         {

@@ -251,7 +251,7 @@ export interface Mover {
 }
 
 /** A monster that moves around the room. See DESIGN.md, section 5. */
-export type MonsterDef =
+export type MonsterDef = (
   | {
       /** Flies in a figure-eight and swoops at Nora. If she's caught she is carried back to the door. */
       type: "flyer";
@@ -285,7 +285,10 @@ export type MonsterDef =
       speed?: number;
     }
   | {
-      /** Sleeps (frame 0). Wakes up (frame 1) and chases Nora if she JUMPS close by – so tiptoe past! */
+      /**
+       * Sleeps (frame 0). Wakes up (frame 1) and chases Nora if she JUMPS close by – so tiptoe past!
+       * Runs with the animation `<sprite>-run` if the sprite has one. Gives up if Nora reaches a person.
+       */
       type: "sleeper";
       sprite: string;
       at: [col: number, row: number];
@@ -302,7 +305,11 @@ export type MonsterDef =
       catchWhen?: Flags;
       /** Until these flags are set it is never seen – only the toys in its shelters rustle now and then. */
       unseenUntil?: Flags;
-    };
+    }
+) & {
+  /** What it shouts when it wakes up, jumps out or catches Nora, e.g. "FRÄÄÄS!" for a cat (default "BUUU!"). */
+  cry?: string;
+};
 
 export interface Room {
   name: string;

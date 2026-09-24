@@ -15,6 +15,8 @@ export interface MonsterWorld {
   startle(text: string): void;
   /** Is there cover (a crate, a shelf…) between this point and Nora? */
   isNoraHiddenFrom(x: number, y: number): boolean;
+  /** Is Nora right next to a person who looks after her? Then a woken monster gives up. */
+  isNoraSafe(): boolean;
 }
 
 export interface Monster {
@@ -32,6 +34,8 @@ export interface Monster {
   update(dt: number, time: number): void;
   /** After catching Nora: back off for a while. */
   retreat(): void;
+  /** What it shouts when it catches Nora (see MonsterDef.cry). */
+  cry?: string;
 }
 
 /** Set when Nora catches the culprit at the end of a case. */
@@ -43,6 +47,12 @@ export const emergedFlag = (sprite: string) => `emerged:${sprite}`;
 const tileCenter = ([col, row]: [number, number]) => ({ x: col * TILE + TILE / 2, y: row * TILE + TILE / 2 });
 
 export function createMonster(scene: Phaser.Scene, def: MonsterDef, world: MonsterWorld): Monster {
+  const monster = buildMonster(scene, def, world);
+  monster.cry = def.cry;
+  return monster;
+}
+
+function buildMonster(scene: Phaser.Scene, def: MonsterDef, world: MonsterWorld): Monster {
   switch (def.type) {
     case "flyer":
       return new Flyer(scene, def, world);
@@ -129,6 +139,10 @@ class Patroller implements Monster {
 
 // ---------- Sleeper: wakes up if Nora jumps close by ----------
 
+/** Seconds a woken sleeper stays in its startled pose before it starts running. */
+const STARTLED_TIME = 0.4;
+const SLEEPER_AWAKE = 3.5;
+
 class Sleeper implements Monster {
   readonly kind = "sleeper";
   readonly sprite: Phaser.GameObjects.Sprite;
@@ -136,7 +150,9 @@ class Sleeper implements Monster {
   private readonly home: { x: number; y: number };
   private readonly wakeRadius: number;
   private readonly spriteKey: string;
+  private readonly runAnim?: string;
   private awakeFor = 0;
+  cry?: string;
   x: number;
   y: number;
 
@@ -150,6 +166,7 @@ class Sleeper implements Monster {
     this.y = this.home.y;
     this.wakeRadius = (def.wakeRadius ?? 3) * TILE;
     this.spriteKey = def.sprite;
+    if (scene.anims.exists(`${def.sprite}-run`)) this.runAnim = `${def.sprite}-run`;
     scene.add.ellipse(this.x, this.y - 1, 14, 4, 0x000000, 0.3).setDepth(this.y - 0.5);
     this.sprite = scene.add.sprite(this.x, this.y, `${def.sprite}-0`).setOrigin(0.5, 1).setDepth(this.y);
     this.zzz = scene.add.image(this.x + 8, this.y - 18, "zzz-0").setDepth(9000);
@@ -158,27 +175,42 @@ class Sleeper implements Monster {
   update(dt: number, time: number): void {
     const nora = this.world.nora();
     const toNora = Math.hypot(nora.x - this.x, nora.y - this.y);
+    let moved = false;
 
     if (this.awakeFor <= 0) {
       // Asleep. A jump close by is too loud!
       if (nora.airborne && toNora < this.wakeRadius && this.world.canCatch()) {
-        this.awakeFor = 3.5;
-        this.world.startle("GRRR!");
+        this.awakeFor = SLEEPER_AWAKE;
+        this.world.startle(this.cry ?? "GRRR!");
       }
       const next = step(this, this.home, 30, dt);
+      moved = !next.arrived;
+      if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
       this.x = next.x;
       this.y = next.y;
+    } else if (this.world.isNoraSafe()) {
+      // Nora made it to someone who looks after her – not worth it. Back to sleep.
+      this.awakeFor = 0;
     } else {
       this.awakeFor -= dt;
-      const next = step(this, nora, 48, dt);
-      this.x = next.x;
-      this.y = next.y;
-      if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
-      if (toNora < 10 && this.world.canCatch()) this.world.caught(this);
+      // First a moment in the startled pose (the warning), then the chase.
+      if (this.awakeFor < SLEEPER_AWAKE - STARTLED_TIME) {
+        const next = step(this, nora, 48, dt);
+        this.x = next.x;
+        this.y = next.y;
+        moved = true;
+        if (Math.abs(next.dx) > 0.5) this.sprite.setFlipX(next.dx < 0);
+        if (toNora < 10 && this.world.canCatch()) this.world.caught(this);
+      }
     }
 
-    const asleep = this.awakeFor <= 0 && Math.hypot(this.x - this.home.x, this.y - this.home.y) < 1;
-    this.sprite.setTexture(`${this.spriteKey}-${asleep ? 0 : 1}`);
+    const asleep = this.awakeFor <= 0 && !moved;
+    if (moved && this.runAnim) {
+      this.sprite.play(this.runAnim, true);
+    } else {
+      this.sprite.stop();
+      this.sprite.setTexture(`${this.spriteKey}-${asleep ? 0 : 1}`);
+    }
     this.sprite.setPosition(Math.round(this.x), Math.round(this.y)).setDepth(this.y);
     this.zzz.setVisible(asleep).setPosition(this.x + 8, this.y - 20 - (time / 200) % 6).setAlpha(1 - ((time / 200) % 6) / 6);
   }
@@ -354,6 +386,7 @@ const FACING_VEC: Record<Facing, [number, number]> = { up: [0, -1], down: [0, 1]
 
 class Sneaker implements Monster {
   readonly kind = "sneaker";
+  cry?: string;
   readonly sprite: Phaser.GameObjects.Sprite;
   readonly thing: Thing;
   private readonly home: { x: number; y: number };
@@ -446,7 +479,7 @@ class Sneaker implements Monster {
 
   private jumpOut(): void {
     this.world.give(emergedFlag(this.spriteKey));
-    this.world.startle("BUU!");
+    this.world.startle(this.cry ?? "BUU!");
     this.sprite.setVisible(true);
     this.emerging = 0;
     this.restFor = 1.5;

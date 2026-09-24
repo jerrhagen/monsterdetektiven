@@ -4,6 +4,7 @@ import type { Case, Thing } from "../src/cases/types";
 import { CaseState } from "../src/engine/caseState";
 import { entryPoint, parseRoom, validateCase } from "../src/engine/room";
 import { sprites } from "../src/sprites";
+import { nearAny, reachableFrom } from "./reachable";
 
 describe("fallen", () => {
   for (const c of cases) {
@@ -35,6 +36,13 @@ describe("fallen", () => {
       }
     });
   }
+
+  it("bakgården: man kan gå runt bäcken till Gustav utan att hoppa (nära Måns)", () => {
+    const yard = parseRoom(cases[1], "yard");
+    const door = entryPoint(yard, cases[1].rooms.yard.doors!.find((d) => d.at === "bottom")!.at);
+    const gustav = yard.things.find((t) => t.thing.name === "Grannen Gustav")!;
+    expect(nearAny(reachableFrom(yard, door, false), gustav.col, gustav.row)).toBe(true);
+  });
 
   it("hittar fel i en trasig karta", () => {
     const broken: Case = {

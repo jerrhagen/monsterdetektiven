@@ -98,7 +98,7 @@ export const case10: Case = {
         ],
         clue: "blueGone",
       },
-      monsters: [{ type: "patroller", sprite: "aqRobot", path: [[1, 4], [18, 4]], speed: 34 }],
+      monsters: [{ type: "patroller", sprite: "aqRobot", path: [[1, 4], [18, 4]], speed: 34, cry: "PIIP-PIIP!" }],
       doors: [
         { at: "top", to: "bigtank", requires: "ticket", lockedText: "Spärren är stängd. Den vill ha en biljett." },
         {
@@ -420,7 +420,7 @@ export const case10: Case = {
           "Hoppa inte nära henne – då vaknar hon!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "aqWalrus", at: [9, 8], wakeRadius: 3 }],
+      monsters: [{ type: "sleeper", sprite: "aqWalrus", at: [9, 8], wakeRadius: 3, cry: "HRÖÖÖMF!" }],
       doors: [
         { at: "bottom", to: "bigtank" },
         { at: "left", to: "entrance" },

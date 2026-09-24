@@ -422,6 +422,7 @@ export const case3: Case = {
         {
           type: "patroller",
           sprite: "dammis",
+          cry: "ATJOO!",
           path: [[1, 6], [18, 6]],
           speed: 40,
         },

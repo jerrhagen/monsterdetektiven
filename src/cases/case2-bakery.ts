@@ -190,16 +190,16 @@ export const case2: Case = {
       theme: "yard",
       layout: [
         "####################",
-        "#TT.......TTTT..TTT#",
-        "#T...SSSS.......g.T#",
-        "#....SS1S...~......#",
-        "#....SSSS...~......#",
-        "#...........~...T..#",
-        "#...........~......#",
-        "#........k..~..T...#",
-        "#...........~......#",
-        "D...........~....T.#",
-        "D...........~....TT#",
+        "#TT......T.......g.#",
+        "#T..SSSS.T~~~~~~...#",
+        "#...SS1S.T.........#",
+        "#...SSSS.T....~~~~~#",
+        "#........T.........#",
+        "#T.......T...k.....#",
+        "#.........~~~~~~~..#",
+        "#..................#",
+        "D..................#",
+        "D.........TT...T.TT#",
         "######DD############",
       ],
       things: {
@@ -245,13 +245,14 @@ export const case2: Case = {
         },
       },
       clues: { "1": "mudPrints" },
-      monsters: [{ type: "sleeper", sprite: "gardskatt", at: [10, 6], wakeRadius: 3 }],
+      monsters: [{ type: "sleeper", sprite: "gardskatt", at: [14, 6], wakeRadius: 3, cry: "FRÄÄÄS!" }],
       onEnter: {
         name: "Ester",
         talk: [
           "Shh, Nora! Där sover gårdskatten Måns.",
           "Om du hoppar nära honom vaknar han. Och då blir han ARG!",
-          "Kanske finns det en väg runt?",
+          "Bäcken slingrar sig hela vägen fram till Gustav. Man kan gå runt…",
+          "…och vaknar Måns ändå: spring till Gustav! Då ger Måns upp.",
         ],
       },
       doors: [
@@ -582,7 +583,7 @@ export const case2: Case = {
 
   cards: [
     { sprite: "smulan", name: "Smulan", text: "Ett litet, runt snaskmonster med tre tår. Känner doften av en nybakad bulle på långt håll!" },
-    { sprite: "gardskatt", name: "Måns", text: "Gårdskatten som sover i solen. Hoppa inte nära honom – då vaknar han och jagar dig!" },
+    { sprite: "gardskatt", name: "Måns", text: "Gårdskatten som sover i solen. Hoppa inte nära honom – då vaknar han och jagar dig! Hinner du fram till en vuxen ger han upp." },
     { sprite: "bakeryFlourGhost", name: "Mjölspöket", text: "Svävar fram och tillbaka i mjölkällaren. När det nyser blir det mjölmoln överallt!" },
   ],
 
@@ -623,7 +624,7 @@ export const case2: Case = {
       doneWhen: YARD_CLUES,
       hints: [
         { text: "Titta noga i sanden!", skipWhen: "clue:mudPrints" },
-        "Måns vaknar om du hoppar nära honom. Gå runt – eller hoppa långt ifrån honom!",
+        "Måns vaknar om du hoppar nära honom. Gå runt längs bäcken – eller hoppa långt ifrån honom. Vaknar han: spring till Gustav!",
         { text: "Vad står bredvid Måns?", skipWhen: "clue:catBowl" },
         { text: "Grannen Gustav står uppe till höger. Prata med honom!", skipWhen: "talked-to-gustav" },
         {

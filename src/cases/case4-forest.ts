@@ -140,7 +140,7 @@ export const case4: Case = {
           "Där är Haren Hilma! Vi pratar med henne.",
         ],
       },
-      monsters: [{ type: "patroller", sprite: "forestWolf", path: [[13, 8], [18, 8]], speed: 30 }],
+      monsters: [{ type: "patroller", sprite: "forestWolf", path: [[13, 8], [18, 8]], speed: 30, cry: "GRRRR!" }],
       doors: [
         {
           at: "bottom",
@@ -243,7 +243,7 @@ export const case4: Case = {
           "Gå tyst förbi. Hoppa inte nära den!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "mossjatte", at: [7, 9], wakeRadius: 3 }],
+      monsters: [{ type: "sleeper", sprite: "mossjatte", at: [7, 9], wakeRadius: 3, cry: "VRÅÅÅL!" }],
       doors: [
         { at: "top", to: "edge" },
         {

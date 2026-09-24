@@ -253,7 +253,7 @@ export const case12: Case = {
         ],
       },
       monsters: [
-        { type: "patroller", sprite: "s2Guard", path: [[2, 6], [17, 6]], speed: 30 },
+        { type: "patroller", sprite: "s2Guard", path: [[2, 6], [17, 6]], speed: 30, cry: "HALLÅ DÄR!" },
         // S2.scribble. First only a painting shakes now and then; once Nora has found the
         // empty page in the cellar she glimpses it; at the end it hides behind a painting.
         {
@@ -447,7 +447,7 @@ export const case12: Case = {
           "Hoppa INTE nära den, Nora. Smyg förbi!",
         ],
       },
-      monsters: [{ type: "sleeper", sprite: "museumGranit", at: [15, 6] }],
+      monsters: [{ type: "sleeper", sprite: "museumGranit", at: [15, 6], cry: "DUNK!" }],
       doors: [
         { at: "right", to: "gallery", stairs: "up" },
         { at: "left", to: "hall", stairs: "up" },

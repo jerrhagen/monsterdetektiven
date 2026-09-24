@@ -17,6 +17,7 @@ const C = {
   water: 0x4a90e2,
   waterDark: 0x2d5f9e,
   waterLight: 0xb8dcff,
+  shallow: 0x6aaaf0,
   mat: 0xa33a3a,
   matStripe: 0xc95050,
   gold: 0xffd66b,
@@ -101,6 +102,7 @@ export function drawRoom(scene: Phaser.Scene, room: ParsedRoom): G {
   for (let row = 0; row < ROOM_ROWS; row++) {
     for (let col = 0; col < ROOM_COLS; col++) painter.tile(col, row, room.base[row][col]);
   }
+  painter.liquids();
   return g;
 }
 
@@ -141,13 +143,12 @@ class Painter {
       case "sand":
         return this.sand(col, row, x, y);
       case "puddle":
-        this.floor(col, row, x, y);
-        return this.puddle(col, row, x, y);
+      case "water":
+        // The puddle or water itself is drawn over the ground afterwards (see liquids).
+        return this.floor(col, row, x, y);
       case "blocks":
         this.floor(col, row, x, y);
         return this.blocks(col, row, x, y);
-      case "water":
-        return this.water(col, row, x, y);
       case "oven":
         this.floor(col, row, x, y);
         return this.oven(col, row, x, y);
@@ -629,22 +630,6 @@ class Painter {
     g.fillStyle(C.woodDark).fillRect(x + 4, y + 13, 1, 3).fillRect(x + 11, y + 13, 1, 3);
   }
 
-  private water(col: number, row: number, x: number, y: number): void {
-    const { g } = this;
-    g.fillStyle(C.waterDark).fillRect(x, y, TILE, TILE);
-    g.fillStyle(C.water).fillRect(x, y + 1, TILE, TILE - 2);
-    g.fillStyle(C.waterLight);
-    for (let i = 0; i < 2; i++) {
-      const wx = x + Math.floor(hash(col, row, i) * 11);
-      const wy = y + 3 + i * 6 + Math.floor(hash(col, row, i + 4) * 2);
-      g.fillRect(wx, wy, 4, 1).fillRect(wx + 1, wy - 1, 2, 1);
-    }
-    // Banks where the water meets land.
-    g.fillStyle(0x6a5a3a);
-    if (this.at(col, row - 1) !== "water") g.fillRect(x, y, TILE, 2);
-    if (this.at(col, row + 1) !== "water") g.fillRect(x, y + TILE - 2, TILE, 2);
-  }
-
   private oven(col: number, row: number, x: number, y: number): void {
     const { g } = this;
     g.fillStyle(C.outline).fillRect(x, y + 1, TILE, 15);
@@ -757,24 +742,102 @@ class Painter {
     if (this.at(col, row + 1) !== "sand") g.fillRect(x, y + TILE - 2, TILE, 2);
   }
 
-  private puddle(col: number, row: number, x: number, y: number): void {
-    const { g } = this;
+  /**
+   * Puddles, slime and water, drawn after all the tiles so their edges can be soft and a
+   * little uneven, like real banks – and round off inner corners where two puddles meet.
+   */
+  liquids(): void {
+    // Outdoors, puddles are shallow water – lighter than deep water, so a ford through a
+    // stream shows where Nora can jump. Where they meet, they flow together without a seam.
     const outdoors = OUTDOORS.includes(this.theme);
-    const [dark, mid, light] = outdoors ? [C.waterDark, C.water, C.waterLight] : [C.slimeDark, C.slime, C.slimeLight];
-    const same = (dc: number, dr: number) => this.at(col + dc, row + dr) === "puddle";
-    const radius = {
-      tl: !same(-1, 0) && !same(0, -1) ? 6 : 0,
-      tr: !same(1, 0) && !same(0, -1) ? 6 : 0,
-      bl: !same(-1, 0) && !same(0, 1) ? 6 : 0,
-      br: !same(1, 0) && !same(0, 1) ? 6 : 0,
+    const puddle = outdoors ? [C.waterDark, C.shallow, C.waterLight] : [C.slimeDark, C.slime, C.slimeLight];
+    this.liquid("puddle", puddle, outdoors ? ["water"] : []);
+    // Deep water meets walls and the edge of the room flush, and has a muddy (or dark) bank.
+    const bank = this.theme === "harbor" || this.theme === "aquarium" ? 0x3a3448 : 0x6a5a3a;
+    this.liquid("water", [C.waterDark, C.water, C.waterLight], ["puddle", "wall", "door"], bank);
+  }
+
+  /** Draws one kind of liquid. `alsoWet` tiles count as liquid for the shape, but aren't painted. */
+  private liquid(kind: TileKind, [dark, mid, light]: number[], alsoWet: TileKind[], bank?: number): void {
+    const W = ROOM_COLS * TILE;
+    const H = ROOM_ROWS * TILE;
+    const tiles: [number, number][] = [];
+    for (let row = 0; row < ROOM_ROWS; row++) {
+      for (let col = 0; col < ROOM_COLS; col++) if (this.at(col, row) === kind) tiles.push([col, row]);
+    }
+    if (tiles.length === 0) return;
+
+    // How much each tile is "this liquid" (1) or not (0).
+    const amount = (col: number, row: number) => {
+      const k = this.at(col, row);
+      return k === kind || alsoWet.includes(k) ? 1 : 0;
     };
-    const inset = { l: same(-1, 0) ? 0 : 1, r: same(1, 0) ? 0 : 1, t: same(0, -1) ? 0 : 1, b: same(0, 1) ? 0 : 1 };
-    const w = TILE - inset.l - inset.r;
-    const h = TILE - inset.t - inset.b;
-    g.fillStyle(dark).fillRoundedRect(x + inset.l, y + inset.t, w, h, radius);
-    g.fillStyle(mid).fillRoundedRect(x + inset.l + 1, y + inset.t + 1, w - 2, h - 3, radius);
-    g.fillStyle(light).fillRect(x + 4 + Math.floor(hash(col, row) * 5), y + 4, 3, 1);
-    g.fillRect(x + 9, y + 9 + Math.floor(hash(row, col) * 3), 2, 1);
+    // Smoothly blend the four nearest tile centres, then add a little noise for uneven banks.
+    const smooth = (t: number) => t * t * (3 - 2 * t);
+    const noise = (x: number, y: number) => {
+      const gx = x / 5;
+      const gy = y / 5;
+      const ix = Math.floor(gx);
+      const iy = Math.floor(gy);
+      const fx = smooth(gx - ix);
+      const fy = smooth(gy - iy);
+      const n = (dx: number, dy: number) => hash(ix + dx, iy + dy, 11);
+      return (n(0, 0) * (1 - fx) + n(1, 0) * fx) * (1 - fy) + (n(0, 1) * (1 - fx) + n(1, 1) * fx) * fy;
+    };
+    const depth = new Float32Array(W * H);
+    for (let y = 0; y < H; y++) {
+      const v = (y + 0.5) / TILE - 0.5;
+      const r0 = Math.floor(v);
+      const fy = smooth(v - r0);
+      for (let x = 0; x < W; x++) {
+        const u = (x + 0.5) / TILE - 0.5;
+        const c0 = Math.floor(u);
+        const fx = smooth(u - c0);
+        const top = amount(c0, r0) * (1 - fx) + amount(c0 + 1, r0) * fx;
+        const bottom = amount(c0, r0 + 1) * (1 - fx) + amount(c0 + 1, r0 + 1) * fx;
+        depth[y * W + x] = top * (1 - fy) + bottom * fy + (noise(x, y) - 0.5) * 0.22;
+      }
+    }
+    const wet = (x: number, y: number) => x < 0 || y < 0 || x >= W || y >= H ? alsoWet.includes("wall") : depth[y * W + x] > 0.42;
+
+    // Paint the liquid's own tiles, and the ground around them that the banks spill onto.
+    const paint = new Set<number>();
+    for (const [col, row] of tiles) {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          const k = this.at(col + dc, row + dr);
+          if (k === kind || k === "floor" || k === "sand") paint.add((row + dr) * ROOM_COLS + col + dc);
+        }
+      }
+    }
+    const { g } = this;
+    for (const index of paint) {
+      const col = index % ROOM_COLS;
+      const row = Math.floor(index / ROOM_COLS);
+      for (let py = 0; py < TILE; py++) {
+        const y = row * TILE + py;
+        let runColour = -1;
+        let runStart = 0;
+        for (let px = 0; px <= TILE; px++) {
+          const x = col * TILE + px;
+          let colour = -1;
+          if (px < TILE) {
+            if (wet(x, y)) {
+              const edge = !wet(x - 1, y) || !wet(x + 1, y) || !wet(x, y - 1) || !wet(x, y + 1) || !wet(x, y + 2);
+              const glint = depth[y * W + x] > 0.8 && x % 6 < 3 && y % 5 === 2 && hash(Math.floor(x / 6), Math.floor(y / 5), 3) < 0.2;
+              colour = edge ? dark : glint ? light : mid;
+            } else if (bank !== undefined && (wet(x - 1, y) || wet(x + 1, y) || wet(x, y - 1) || wet(x, y + 1) || wet(x, y - 2))) {
+              colour = bank;
+            }
+          }
+          if (colour !== runColour) {
+            if (runColour >= 0) g.fillStyle(runColour).fillRect(col * TILE + runStart, y, px - runStart, 1);
+            runColour = colour;
+            runStart = px;
+          }
+        }
+      }
+    }
   }
 
   private blocks(col: number, row: number, x: number, y: number): void {

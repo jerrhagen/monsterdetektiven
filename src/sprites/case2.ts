@@ -167,7 +167,7 @@ export const smulan: PixelSprite = {
   ],
 };
 
-/** Måns, the yard cat. Frame 0: curled up asleep. Frame 1: awake – arched back and glowing eyes! */
+/** Måns, the yard cat. Frame 0: curled up asleep. Frame 1: awake – arched back and glowing eyes! Frames 2–3: running. */
 export const gardskatt: PixelSprite = {
   palette: {
     ".": null,
@@ -217,7 +217,44 @@ export const gardskatt: PixelSprite = {
       "..oggo.oggo.oggo",
       "..ooo..ooo..ooo.",
     ],
+    [
+      E,
+      "................",
+      "oo.........o..o.",
+      "ogoo......ogoogo",
+      ".oggo....ogggggo",
+      ".og.....ogykgyko",
+      ".og..oooogggpggo",
+      ".ogooggggggwgwgo",
+      "..oggggggggggGo.",
+      "..ogGgggGgggggo.",
+      "..oggggggggggo..",
+      "...ogggggggggo..",
+      "..oggo....oggo..",
+      ".ogo........ogo.",
+      "ogo..........ogo",
+      "oo............oo",
+    ],
+    [
+      E,
+      ".o..............",
+      "ogo........o..o.",
+      "ogo.......ogoogo",
+      ".ogo.....ogggggo",
+      ".og.....ogykgyko",
+      ".og..oooogggpggo",
+      ".ogooggggggwgwgo",
+      "..oggggggggggGo.",
+      "..ogGgggGgggggo.",
+      "..oggggggggggo..",
+      "...ogggggggggo..",
+      "....ogo..ogo....",
+      ".....ogo.ogo....",
+      "....oggo.oggo...",
+      "....ooo..ooo....",
+    ],
   ],
+  animations: { run: { frames: [2, 3], frameRate: 10 } },
 };
 
 /** Mjölspöket – a ghost made of flour, with hollow eyes and tiny red pupils. Floats back and forth. */
