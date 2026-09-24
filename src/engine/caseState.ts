@@ -126,11 +126,19 @@ export class CaseState {
   /**
    * Does the thing have something new: never used, it says something else now,
    * it still has a clue to give, or its puzzle is ready and not solved?
+   * A thing that isn't a person only counts a new line as news if it gives something –
+   * "the till is empty now" is there if Nora looks, but shouldn't lure her back.
    */
   hasNews(key: string, thing: Thing): boolean {
-    if (this.heard.get(key) !== this.talkIndex(thing)) return true;
+    const heard = this.heard.get(key);
+    if (heard === undefined) return true;
+    if (heard !== this.talkIndex(thing) && (thing.person || this.givesSomethingNew(thing))) return true;
     if (flagList(thing.clue).some((id) => !this.hasClue(id))) return true;
     const puzzle = thing.puzzle ? this.puzzles.get(thing.puzzle) : undefined;
     return !!puzzle && !this.has(puzzle.gives) && this.has(thing.puzzleWhen);
+  }
+
+  private givesSomethingNew(thing: Thing): boolean {
+    return flagList(this.talkFor(thing).gives).some((f) => !this.flags.has(f));
   }
 }

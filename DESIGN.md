@@ -265,7 +265,7 @@ Monster är både **faror**, **vittnen** och **delar av mysteriet**. Läskighet:
 
 ### Vad som lyser och vem som vill prata
 
-- **Saker** man inte har undersökt, eller som har något nytt (en ledtråd, ett pussel som är redo), har en tunn glödande kant.
+- **Saker** man inte har undersökt, eller som har något nytt (en ledtråd, ett pussel som är redo, eller en ny replik som ger något), har en tunn glödande kant. En ny replik som inte ger något ("Kassaapparaten är öppen och tom.") syns om man går fram och tittar, men gör inte att saken glöder igen. Annars lockas man tillbaka i onödan.
 - **Personer, djur och monster** man pratar med (`person: true`) glöder aldrig. De får i stället en **pratbubbla** när de har något nytt att säga, till exempel när en ny replik blir aktuell eller när avslöjandet är redo.
 - När Nora står vid något hon kan använda syns ett **förstoringsglas** (ledtrådar och saker att undersöka) eller en **pratbubbla** (någon att prata med). Medan någon pratar syns inga andra bubblor.
 - Uppe till höger står **"Ledtrådar i rummet: 2 av 5"**, så att man vet om det finns mer att hitta. Ledtrådar som Ester ger när man kommer in räknas inte där. I detektivboken står hur många man har av alla.

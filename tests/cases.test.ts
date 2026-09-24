@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { cases } from "../src/cases";
-import type { Case } from "../src/cases/types";
+import type { Case, Thing } from "../src/cases/types";
 import { CaseState } from "../src/engine/caseState";
 import { entryPoint, parseRoom, validateCase } from "../src/engine/room";
 import { sprites } from "../src/sprites";
@@ -113,6 +113,28 @@ describe("detektivens anteckningar", () => {
     for (let i = 0; i < 5; i++) expect(state.nextHint()).not.toContain("Nallen");
     state.give(["clue:dots", "clue:thread", "clue:customerBook", "heard-about-register", "storeroom-key"]);
     expect(state.nextHint()).toContain("Du har nyckeln");
+  });
+
+  it("saker glöder inte igen för en replik som inte ger något nytt", () => {
+    const state = new CaseState(c);
+    const bin: Thing = { name: "Soptunnan", sprite: "sign", talk: ["En nyckel!"], gives: "key", talkIf: [{ when: "opened", talk: ["Tom nu."] }] };
+    const box: Thing = { name: "Lådan", sprite: "sign", talk: ["Låst."], talkIf: [{ when: "opened", talk: ["En lapp!"], gives: "note" }] };
+    const friend: Thing = { name: "Stina", sprite: "sign", person: true, talk: ["Hej!"], talkIf: [{ when: "opened", talk: ["Bra jobbat!"] }] };
+    expect(state.hasNews("bin", bin)).toBe(true);
+    for (const [key, thing] of [["bin", bin], ["box", box], ["friend", friend]] as const) {
+      state.give(state.talkFor(thing).gives);
+      state.markHeard(key, thing);
+      expect(state.hasNews(key, thing)).toBe(false);
+    }
+    state.give("opened");
+    // The bin's new line is still there if Nora looks, but it doesn't glow.
+    expect(state.talkFor(bin).talk).toEqual(["Tom nu."]);
+    expect(state.hasNews("bin", bin)).toBe(false);
+    // Something that gives something new still glows, and people still get a bubble.
+    expect(state.hasNews("box", box)).toBe(true);
+    expect(state.hasNews("friend", friend)).toBe(true);
+    // A thing Nora has never looked at always glows.
+    expect(state.hasNews("other", bin)).toBe(true);
   });
 
   it("väljer rätt repliker beroende på vad man gjort", () => {
