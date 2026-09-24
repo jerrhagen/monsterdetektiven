@@ -768,6 +768,198 @@ body {
   padding: calc(var(--px) * 1.5) calc(var(--px) * 8);
 }
 
+/* Type a word */
+
+.word-shown {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: calc(var(--px) * 1.5);
+  margin: calc(var(--px) * 2) 0;
+}
+
+.word-shown span {
+  min-width: calc(var(--px) * 9);
+  padding: calc(var(--px) * 1) calc(var(--px) * 1.2);
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border-radius: calc(var(--px) * 1.5);
+  font-size: calc(var(--px) * 7);
+  font-weight: 700;
+}
+
+.word-shown img {
+  width: calc(var(--px) * 30);
+  height: calc(var(--px) * 30);
+  image-rendering: pixelated;
+}
+
+.cipher-table {
+  display: grid;
+  grid-template-columns: repeat(10, auto);
+  justify-content: center;
+  gap: calc(var(--px) * 0.8) calc(var(--px) * 2);
+  font-size: calc(var(--px) * 3.6);
+  color: #cdb8ec;
+}
+
+.cipher-table:empty {
+  display: none;
+}
+
+.cipher-table b {
+  margin-right: calc(var(--px) * 0.6);
+  color: #ffd66b;
+}
+
+.letter-keys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: calc(var(--px) * 1);
+  max-width: calc(var(--px) * 200);
+  margin: 0 auto;
+}
+
+.letter-keys .letter {
+  min-width: calc(var(--px) * 10);
+  padding: calc(var(--px) * 1.2);
+  font-size: calc(var(--px) * 5);
+  font-weight: 700;
+  background: #f4ecd8;
+  color: #2a1a2e;
+  border: none;
+  border-radius: calc(var(--px) * 1.5);
+  box-shadow: 0 calc(var(--px) * 0.8) 0 #0d0718;
+}
+
+.letter-keys .letter:disabled {
+  opacity: 0.25;
+}
+
+/* Pay with coins */
+
+.coin-tray,
+.coin-purse {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--px) * 2);
+  min-height: calc(var(--px) * 16);
+  margin: calc(var(--px) * 2) 0;
+}
+
+.coin-tray {
+  padding: calc(var(--px) * 2);
+  background: #0d0718;
+  border-radius: calc(var(--px) * 3);
+}
+
+.coin-tray .empty {
+  font-size: calc(var(--px) * 4);
+  color: #8a7a9a;
+}
+
+.coin-sum {
+  margin: 0;
+  font-size: calc(var(--px) * 5);
+  font-weight: 700;
+}
+
+.money {
+  border: calc(var(--px) * 0.6) solid #8a6a20;
+  color: #3a2a10;
+  font-weight: 700;
+  font-size: calc(var(--px) * 3.8);
+  box-shadow: 0 calc(var(--px) * 0.8) 0 #0d0718;
+}
+
+.money.coin {
+  width: calc(var(--px) * 15);
+  height: calc(var(--px) * 15);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ffe9a0, #e0b040);
+}
+
+.money.coin[data-value="1"],
+.money.coin[data-value="2"] {
+  background: radial-gradient(circle at 35% 35%, #f0f0f0, #a8a8b8);
+  border-color: #6a6a7a;
+}
+
+.money.note {
+  width: calc(var(--px) * 24);
+  height: calc(var(--px) * 13);
+  border-radius: calc(var(--px) * 1);
+  background: #b0d8a0;
+  border-color: #4a7a3a;
+}
+
+/* 4 × 4 picture sudoku */
+
+.grid-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: calc(var(--px) * 6);
+  margin: calc(var(--px) * 2) 0;
+}
+
+.grid-board {
+  display: grid;
+  grid-template-columns: repeat(4, calc(var(--px) * 17));
+  grid-auto-rows: calc(var(--px) * 17);
+  border: calc(var(--px) * 1) solid #f4ecd8;
+  border-radius: calc(var(--px) * 1.5);
+  overflow: hidden;
+}
+
+.grid-board .square {
+  padding: 0;
+  background: #f4ecd8;
+  border: calc(var(--px) * 0.3) solid #c8b890;
+}
+
+.grid-board .square.given {
+  background: #d8ccb0;
+}
+
+.grid-board .square.box-right {
+  border-right: calc(var(--px) * 1) solid #8a2346;
+}
+
+.grid-board .square.box-bottom {
+  border-bottom: calc(var(--px) * 1) solid #8a2346;
+}
+
+.grid-board img,
+.grid-palette img {
+  width: 80%;
+  height: 80%;
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.grid-palette {
+  display: grid;
+  grid-template-columns: repeat(2, calc(var(--px) * 16));
+  gap: calc(var(--px) * 2);
+}
+
+.grid-palette .pen {
+  height: calc(var(--px) * 16);
+  padding: 0;
+  background: #f4ecd8;
+  border: calc(var(--px) * 0.8) solid transparent;
+  border-radius: calc(var(--px) * 2);
+}
+
+.grid-palette .pen.chosen {
+  border-color: #5cc46a;
+  background: #eaffdc;
+}
+
 /* ---------- Confetti ---------- */
 
 .case-result .time.record {

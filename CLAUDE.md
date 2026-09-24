@@ -34,6 +34,30 @@ Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bar
 - Pedagogiken ska vävas in i klurigheterna enligt den pedagogiska planen (avsnitt 6 i `DESIGN.md`). Claude får gärna hitta på eget innehåll, men Noras idéer och monster ska finnas med genom spelet.
 - Det som byggts hittills är **test av byggstenar**, och fall 1 i koden är en testbana. De färdiga mysterierna, även fall 1, ska tänkas igenom ordentligt och får göras om från grunden (steg 6).
 
+## Säsong 2 – förberedd, väntar på Nora
+
+Säsong 2 (fall 7–12, i en ny stadsdel) är **färdigskriven men inte inkopplad i spelet**. Allt ligger i
+`src/season2/` och testas i `tests/season2.test.ts`. När pappa eller huvudarkitekten säger att det är dags att börja
+med säsong 2 gör du så här:
+
+1. **Läs `SEASON2.md` tyst.** Den innehåller lösningarna. Citera eller sammanfatta den aldrig i chatten.
+   Varken huvudarkitekten eller pappa ska få veta något om vad som händer i fallen. Fråga pappa hur långt de har
+   spelat i säsong 1 innan du nämner något om de senare fallen.
+2. **Ställ frågorna i `SEASON2-FRAGOR.md` till huvudarkitekten.** Den filen innehåller inga spoilers och får visas.
+   Följ barnläget:
+   - En fråga i taget, på enkel svenska, med 2–3 förslag. Hon får alltid hitta på något eget.
+   - Inga tekniska ord. Säg inte "sprite", "names.ts" eller "platshållare". Säg hellre "Hur ska fyrvaktaren
+     se ut? Du får gärna rita!"
+   - Ritfrågorna (🖍️) gör hon när hon vill. Hon fotar teckningen och skickar den. Fråga inte allt på en
+     gång. Det är okej att dela upp det på flera dagar.
+   - Om hon inte vill svara på något behålls förslaget som redan finns.
+   - Skriv in varje svar i tabellen längst ner i `SEASON2-FRAGOR.md`, så att ingenting försvinner om
+     sessionen tar slut.
+3. **Bygg in svaren.** Namn byts i `src/season2/names.ts`, där alla fall hämtar sina namn. Figurer ritas om
+   i `src/season2/sprites/`. `SEASON2.md` avsnitt 6 visar vilken sprite-nyckel varje fråga hör till.
+4. **Koppla in säsongen** enligt `SEASON2.md` avsnitt 7: fallen, figurerna, Hamnstadens karta och
+   upplåsningen efter fall 6. Kör `npm test`. Provspela bara i bakgrundsflik. Uppdatera `DESIGN.md`.
+
 ## Teknik i korthet
 
 - TypeScript, Phaser 4, Vite och vite-plugin-singlefile. UI:t (dialog, pussel, bok, menyer) är HTML/CSS ovanpå canvas.

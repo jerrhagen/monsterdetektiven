@@ -47,6 +47,14 @@ export function advanceDialog(): void {
   }
 }
 
+/** Leaving the room (e.g. to the town map): remove the dialog without running what it would do when read. */
+export function dismissDialog(): void {
+  if (!current) return;
+  window.clearInterval(current.timer);
+  current.el.remove();
+  current = null;
+}
+
 function closeDialog(): void {
   if (!current) return;
   const { el, timer, onClose } = current;

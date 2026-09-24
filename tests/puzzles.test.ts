@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { CodePuzzle, OrderPuzzle, RevealQuestion } from "../src/cases/types";
+import type { CodePuzzle, CoinsPuzzle, GridPuzzle, OrderPuzzle, RevealQuestion, WordPuzzle } from "../src/cases/types";
 import { cases } from "../src/cases";
 import { CaseState } from "../src/engine/caseState";
-import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../src/engine/puzzleCheck";
-import { evaluate, fillIn, rollPuzzle, timeText } from "../src/engine/puzzleRoll";
+import { checkCode, checkCoins, checkEvidence, checkGrid, checkOrder, checkWord, explainEvidence } from "../src/engine/puzzleCheck";
+import { countGridSolutions, evaluate, fewestCoins, fillIn, fitsInGrid, rollPuzzle, timeText, toCipher } from "../src/engine/puzzleRoll";
 
 const code: CodePuzzle = { type: "code", title: "", text: [], answer: "15", gives: "x" };
 const order: OrderPuzzle = {
@@ -182,5 +182,62 @@ describe("nya pusseltyper", () => {
     });
     if (puzzle.type !== "code") throw new Error("fel typ");
     expect(Number(puzzle.answer)).toBe(Number(vars.c) + Number(vars.step));
+  });
+});
+
+describe("nya pusseltyper (säsong 2)", () => {
+  it("klockan i femminuterssteg", () => {
+    expect(timeText(3, 5)).toBe("fem över tre");
+    expect(timeText(3, 25)).toBe("fem i halv fyra");
+    expect(timeText(3, 35)).toBe("fem över halv fyra");
+    expect(timeText(3, 40)).toBe("tjugo i fyra");
+    expect(timeText(12, 55)).toBe("fem i ett");
+  });
+
+  const seq = (values: number[]) => {
+    let i = 0;
+    return () => values[i++ % values.length];
+  };
+
+  it("skriv ordet: blandar, vänder, gör kod och rättar förlåtande", () => {
+    const base = { title: "", text: [] as string[], gives: "x", words: ["FYREN"] };
+    const anagram = rollPuzzle("a", { ...base, type: "word", mode: "anagram" }).puzzle as WordPuzzle;
+    expect(anagram.shown).not.toBe("FYREN");
+    expect([...anagram.shown!].sort().join("")).toBe([..."FYREN"].sort().join(""));
+    expect((rollPuzzle("r", { ...base, type: "word", mode: "reverse" }).puzzle as WordPuzzle).shown).toBe("NERYF");
+    expect(toCipher("HEJ")).toBe("8-5-10");
+    expect(toCipher("ÖÄ")).toBe("29-28");
+    const rolled = rollPuzzle("c", { ...base, type: "word", mode: "cipher" });
+    expect(rolled.vars).toEqual({ "c:first": "F", "c:length": "5" });
+    expect(checkWord(rolled.puzzle as WordPuzzle, " fyren ")).toBe(true);
+    expect(checkWord(rolled.puzzle as WordPuzzle, "FYRAN")).toBe(false);
+  });
+
+  it("handla: exakt summa, och med få mynt när det krävs", () => {
+    expect(fewestCoins(17, [1, 2, 5, 10])).toBe(3);
+    const p = rollPuzzle("m", { type: "coins", title: "", text: ["Det kostar {price} kr."], gives: "x", price: [17, 17], coins: [1, 2, 5, 10], fewest: true }).puzzle as CoinsPuzzle;
+    expect(p.text[0]).toBe("Det kostar 17 kr.");
+    expect(checkCoins(p, [10, 5, 2])).toBe("ok");
+    expect(checkCoins(p, [5, 5, 5, 2])).toBe("many");
+    expect(checkCoins(p, [10, 5])).toBe("little");
+    expect(checkCoins(p, [10, 10])).toBe("much");
+  });
+
+  it("monster-sudoku: giltig lösning, bara ett sätt att lösa, och rättning", () => {
+    for (let n = 0; n < 50; n++) {
+      const p = rollPuzzle("g", { type: "grid", title: "", text: [], gives: "x", symbols: ["a", "b", "c", "d"], givens: 6 }).puzzle as GridPuzzle;
+      const sol = p.solution!;
+      expect(sol.every((v, i) => fitsInGrid(sol, i, v))).toBe(true);
+      const cells = sol.map((v, i) => (p.given![i] ? v : null));
+      expect(countGridSolutions(cells)).toBe(1);
+      expect(p.given!.filter(Boolean).length).toBeGreaterThanOrEqual(6);
+      expect(checkGrid(p, sol)).toBe(true);
+      expect(checkGrid(p, cells)).toBe(false);
+    }
+    // A swapped pair breaks a row.
+    const p = rollPuzzle("g", { type: "grid", title: "", text: [], gives: "x", symbols: ["a", "b", "c", "d"], givens: 16 }, seq([0.1, 0.7, 0.3])).puzzle as GridPuzzle;
+    const wrong = [...p.solution!];
+    [wrong[0], wrong[1]] = [wrong[1], wrong[0]];
+    expect(checkGrid({ ...p, given: new Array(16).fill(false) }, wrong)).toBe(false);
   });
 });

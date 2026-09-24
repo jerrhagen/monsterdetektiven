@@ -38,10 +38,17 @@ const THEMES: Record<Theme, { floor: number; seam: number; light: number; wallTo
   forest: { floor: 0x2f6a2e, seam: 0x24522a, light: 0x4a8a3a, wallTop: 0x1a3a1c, wallEdge: 0x2a5a2a },
   tower: { floor: 0x6a6470, seam: 0x4a4450, light: 0x8a8490, wallTop: 0x2a2630, wallEdge: 0x4a4450 },
   square: { floor: 0x9a8a7a, seam: 0x6a5a4a, light: 0xb8a898, wallTop: 0x6a2a2a, wallEdge: 0x8a3a3a },
+  // Season 2:
+  harbor: { floor: 0x9a7448, seam: 0x6a4a2a, light: 0xb08a58, wallTop: 0x4a5a6a, wallEdge: 0x6a7a8a },
+  school: { floor: 0x8aa0b0, seam: 0x6a8090, light: 0xa8bccc, wallTop: 0x3a3a4a, wallEdge: 0x5a5a6a },
+  greenhouse: { floor: 0xb86a4a, seam: 0x8a4a32, light: 0xd08a64, wallTop: 0x2a4a3a, wallEdge: 0x4a6a5a },
+  aquarium: { floor: 0x2a4a6a, seam: 0x1a3450, light: 0x3a6a8a, wallTop: 0x0e1a2e, wallEdge: 0x1a2e4a },
+  fair: { floor: 0xd8b878, seam: 0xb89858, light: 0xe8d098, wallTop: 0x8a2a3a, wallEdge: 0xc04a5a },
+  museum: { floor: 0xc8c0b0, seam: 0x9a9288, light: 0xe0d8cc, wallTop: 0x3a2a4a, wallEdge: 0x5a4a6a },
 };
 
 /** Outdoor themes have water in their puddles instead of slime. */
-const OUTDOORS: Theme[] = ["yard", "forest", "square"];
+const OUTDOORS: Theme[] = ["yard", "forest", "square", "harbor", "fair"];
 
 const BOOK_COLOURS = [0x8a2346, 0x2d5f9e, 0x2a8a6a, 0xc9961e, 0x6a45a8, 0xa0643a, 0x3d3d50];
 
@@ -197,6 +204,42 @@ class Painter {
       g.fillStyle(t.seam).fillRect(x, y + 7, TILE, 1).fillRect(x, y + 15, TILE, 1);
       g.fillRect(x + ((offset + 0) % 16), y, 1, 7).fillRect(x + ((offset + 8) % 16), y + 8, 1, 7);
       if (hash(col, row) < 0.3) g.fillStyle(t.light).fillRect(x + 3, y + 2, 2, 1);
+    } else if (this.theme === "harbor") {
+      // Wooden pier planks running sideways, with nail heads.
+      for (let i = 0; i < 4; i++) {
+        g.fillStyle(t.seam).fillRect(x, y + i * 4 + 3, TILE, 1);
+        if (hash(col, row, i) < 0.25) g.fillStyle(t.light).fillRect(x + Math.floor(hash(col, row, i + 9) * 12), y + i * 4 + 1, 3, 1);
+      }
+      g.fillStyle(0x4a3a2a).fillRect(x + ((col * 5) % 14), y + 1, 1, 1).fillRect(x + ((col * 5 + 7) % 14), y + 9, 1, 1);
+    } else if (this.theme === "school") {
+      // Speckled linoleum.
+      for (let i = 0; i < 5; i++) {
+        g.fillStyle(i % 2 ? t.light : t.seam);
+        g.fillRect(x + Math.floor(hash(col, row, i + 3) * 15), y + Math.floor(hash(col, row, i + 13) * 15), 1, 1);
+      }
+      if ((col + row) % 4 === 0) g.fillStyle(t.seam, 0.5).fillRect(x, y, TILE, 1).fillRect(x, y, 1, TILE);
+    } else if (this.theme === "greenhouse") {
+      // Terracotta tiles with a bit of soil and the odd leaf.
+      g.fillStyle(t.seam).fillRect(x, y + 7, TILE, 1).fillRect(x, y + 15, TILE, 1).fillRect(x + (row % 2 ? 4 : 11), y, 1, TILE);
+      if (hash(col, row, 5) < 0.2) g.fillStyle(0x4ea84a).fillRect(x + 4 + Math.floor(hash(col, row, 6) * 8), y + 10, 2, 1);
+      if (hash(col, row, 7) < 0.2) g.fillStyle(0x5a3a26).fillRect(x + 2 + Math.floor(hash(col, row, 8) * 10), y + 3, 2, 2);
+    } else if (this.theme === "aquarium") {
+      // Dark blue tiles, with light rippling across them.
+      g.fillStyle(t.seam).fillRect(x, y + 15, TILE, 1).fillRect(x + 15, y, 1, TILE);
+      if (hash(col, row, 3) < 0.35) g.fillStyle(t.light).fillRect(x + 2 + Math.floor(hash(col, row, 4) * 8), y + 5 + Math.floor(hash(col, row, 6) * 6), 5, 1);
+    } else if (this.theme === "fair") {
+      // Trampled sand with bits of confetti and popcorn.
+      for (let i = 0; i < 4; i++) {
+        g.fillStyle(i % 2 ? t.light : t.seam).fillRect(x + Math.floor(hash(col, row, i) * 14), y + Math.floor(hash(col, row, i + 7) * 14), 2, 1);
+      }
+      if (hash(col, row, 30) < 0.25) {
+        g.fillStyle([0xe04848, 0x4a90e2, 0xf2d24b, 0x5cc46a, 0xff8ade][Math.floor(hash(col, row, 31) * 5)]);
+        g.fillRect(x + 3 + Math.floor(hash(col, row, 32) * 10), y + 3 + Math.floor(hash(col, row, 33) * 10), 1, 1);
+      }
+    } else if (this.theme === "museum") {
+      // Polished stone, light and dark squares, with a shine.
+      if ((col + row) % 2) g.fillStyle(t.seam).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0xffffff, 0.18).fillRect(x + 2, y + 2, 4, 1);
     } else if (this.theme === "square") {
       // Cobblestones.
       for (let cy = 0; cy < 4; cy++) {
@@ -277,6 +320,58 @@ class Painter {
       return;
     }
 
+    if (facesRoom && this.theme === "harbor") {
+      // The sea beyond the quay, with a little wave.
+      g.fillStyle(0x2d5f9e).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0x4a90e2).fillRect(x, y + 4, TILE, 8);
+      g.fillStyle(0xb8dcff).fillRect(x + ((col * 7) % 10), y + 6, 4, 1);
+      g.fillStyle(0x6a6a7a).fillRect(x, y + 13, TILE, 3);
+      return;
+    }
+    if (facesRoom && this.theme === "school") {
+      // Pale yellow wall with a wooden rail.
+      g.fillStyle(0xe8dca0).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0xd0c488).fillRect(x, y + 3, TILE, 1);
+      g.fillStyle(C.woodMid).fillRect(x, y + 10, TILE, 2);
+      g.fillStyle(C.outline, 0.3).fillRect(x, y + 15, TILE, 1);
+      return;
+    }
+    if (facesRoom && this.theme === "greenhouse") {
+      // Glass panes in green frames, with plants outside.
+      g.fillStyle(0xbfe8d8).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0x8cc8b0).fillRect(x + 2, y + 9, 5, 5).fillRect(x + 10, y + 7, 4, 7);
+      g.fillStyle(0x2a6a4a).fillRect(x, y, TILE, 1).fillRect(x + 7, y, 2, TILE).fillRect(x, y + 14, TILE, 2);
+      g.fillStyle(0xffffff, 0.6).fillRect(x + 2, y + 2, 1, 4);
+      return;
+    }
+    if (facesRoom && this.theme === "aquarium") {
+      // A big tank in the wall: blue water, bubbles and a fish going by.
+      g.fillStyle(0x1a4a8a).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0x2a6ab0).fillRect(x, y + 2, TILE, 11);
+      g.fillStyle(0xb8dcff).fillRect(x + ((col * 5) % 12), y + 4, 1, 1).fillRect(x + ((col * 5 + 2) % 12), y + 7, 1, 1);
+      if (col % 3 === 1) {
+        const fish = [0xf28c38, 0xf2d24b, 0xe04848][row % 3];
+        g.fillStyle(fish).fillRect(x + 5, y + 8, 4, 2).fillRect(x + 9, y + 7, 1, 4);
+        g.fillStyle(C.outline).fillRect(x + 6, y + 8, 1, 1);
+      }
+      g.fillStyle(0x3a3a4a).fillRect(x, y + 13, TILE, 3);
+      return;
+    }
+    if (facesRoom && this.theme === "fair") {
+      // Red and white striped tent cloth.
+      for (let sx = 0; sx < TILE; sx += 4) g.fillStyle(((col * 4 + sx) / 4) % 2 ? 0xf4ecd8 : 0xc0303a).fillRect(x + sx, y, 4, TILE);
+      g.fillStyle(0xffd66b).fillRect(x, y + 12, TILE, 1);
+      g.fillStyle(C.outline, 0.35).fillRect(x, y + 15, TILE, 1);
+      return;
+    }
+    if (facesRoom && this.theme === "museum") {
+      // Purple wallpaper with a gold line.
+      g.fillStyle(0x6a4a8a).fillRect(x, y, TILE, TILE);
+      g.fillStyle(0x7a5a9a).fillRect(x + 3, y, 1, 13).fillRect(x + 11, y, 1, 13);
+      g.fillStyle(0xc9a040).fillRect(x, y + 11, TILE, 1);
+      g.fillStyle(0x4a3060).fillRect(x, y + 12, TILE, 4);
+      return;
+    }
     if (facesRoom && this.theme === "bakery") {
       // White tiles with a blue stripe.
       g.fillStyle(0xf4f0e8).fillRect(x, y, TILE, TILE);
@@ -446,7 +541,12 @@ class Painter {
     if (this.at(col - 1, row) !== "shelf") g.fillRect(x, y + 3, 1, 12);
     if (this.at(col + 1, row) !== "shelf") g.fillRect(x + TILE - 1, y + 3, 1, 12);
 
-    if (this.theme === "library" || this.theme === "bakery" || this.theme === "tower") {
+    if (this.theme === "museum") {
+      this.painting(col, row, x, y);
+      return;
+    }
+    if (this.theme === "library" || this.theme === "bakery" || this.theme === "tower" || this.theme === "school" ||
+      this.theme === "greenhouse" || this.theme === "aquarium" || this.theme === "harbor") {
       this.shelfGoods(col, row, x, y);
       return;
     }
@@ -486,6 +586,26 @@ class Painter {
           g.fillStyle(0xc9854a).fillRect(tx, floorY - 3, bun ? 3 : 5, 2);
           g.fillStyle(0xf4ecd8).fillRect(tx + 1, floorY - 3, 1, 1);
           tx += (bun ? 3 : 5) + 1;
+        } else if (this.theme === "school") {
+          // Folders and pencil pots.
+          const w = 2 + Math.floor(r * 2);
+          g.fillStyle([0xe04848, 0x4a90e2, 0xf2d24b, 0x5cc46a][Math.floor(r * 4)]).fillRect(tx, floorY - 5, w, 5);
+          tx += w + 1;
+        } else if (this.theme === "greenhouse") {
+          // Pots with little plants.
+          g.fillStyle(0xb86a4a).fillRect(tx, floorY - 2, 3, 2);
+          g.fillStyle(r < 0.5 ? 0x4ea84a : 0x2f7a36).fillRect(tx, floorY - 5, 3, 3);
+          if (r < 0.3) g.fillStyle(0xff8ade).fillRect(tx + 1, floorY - 6, 1, 1);
+          tx += 4;
+        } else if (this.theme === "aquarium") {
+          // Small tanks with a fish.
+          g.fillStyle(0x2a6ab0).fillRect(tx, floorY - 4, 4, 4);
+          g.fillStyle([0xf28c38, 0xf2d24b, 0xe04848][Math.floor(r * 3)]).fillRect(tx + 1, floorY - 2, 2, 1);
+          tx += 5;
+        } else if (this.theme === "harbor") {
+          // Coiled rope and fishing floats.
+          g.fillStyle(r < 0.5 ? 0xc9a86a : 0xe04848).fillRect(tx, floorY - 3, 3, 3);
+          tx += 4;
         } else {
           g.fillStyle(r < 0.5 ? 0x8a86a0 : 0xc97a3a).fillRect(tx, floorY - 4, 4, 4);
           g.fillStyle(0x2a2630).fillRect(tx + 1, floorY - 3, 2, 2);
@@ -494,6 +614,19 @@ class Painter {
         i++;
       }
     }
+  }
+
+  /** In the museum, a "shelf" tile is a painting in a gold frame on a stand. */
+  private painting(col: number, row: number, x: number, y: number): void {
+    const { g } = this;
+    this.floor(col, row, x, y);
+    g.fillStyle(C.outline).fillRect(x + 1, y, 14, 13);
+    g.fillStyle(0xc9a040).fillRect(x + 2, y + 1, 12, 11);
+    const sky = [0x8cc4e8, 0xf2b8a0, 0xb8a8e0, 0xa8d8a0][Math.floor(hash(col, row, 1) * 4)];
+    g.fillStyle(sky).fillRect(x + 3, y + 2, 10, 9);
+    g.fillStyle([0x5cc46a, 0x4a90e2, 0xe04848, 0xf2d24b][Math.floor(hash(col, row, 2) * 4)]).fillRect(x + 3, y + 7, 10, 4);
+    g.fillStyle(0xffffff).fillRect(x + 4 + Math.floor(hash(col, row, 3) * 6), y + 3, 2, 2);
+    g.fillStyle(C.woodDark).fillRect(x + 4, y + 13, 1, 3).fillRect(x + 11, y + 13, 1, 3);
   }
 
   private water(col: number, row: number, x: number, y: number): void {

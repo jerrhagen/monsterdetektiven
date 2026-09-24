@@ -2,15 +2,18 @@ import type {
   ChoicePuzzle,
   ClockPuzzle,
   CodePuzzle,
+  CoinsPuzzle,
+  GridPuzzle,
   MatchPuzzle,
   OrderPuzzle,
   Puzzle,
   PuzzleOption,
   RevealPuzzle,
+  WordPuzzle,
 } from "../cases/types";
 import type { CaseState } from "../engine/caseState";
-import { checkCode, checkEvidence, checkOrder, explainEvidence } from "../engine/puzzleCheck";
-import { shuffleOptions } from "../engine/puzzleRoll";
+import { checkCode, checkCoins, checkEvidence, checkGrid, checkOrder, checkWord, explainEvidence } from "../engine/puzzleCheck";
+import { ALPHABET, shuffleOptions } from "../engine/puzzleRoll";
 import { confetti } from "./confetti";
 import { uiRoot } from "./layer";
 import { playClick, playSuccess, playWrong } from "./sound";
@@ -106,6 +109,15 @@ export function openPuzzle(puzzle: Puzzle, state: CaseState, onSolved: () => voi
       break;
     case "clock":
       keyHandler = clocks(puzzle, ui);
+      break;
+    case "word":
+      keyHandler = word(puzzle, ui);
+      break;
+    case "coins":
+      keyHandler = coins(puzzle, ui);
+      break;
+    case "grid":
+      keyHandler = grid(puzzle, ui);
       break;
   }
 
@@ -485,4 +497,204 @@ function clocks(p: ClockPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
   }
   ui.body.append(options);
   return () => {};
+}
+
+// ---------- Type a word: mixed-up letters, backwards, secret number code, or a picture ----------
+
+function word(p: WordPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
+  const answer = p.answer!;
+  const length = [...answer].length;
+  const typed: { letter: string; tile?: HTMLButtonElement }[] = [];
+
+  // What is shown: letter tiles, number tiles, or the picture to spell.
+  const shown = document.createElement("div");
+  shown.className = `word-shown word-${p.mode}`;
+  if (p.mode === "spell") {
+    shown.innerHTML = `<img src="${spriteUrl(p.pictures![answer])}" alt="">`;
+  } else {
+    const parts = p.mode === "cipher" ? p.shown!.split("-") : [...p.shown!];
+    for (const part of parts) shown.appendChild(document.createElement("span")).textContent = part;
+  }
+
+  // The secret code table: A=1, B=2 … Ö=29.
+  const table = document.createElement("div");
+  table.className = "cipher-table";
+  if (p.mode === "cipher") {
+    table.innerHTML = ALPHABET.map((ch, i) => `<span><b>${ch}</b>${i + 1}</span>`).join("");
+  }
+
+  const slots = document.createElement("div");
+  slots.className = "code-slots word-slots";
+  const boxes = Array.from({ length }, () => slots.appendChild(document.createElement("span")));
+
+  const keys = document.createElement("div");
+  keys.className = "letter-keys";
+  // For a mixed-up word Nora uses its own letters (each once); otherwise the whole alphabet.
+  const letters = p.mode === "anagram" ? [...p.shown!] : ALPHABET;
+  const tiles = letters.map((letter) => {
+    const b = button(letter, "letter");
+    b.addEventListener("click", () => add(letter, b));
+    keys.appendChild(b);
+    return b;
+  });
+  const back = button("⌫", "letter back");
+  back.addEventListener("click", () => remove());
+  keys.appendChild(back);
+
+  const render = () => boxes.forEach((b, i) => (b.textContent = typed[i]?.letter ?? ""));
+  const add = (letter: string, tile?: HTMLButtonElement) => {
+    if (typed.length >= length) return;
+    if (p.mode === "anagram") {
+      // Use a letter tile that isn't used yet.
+      tile = tile && !tile.disabled ? tile : tiles.find((t) => t.textContent === letter && !t.disabled);
+      if (!tile) return;
+      tile.disabled = true;
+    }
+    playClick();
+    typed.push({ letter, tile });
+    render();
+    if (typed.length === length) window.setTimeout(submit, 300);
+  };
+  const remove = () => {
+    const last = typed.pop();
+    if (last?.tile) last.tile.disabled = false;
+    render();
+  };
+  const submit = () => {
+    if (typed.length < length) return;
+    if (checkWord(p, typed.map((t) => t.letter).join(""))) {
+      ui.solved();
+    } else {
+      ui.say(p.wrong ?? "Nej, det blev inte rätt ord. Försök igen!");
+      while (typed.length) remove();
+    }
+  };
+
+  ui.body.append(shown, table, slots, keys);
+  return (e) => {
+    const letter = e.key.toLocaleUpperCase("sv");
+    if (ALPHABET.includes(letter)) add(letter);
+    else if (e.key === "Backspace") remove();
+    else if (e.key === "Enter") submit();
+  };
+}
+
+// ---------- Pay with coins ----------
+
+function coins(p: CoinsPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
+  const paid: number[] = [];
+  const tray = document.createElement("div");
+  tray.className = "coin-tray";
+  const sum = document.createElement("p");
+  sum.className = "coin-sum";
+  const purse = document.createElement("div");
+  purse.className = "coin-purse";
+
+  const money = (value: number) => {
+    const b = button(`${value} kr`, value >= 20 ? "money note" : "money coin");
+    b.dataset.value = String(value);
+    return b;
+  };
+  const render = () => {
+    tray.innerHTML = "";
+    paid.forEach((value, i) => {
+      const b = money(value);
+      b.title = "Ta tillbaka";
+      b.addEventListener("click", () => {
+        playClick();
+        paid.splice(i, 1);
+        render();
+      });
+      tray.appendChild(b);
+    });
+    if (!paid.length) tray.innerHTML = `<span class="empty">Klicka på mynten för att lägga dem här.</span>`;
+    sum.textContent = `Du har lagt: ${paid.reduce((a, b) => a + b, 0)} kr`;
+  };
+  for (const value of [...p.coins].sort((a, b) => a - b)) {
+    const b = money(value);
+    b.addEventListener("click", () => {
+      playClick();
+      paid.push(value);
+      render();
+    });
+    purse.appendChild(b);
+  }
+  const pay = button("Betala!", "ok");
+  pay.addEventListener("click", () => {
+    const result = checkCoins(p, paid);
+    if (result === "ok") ui.solved();
+    else if (result === "little") ui.say(p.wrong ?? "Det räcker inte. Lägg dit lite till!");
+    else if (result === "much") ui.say("Det blev för mycket. Ta tillbaka något!");
+    else ui.say("Rätt summa! Men det går med färre mynt. Försök igen!");
+  });
+  render();
+  ui.body.append(tray, sum, purse, pay);
+  return (e) => {
+    if (e.key === "Enter") pay.click();
+  };
+}
+
+// ---------- 4 × 4 picture sudoku ----------
+
+function grid(p: GridPuzzle, ui: PuzzleUi): (e: KeyboardEvent) => void {
+  const cells: (number | null)[] = p.solution!.map((v, i) => (p.given![i] ? v : null));
+  let selected = 0;
+
+  const palette = document.createElement("div");
+  palette.className = "grid-palette";
+  const pens = p.symbols.map((sprite, i) => {
+    const b = document.createElement("button");
+    b.className = "pen";
+    b.innerHTML = `<img src="${spriteUrl(sprite)}" alt="">`;
+    b.addEventListener("click", () => {
+      playClick();
+      selected = i;
+      pens.forEach((pen, k) => pen.classList.toggle("chosen", k === i));
+    });
+    palette.appendChild(b);
+    return b;
+  });
+  pens[0].classList.add("chosen");
+
+  const board = document.createElement("div");
+  board.className = "grid-board";
+  const squares = cells.map((_, i) => {
+    const b = document.createElement("button");
+    b.className = `square ${p.given![i] ? "given" : ""} ${i % 4 === 1 ? "box-right" : ""} ${Math.floor(i / 4) === 1 ? "box-bottom" : ""}`;
+    b.addEventListener("click", () => {
+      if (p.given![i]) return;
+      playClick();
+      // Tapping the same picture again clears the square.
+      cells[i] = cells[i] === selected ? null : selected;
+      render();
+    });
+    board.appendChild(b);
+    return b;
+  });
+  const render = () =>
+    squares.forEach((b, i) => {
+      const v = cells[i];
+      b.innerHTML = v === null ? "" : `<img src="${spriteUrl(p.symbols[v])}" alt="">`;
+    });
+
+  const done = button("Klar!", "ok");
+  done.addEventListener("click", () => {
+    if (cells.some((v) => v === null)) {
+      ui.say("Fyll i alla rutor först!");
+    } else if (checkGrid(p, cells)) {
+      ui.solved();
+    } else {
+      ui.say(p.wrong ?? "Något står två gånger i samma rad, kolumn eller fyrkant. Titta igen!");
+    }
+  });
+  render();
+  const row = document.createElement("div");
+  row.className = "grid-row";
+  row.append(board, palette);
+  ui.body.append(row, done);
+  return (e) => {
+    const n = Number(e.key);
+    if (n >= 1 && n <= 4) pens[n - 1].click();
+    else if (e.key === "Enter") done.click();
+  };
 }

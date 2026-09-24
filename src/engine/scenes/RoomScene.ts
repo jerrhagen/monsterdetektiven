@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 import type { Edge, FinaleStep, Flags, Mover, Puzzle, Thing } from "../../cases/types";
 import { isCaseScreenOpen, showCaseIntro, showCaseResult, showLeaveCase } from "../../ui/caseScreens";
-import { advanceDialog, isDialogOpen, openDialog } from "../../ui/dialog";
+import { advanceDialog, dismissDialog, isDialogOpen, openDialog } from "../../ui/dialog";
 import { hideHud, setHudRoomClues, showHud, updateHud, updateMusicButton } from "../../ui/hud";
 import { toggleMusic } from "../../ui/music";
 import { closeNotebook, isNotebookOpen, toggleNotebook } from "../../ui/notebook";
@@ -89,6 +89,8 @@ export class RoomScene extends Phaser.Scene {
   private thingShadows: Phaser.GameObjects.Ellipse[] = [];
   /** Glowing outlines on things (not people) that have something new. */
   private thingGlows = new Map<number, Phaser.GameObjects.GameObject[]>();
+  /** The grey filter for faded rooms (season 2). */
+  private fadeFilter?: Phaser.Filters.ColorMatrix;
   /** Speech bubbles over people who have something new to say. */
   private thingBubbles = new Map<number, Phaser.GameObjects.Image>();
   /** True while the ending plays – no walking, no monsters. */
@@ -122,6 +124,7 @@ export class RoomScene extends Phaser.Scene {
     this.cutscene = false;
     this.thingGlows = new Map();
     this.thingBubbles = new Map();
+    this.fadeFilter = undefined;
   }
 
   create(): void {
@@ -129,6 +132,7 @@ export class RoomScene extends Phaser.Scene {
     const roomId = this.entry.roomId ?? this.state.data.startRoom;
     this.room = parseRoom(this.state.data, roomId);
     drawRoom(this, this.room);
+    this.applyFade(this.room.data.faded ?? 0);
 
     // Clues lie on the floor; unfound ones glow softly.
     this.room.clues.forEach((c, index) => {
@@ -227,6 +231,7 @@ export class RoomScene extends Phaser.Scene {
     showTouchControls();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       hideHud();
+      dismissDialog();
       closeNotebook();
       closePuzzle();
       hideTouchControls();
@@ -755,7 +760,28 @@ export class RoomScene extends Phaser.Scene {
       await new Promise((done) => this.time.delayedCall(900, done));
     } else if ("give" in step) {
       this.reward(step.give);
+    } else if ("recolor" in step) {
+      // The colour flows back in (season 2).
+      this.cameras.main.flash(600, 255, 255, 255);
+      await new Promise<void>((done) =>
+        this.tweens.addCounter({
+          from: this.room.data.faded ?? 0,
+          to: 0,
+          duration: 1500,
+          onUpdate: (tween) => this.applyFade(tween.getValue() ?? 0),
+          onComplete: () => done(),
+        }),
+      );
     }
+  }
+
+  /** Season 2: the colours are draining away – draw the room this much greyer (0–1). */
+  private applyFade(amount: number): void {
+    const camera = this.cameras.main;
+    if (!this.fadeFilter && amount <= 0) return;
+    this.fadeFilter ??= camera.filters.internal.addColorMatrix();
+    this.fadeFilter.colorMatrix.reset();
+    this.fadeFilter.colorMatrix.saturate(-amount);
   }
 
   /** Stars, time and monster cards – and remember them. */

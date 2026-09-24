@@ -1,4 +1,4 @@
-import type { ChoicePuzzle, ClockPuzzle, CodePuzzle, OrderPuzzle, Puzzle } from "../cases/types";
+import type { ChoicePuzzle, ClockPuzzle, CodePuzzle, CoinsPuzzle, GridPuzzle, OrderPuzzle, Puzzle, WordPuzzle } from "../cases/types";
 
 /** A rolled puzzle, plus values that goal hints may show with {name}. */
 export interface Rolled {
@@ -26,13 +26,30 @@ export function evaluate(expression: string, vars: Record<string, string>): numb
 
 const HOURS = ["tolv", "ett", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio", "tio", "elva", "tolv"];
 
-/** Swedish clock time: "tre", "kvart över tre", "halv fyra", "kvart i fyra". */
+/**
+ * Swedish clock time, in five-minute steps: "tre", "fem över tre", "kvart över tre",
+ * "fem i halv fyra", "halv fyra", "tio över halv fyra", "kvart i fyra", "fem i fyra".
+ */
 export function timeText(hour: number, minute: number): string {
   const h = (n: number) => HOURS[((n - 1) % 12) + 1];
-  if (minute === 0) return h(hour);
-  if (minute === 15) return `kvart över ${h(hour)}`;
-  if (minute === 30) return `halv ${h(hour + 1)}`;
-  return `kvart i ${h(hour + 1)}`;
+  const next = h(hour + 1);
+  const words: Record<number, string> = {
+    0: h(hour),
+    5: `fem över ${h(hour)}`,
+    10: `tio över ${h(hour)}`,
+    15: `kvart över ${h(hour)}`,
+    20: `tjugo över ${h(hour)}`,
+    25: `fem i halv ${next}`,
+    30: `halv ${next}`,
+    35: `fem över halv ${next}`,
+    40: `tjugo i ${next}`,
+    45: `kvart i ${next}`,
+    50: `tio i ${next}`,
+    55: `fem i ${next}`,
+  };
+  const text = words[minute];
+  if (!text) throw new Error(`Klockan ${hour}:${minute} går inte att säga i femminuterssteg.`);
+  return text;
 }
 
 function shuffled<T>(items: T[], random: () => number): T[] {
@@ -58,6 +75,12 @@ export function rollPuzzle(id: string, p: Puzzle, random: () => number = Math.ra
       return { puzzle: { ...p, pairs: shuffled(p.pairs, random).slice(0, p.pick ?? p.pairs.length) }, vars: {} };
     case "clock":
       return rollClock(p, random);
+    case "word":
+      return rollWord(id, p, random);
+    case "coins":
+      return rollCoins(p, random);
+    case "grid":
+      return rollGrid(p, random);
     default:
       return { puzzle: p, vars: {} };
   }
@@ -130,6 +153,95 @@ function rollClock(p: ClockPuzzle, random: () => number): Rolled {
 function rollChoice(id: string, p: ChoicePuzzle, random: () => number): Rolled {
   const v = p.variants![Math.floor(random() * p.variants!.length)];
   return { puzzle: { ...p, text: v.text, options: v.options, answer: v.answer }, vars: { [`${id}:hint`]: v.hint } };
+}
+
+/** The Swedish alphabet, for the secret number code (A=1 … Ö=29). */
+export const ALPHABET = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ"];
+
+/** A word as the secret number code: "HEJ" → "8-5-10". */
+export function toCipher(word: string): string {
+  return [...word].map((ch) => ALPHABET.indexOf(ch) + 1).join("-");
+}
+
+function rollWord(id: string, p: WordPuzzle, random: () => number): Rolled {
+  const word = p.words[Math.floor(random() * p.words.length)];
+  let shown = word;
+  if (p.mode === "anagram") {
+    // Mix the letters, but never leave the word as it was.
+    for (let i = 0; i < 20 && shown === word; i++) shown = shuffled([...word], random).join("");
+  } else if (p.mode === "reverse") {
+    shown = [...word].reverse().join("");
+  } else if (p.mode === "cipher") {
+    shown = toCipher(word);
+  }
+  const vars = { [`${id}:first`]: word[0], [`${id}:length`]: String([...word].length) };
+  return { puzzle: { ...p, answer: word, shown }, vars };
+}
+
+/** The fewest coins that make exactly `amount` (or Infinity if it can't be done). */
+export function fewestCoins(amount: number, coins: number[]): number {
+  const best = new Array(amount + 1).fill(Infinity);
+  best[0] = 0;
+  for (let a = 1; a <= amount; a++) {
+    for (const c of coins) if (c <= a && best[a - c] + 1 < best[a]) best[a] = best[a - c] + 1;
+  }
+  return best[amount];
+}
+
+function rollCoins(p: CoinsPuzzle, random: () => number): Rolled {
+  const amount = Array.isArray(p.price) ? p.price[0] + Math.floor(random() * (p.price[1] - p.price[0] + 1)) : p.price;
+  const vars = { price: String(amount), fewest: String(fewestCoins(amount, p.coins)) };
+  return { puzzle: { ...p, amount, text: p.text.map((t) => fillIn(t, vars)) }, vars };
+}
+
+/** All ways to finish a 4 × 4 picture sudoku (stops counting at `limit`). */
+export function countGridSolutions(cells: (number | null)[], limit = 2): number {
+  const i = cells.indexOf(null);
+  if (i < 0) return 1;
+  let count = 0;
+  for (let v = 0; v < 4 && count < limit; v++) {
+    if (fitsInGrid(cells, i, v)) {
+      const next = [...cells];
+      next[i] = v;
+      count += countGridSolutions(next, limit - count);
+    }
+  }
+  return count;
+}
+
+/** Can symbol `v` go in square `i` – not already in its row, column or 2 × 2 box? */
+export function fitsInGrid(cells: (number | null)[], i: number, v: number): boolean {
+  const row = Math.floor(i / 4);
+  const col = i % 4;
+  for (let k = 0; k < 16; k++) {
+    if (k === i || cells[k] !== v) continue;
+    const r = Math.floor(k / 4);
+    const c = k % 4;
+    const sameBox = Math.floor(r / 2) === Math.floor(row / 2) && Math.floor(c / 2) === Math.floor(col / 2);
+    if (r === row || c === col || sameBox) return false;
+  }
+  return true;
+}
+
+function rollGrid(p: GridPuzzle, random: () => number): Rolled {
+  // Start from a valid square, then shuffle symbols, rows within bands, bands, columns and stacks.
+  const base = [0, 1, 2, 3, 2, 3, 0, 1, 1, 0, 3, 2, 3, 2, 1, 0];
+  const symbols = shuffled([0, 1, 2, 3], random);
+  const flip = () => (random() < 0.5 ? [0, 1] : [1, 0]);
+  const [b0, b1] = flip();
+  const rows = [...flip().map((r) => b0 * 2 + r), ...flip().map((r) => b1 * 2 + r)];
+  const [s0, s1] = flip();
+  const cols = [...flip().map((c) => s0 * 2 + c), ...flip().map((c) => s1 * 2 + c)];
+  const solution = Array.from({ length: 16 }, (_, i) => symbols[base[rows[Math.floor(i / 4)] * 4 + cols[i % 4]]]);
+  // Hide squares one by one, as long as there is still only one way to finish it.
+  const given = new Array(16).fill(true);
+  for (const i of shuffled([...Array(16).keys()], random)) {
+    if (given.filter(Boolean).length <= p.givens) break;
+    given[i] = false;
+    const cells = solution.map((v, k) => (given[k] ? v : null));
+    if (countGridSolutions(cells) !== 1) given[i] = true;
+  }
+  return { puzzle: { ...p, solution, given }, vars: {} };
 }
 
 /** A copy of the options in a new random order – so the right one isn't always in the same place. */

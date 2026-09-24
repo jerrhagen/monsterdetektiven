@@ -1,7 +1,7 @@
 import type { Case, Clue, Door, Edge, Room, Thing } from "../cases/types";
 import { clueFlag, flagList } from "./caseState";
 import { emergedFlag } from "./monsters";
-import { rollPuzzle } from "./puzzleRoll";
+import { fewestCoins, rollPuzzle } from "./puzzleRoll";
 import { ROOM_COLS, ROOM_ROWS } from "./config";
 
 export type TileKind =
@@ -330,6 +330,24 @@ export function validateCase(c: Case): string[] {
       errors.push(`${where}: klockpusslet behöver fyra olika klockor.`);
     }
     if (rolled.type === "match" && rolled.pairs.length < 2) errors.push(`${where}: behöver minst två par.`);
+    if (p.type === "word") {
+      if (!p.words.length) errors.push(`${where}: behöver minst ett ord.`);
+      for (const w of p.words) {
+        if (!/^[A-ZÅÄÖ]+$/.test(w)) errors.push(`${where}: '${w}' ska bara ha stora bokstäver A–Ö.`);
+        if (p.mode === "anagram" && new Set(w).size < 2) errors.push(`${where}: '${w}' går inte att blanda.`);
+        if (p.mode === "spell" && !p.pictures?.[w]) errors.push(`${where}: '${w}' saknar en bild att stava till.`);
+      }
+    }
+    if (p.type === "coins") {
+      const [low, high] = Array.isArray(p.price) ? p.price : [p.price, p.price];
+      for (let a = low; a <= high; a++) {
+        if (fewestCoins(a, p.coins) === Infinity) errors.push(`${where}: ${a} kr går inte att betala med de mynten.`);
+      }
+    }
+    if (p.type === "grid") {
+      if (p.symbols.length !== 4) errors.push(`${where}: sudokut behöver precis fyra bilder.`);
+      if (p.givens < 4 || p.givens > 12) errors.push(`${where}: 4–12 rutor ska vara ifyllda från början.`);
+    }
     if (p.type === "order" && p.describe) {
       for (const key of Object.keys(p.describe)) {
         if (!p.options.some((o) => o.id === key)) errors.push(`${where}: '${key}' finns inte bland valen.`);

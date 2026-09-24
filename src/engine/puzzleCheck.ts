@@ -1,9 +1,31 @@
-import type { CodePuzzle, OrderPuzzle, RevealQuestion } from "../cases/types";
+import type { CodePuzzle, CoinsPuzzle, GridPuzzle, OrderPuzzle, RevealQuestion, WordPuzzle } from "../cases/types";
+import { fewestCoins, fitsInGrid } from "./puzzleRoll";
 
 /** Digits typed into a code lock. Spaces and leading zeros don't matter. */
 export function checkCode(p: CodePuzzle, input: string): boolean {
   const clean = (s: string) => s.replace(/\s/g, "").replace(/^0+(?=\d)/, "");
   return clean(input) === clean(p.answer);
+}
+
+/** A typed word: big or small letters and spaces don't matter. */
+export function checkWord(p: WordPuzzle, typed: string): boolean {
+  return typed.replace(/\s/g, "").toLocaleUpperCase("sv") === p.answer;
+}
+
+/** What the paid coins say: right, too little, too much, or right amount but too many coins. */
+export function checkCoins(p: CoinsPuzzle, paid: number[]): "ok" | "little" | "much" | "many" {
+  const sum = paid.reduce((a, b) => a + b, 0);
+  if (sum < p.amount!) return "little";
+  if (sum > p.amount!) return "much";
+  if (p.fewest && paid.length > fewestCoins(p.amount!, p.coins)) return "many";
+  return "ok";
+}
+
+/** A finished picture sudoku: every square filled, the given ones unchanged, no picture twice in a line or box. */
+export function checkGrid(p: GridPuzzle, cells: (number | null)[]): boolean {
+  if (cells.some((v) => v === null)) return false;
+  if (p.given!.some((g, i) => g && cells[i] !== p.solution![i])) return false;
+  return cells.every((v, i) => fitsInGrid(cells, i, v!));
 }
 
 export function checkOrder(p: OrderPuzzle, picked: string[]): boolean {

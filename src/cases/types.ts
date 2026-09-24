@@ -128,6 +128,50 @@ export interface ClockPuzzle extends PuzzleBase {
 }
 
 /**
+ * Type a word (UPPER CASE Swedish letters). One word is picked at random per case and shown
+ * – with its letters mixed up (anagram), backwards, as numbers (A=1, B=2 … Ö=29, with the
+ * table shown), or as a picture to spell. Nora builds the answer with letter buttons or the keyboard.
+ * Goal hints can use {id:first} (the first letter) and {id:length}.
+ */
+export interface WordPuzzle extends PuzzleBase {
+  type: "word";
+  mode: "anagram" | "reverse" | "cipher" | "spell";
+  words: string[];
+  /** For "spell": a picture (sprite key) for every word. */
+  pictures?: Record<string, string>;
+  /** Filled in when rolled. */
+  answer?: string;
+  shown?: string;
+}
+
+/**
+ * Pay with coins and notes. `price` is a number or a random [min, max] rolled per case –
+ * write {price} in the text. With `fewest`, it must be paid with as few coins as possible.
+ */
+export interface CoinsPuzzle extends PuzzleBase {
+  type: "coins";
+  price: number | [number, number];
+  /** The coins and notes to pay with, in kronor, e.g. [1, 2, 5, 10, 20]. */
+  coins: number[];
+  fewest?: boolean;
+  /** Filled in when rolled. */
+  amount?: number;
+}
+
+/**
+ * A 4 × 4 picture sudoku: each of the four pictures once in every row, column and 2 × 2 box.
+ * `givens` squares are filled in from the start (fewer is harder). Rolled per case.
+ */
+export interface GridPuzzle extends PuzzleBase {
+  type: "grid";
+  symbols: string[];
+  givens: number;
+  /** Filled in when rolled: the solution (symbol index per square) and which squares are given. */
+  solution?: number[];
+  given?: boolean[];
+}
+
+/**
  * One question in the reveal: pick the answer, then mark EVERY clue in the book that shows it.
  * Nora is told how many to mark. A clue that shows the answer must be in `proof`, and every
  * other clue needs a `why` – so a player who reasons right is never told she's wrong.
@@ -152,7 +196,16 @@ export interface RevealPuzzle extends PuzzleBase {
   questions: RevealQuestion[];
 }
 
-export type Puzzle = CodePuzzle | OrderPuzzle | ChoicePuzzle | RevealPuzzle | MatchPuzzle | ClockPuzzle;
+export type Puzzle =
+  | CodePuzzle
+  | OrderPuzzle
+  | ChoicePuzzle
+  | RevealPuzzle
+  | MatchPuzzle
+  | ClockPuzzle
+  | WordPuzzle
+  | CoinsPuzzle
+  | GridPuzzle;
 
 export type Edge = "left" | "right" | "top" | "bottom";
 
@@ -170,7 +223,22 @@ export interface Door {
   stairs?: "up" | "down";
 }
 
-export type Theme = "shop" | "storage" | "yard" | "bakery" | "library" | "forest" | "tower" | "square";
+export type Theme =
+  | "shop"
+  | "storage"
+  | "yard"
+  | "bakery"
+  | "library"
+  | "forest"
+  | "tower"
+  | "square"
+  // Season 2:
+  | "harbor"
+  | "school"
+  | "greenhouse"
+  | "aquarium"
+  | "fair"
+  | "museum";
 
 /** Something that moves around by itself, e.g. a toy car. Loops through its path (tile positions). */
 export interface Mover {
@@ -249,6 +317,11 @@ export interface Room {
   monsters?: MonsterDef[];
   /** Said the first time Nora walks in. */
   onEnter?: Talk & { name: string };
+  /**
+   * How much colour has drained out of the room, 0–1 (season 2: the colours are disappearing).
+   * The room is drawn that much greyer until a finale `recolor` step brings the colour back.
+   */
+  faded?: number;
 }
 
 export interface Clue {
@@ -289,7 +362,9 @@ export type FinaleStep =
   | { reveal: string; sprite: string }
   /** Someone leaves the scene. */
   | { hide: string }
-  | { give: string };
+  | { give: string }
+  /** The colour flows back into a faded room (season 2). */
+  | { recolor: true };
 
 export interface MonsterCard {
   sprite: string;
