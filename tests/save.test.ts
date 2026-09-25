@@ -46,3 +46,21 @@ describe("slutet på fallen", () => {
     });
   }
 });
+
+describe("monsterkort för klarade fall", () => {
+  it("ger de kort som saknas för fall som är klara", async () => {
+    const save = await import("../src/engine/save");
+    const store: Record<string, string> = {};
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => (store[k] = v),
+      removeItem: (k: string) => delete store[k],
+    });
+    save.setSolvedCases(0, { a: { stars: 3, bestTime: 60, egg: true } }, []);
+    save.addMissingCards((id) => (id === "a" ? ["Fladder", "Viskan"] : []));
+    expect(save.listPlayers()[0].data.cards).toEqual(["Fladder", "Viskan"]);
+    save.addMissingCards((id) => (id === "a" ? ["Fladder", "Viskan"] : []));
+    expect(save.listPlayers()[0].data.cards).toEqual(["Fladder", "Viskan"]);
+    vi.unstubAllGlobals();
+  });
+});

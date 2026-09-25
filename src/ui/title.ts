@@ -1,5 +1,6 @@
 import { cases } from "../cases";
 import {
+  addMissingCards,
   type CaseRecord,
   PLAYER_COUNT,
   type SaveData,
@@ -46,6 +47,8 @@ function progress(data: SaveData): string {
 /** The title with four players to choose from. Space/Enter (or clicking the hint) starts with the chosen one. */
 export function showTitle(onStart: () => void): void {
   hideTitle();
+  // Cases marked as solved in the secret panel before it handed out cards get their cards now.
+  addMissingCards((id) => cases.find((c) => c.id === id)?.cards.map((card) => card.name) ?? []);
   titleEl = document.createElement("div");
   titleEl.className = "title";
   uiRoot.appendChild(titleEl);
@@ -217,7 +220,9 @@ export function showTitle(onStart: () => void): void {
           // Three stars always include the secret egg (see starsFor).
           next[row.dataset.id!] = { stars, bestTime: Math.max(1, seconds), egg: stars === 3 || (before?.egg ?? false) };
         });
-        setSolvedCases(i, next);
+        // The monster cards follow the solved cases: every card from those cases, none from the others.
+        const cards = [...new Set(cases.filter((c) => next[c.id]).flatMap((c) => c.cards.map((card) => card.name)))];
+        setSolvedCases(i, next, cards);
         close();
       };
       box.querySelector(".ok")!.addEventListener("click", save);

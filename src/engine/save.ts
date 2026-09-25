@@ -103,11 +103,28 @@ export function renamePlayer(index: number, name: string): void {
   writeStore(store);
 }
 
-/** Replaces which cases a player has solved, with stars and times (the secret grown-up panel). */
-export function setSolvedCases(index: number, records: Record<string, CaseRecord>): void {
+/** Replaces which cases a player has solved, with stars and times, and their monster cards (the secret grown-up panel). */
+export function setSolvedCases(index: number, records: Record<string, CaseRecord>, cards: string[]): void {
   const store = readStore();
   store.players[index].data.cases = records;
+  store.players[index].data.cards = cards;
   writeStore(store);
+}
+
+/** Gives each player any monster cards they lack from the cases they have solved. */
+export function addMissingCards(cardsOf: (caseId: string) => string[]): void {
+  const store = readStore();
+  let changed = false;
+  for (const player of store.players) {
+    const missing = Object.keys(player.data.cases)
+      .flatMap(cardsOf)
+      .filter((card, i, all) => !player.data.cards.includes(card) && all.indexOf(card) === i);
+    if (missing.length > 0) {
+      player.data.cards.push(...missing);
+      changed = true;
+    }
+  }
+  if (changed) writeStore(store);
 }
 
 /** Forgets everything a player has done (after the player confirmed it). */
