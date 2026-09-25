@@ -20,7 +20,7 @@ export interface Thing extends Talk {
   person?: boolean;
   /** Pixel sprite key, see src/sprites. */
   sprite: string;
-  /** Layout character of what's drawn underneath, e.g. "K" for something standing on the counter. */
+  /** Layout character of what's drawn underneath, e.g. "K" for something standing on the counter, "#" for a window in the wall. */
   on?: string;
   /** Alternative talks, checked in order – the first whose `when` flags are all set is used. */
   talkIf?: (Talk & { when: Flags })[];

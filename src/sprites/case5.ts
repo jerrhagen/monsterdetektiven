@@ -358,6 +358,56 @@ export const clockWeights: PixelSprite = {
   ],
 };
 
+/** A narrow arched window in the tower wall – two glowing yellow eyes look in from the dark. */
+export const towerSlitWindow: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", S: "#8a8494", s: "#6a6470", d: "#0d0718", y: "#ffe27a" },
+  frames: [
+    [
+      E,
+      "......oooo......",
+      ".....oSSSSo.....",
+      "....oSddddSo....",
+      "...oSddddddSo...",
+      "...oSddddddso...",
+      "...oSdyddydso...",
+      "...oSdyddydso...",
+      "...oSddddddso...",
+      "...oSddddddso...",
+      "...oSddddddso...",
+      "...oSSSSSSSSo...",
+      "..oSSSSSSSSSSo..",
+      "..oooooooooooo..",
+      E,
+      E,
+    ],
+  ],
+};
+
+/** The same window once the eyes are gone – just the night outside, and one little star. */
+export const towerSlitWindowDark: PixelSprite = {
+  palette: { ".": null, o: "#1a1024", S: "#8a8494", s: "#6a6470", d: "#0d0718", w: "#d9ccff" },
+  frames: [
+    [
+      E,
+      "......oooo......",
+      ".....oSSSSo.....",
+      "....oSddddSo....",
+      "...oSddddwdSo...",
+      "...oSddddddso...",
+      "...oSddddddso...",
+      "...oSddddddso...",
+      "...oSdwddddso...",
+      "...oSddddddso...",
+      "...oSddddddso...",
+      "...oSSSSSSSSo...",
+      "..oSSSSSSSSSSo..",
+      "..oooooooooooo..",
+      E,
+      E,
+    ],
+  ],
+};
+
 /** Knut's logbook on a little desk, open at this week's page. */
 export const towerLogbook: PixelSprite = {
   palette: { ".": null, o: "#1a1024", w: "#f4f0e4", W: "#d8d0c0", t: "#6a6470", b: "#2d5f9e", L: "#7a4f2a", l: "#a0643a" },
@@ -631,6 +681,8 @@ export const case5Sprites: Record<string, PixelSprite> = {
   towerPlaque,
   clockWeights,
   towerLogbook,
+  towerSlitWindow,
+  towerSlitWindowDark,
   clockOilPrints,
   clockBeetle,
   moonSlotHatch,

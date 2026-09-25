@@ -150,7 +150,8 @@ export class RoomScene extends Phaser.Scene {
       const x = col * TILE + TILE / 2;
       const y = row * TILE + TILE;
       // Something standing on a counter or a shelf sits on its top surface, without a floor shadow.
-      const lift = thing.on ? ON_TOP_LIFT : 0;
+      // Something set in a wall (a window) sits right in it.
+      const lift = thing.on && thing.on !== "#" ? ON_TOP_LIFT : 0;
       this.thingShadows.push(this.add.ellipse(x, y - 1, 12, 4, 0x000000, thing.on ? 0 : 0.25).setDepth(y - 0.5));
       return this.add.sprite(x, y - lift, `${thing.sprite}-0`).setOrigin(0.5, 1).setDepth(y);
     });
