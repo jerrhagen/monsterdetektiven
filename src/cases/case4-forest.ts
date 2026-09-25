@@ -13,7 +13,7 @@ import type { Case } from "./types";
 //
 // Built as a "theory ladder": every room changes what Nora believes.
 //   Forest edge:   "There's a MONSTER!" – huge prints no animal has, red drops (blood?!), wolf fur,
-//                  a warning sign about Trattis and her vampire teeth.
+//                  a warning sign about Trattis, who hisses at everyone.
 //   Stream:        "The monster is a giant – but it's searching. Its little one is missing!" – the
 //                  sleeping giant, prints in circles, an empty little moss bed, tiny prints over the
 //                  stones, and Bruno saw blue glitter on the same stones (and the wolf slept).
@@ -108,7 +108,7 @@ export const case4: Case = {
           talk: [
             "Djuren har satt upp en skylt:",
             "\"AKTA ER FÖR TRATTIS!\"",
-            "\"Hon har VAMPYRTÄNDER och bor vid svampringen.\"",
+            "\"Hon VÄSER åt alla och bor vid svampringen.\"",
           ],
           clue: "warning",
         },
@@ -178,7 +178,7 @@ export const case4: Case = {
           talk: [
             "Sssss… STOPP DÄR!",
             "Jag är Trattis. Jag vaktar vägen till svampringen.",
-            "(Det droppar något rött från hennes vassa tänder…)",
+            "(Det droppar något rött ur korgen hon bär på…)",
             "Svara rätt på min fråga, så får du gå förbi!",
           ],
           talkIf: [
@@ -283,7 +283,7 @@ export const case4: Case = {
           sprite: "trattis",
           talk: [
             "Hihi, där är du ju! Jag tog genvägen.",
-            "Var inte rädd för mina tänder. Jag äter bara lingon!",
+            "Var inte rädd för att jag väste. Jag äter bara lingon!",
             "Men lyssna: varje natt gråter någon här vid ringen.",
             "En liten, ljus röst. När jag kommer med lyktan blir det tyst.",
           ],
@@ -605,7 +605,7 @@ export const case4: Case = {
     warning: {
       name: "Djurens skylt",
       sprite: "sign",
-      text: "\"AKTA ER FÖR TRATTIS! Hon har vampyrtänder och bor vid svampringen.\"",
+      text: "\"AKTA ER FÖR TRATTIS! Hon väser åt alla och bor vid svampringen.\"",
     },
     noAnimal: {
       name: "Inget djur",
@@ -718,7 +718,7 @@ export const case4: Case = {
     {
       sprite: "trattis",
       name: "Trattis",
-      text: "Har en hatt som en trattkantarell och vassa vampyrtänder. Men hon äter bara lingon och vaktar svampringen!",
+      text: "Har en hatt som en trattkantarell och väser åt den som kommer för nära. Men hon äter bara lingon och vaktar svampringen!",
     },
     { sprite: "mossjatte", name: "Mossjätten", text: "Stor som ett hus och täckt av mossa. Sover på dagen. Hoppa inte nära – då vaknar hen!" },
     { sprite: "mossunge", name: "Mossungen", text: "Liten, mjuk och mossig. Gömmer sig under mossan när den är rädd." },

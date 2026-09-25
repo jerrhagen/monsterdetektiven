@@ -78,7 +78,7 @@ Titelskärm (välj spelare) → Stadskartan (välj fall) → Introkort → FALLE
 - **Fladder** (`monster-vingar.jpg`, Lego): svart monster med stora rosa, genomskinliga fladdermusvingar, en rosa-lila spets på huvudet och arga ljusa ögon. Namnet är hennes.
 - **Viskan** (`spoke.jpg`, Lego): ett vitt spöke som lyser i mörkret och ler lite för brett. Hen viskar ens namn bakom ryggen. Namnet är Claudes förslag.
 - **Grymlan** (`lila-har.jpg`, teckning): zombieliknande med taggigt lila hår, grön tröja och bruna byxor. Ena armen sitter löst och trillar av. Namnet är Claudes förslag. Det droppar lite blod där armen trillat av (måttligt och tecknat, se designprincip 4).
-- **Trattis** (`trattis.jpg`, teckning, huvudarkitektens egen idé och namn): ett svampmonster inspirerat av kantareller. Hen har en spetsig trattformad svamphatt, långt stripigt hår, vampyrtänder som det droppar lite ur och en lång kjol. Färgerna är gyllene kantarellgult och orange (Claudes förslag, teckningen är i blyerts).
+- **Trattis** (`trattis.jpg`, teckning, huvudarkitektens egen idé och namn): ett svampmonster inspirerat av kantareller. Hen har en spetsig trattformad svamphatt, långt stripigt hår, ett litet leende och en lång kjol. (Inga vampyrtänder – det var aldrig tanken.) Färgerna är gyllene kantarellgult och orange (Claudes förslag, teckningen är i blyerts).
 
 ---
 

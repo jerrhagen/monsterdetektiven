@@ -8,7 +8,7 @@ const E16 = "................";
 /**
  * Trattis – the architect's own monster (assets/bilder/teckningar/trattis.jpg):
  * a tall pointy funnel hat like a golden chanterelle, long stringy hair, big round
- * eyes, vampire teeth with a little red drip, a long skirt and round shoes.
+ * eyes, a small smile, a long skirt and round shoes.
  */
 export const trattis: PixelSprite = {
   palette: {
@@ -19,9 +19,8 @@ export const trattis: PixelSprite = {
     g: "#b8661a", // gills under the hat
     h: "#7a4a22", // stringy hair
     s: "#f3e3c3", // pale skin
-    w: "#ffffff", // eyes, fangs
+    w: "#ffffff", // eyes
     m: "#3a1020", // mouth
-    r: "#c0182c", // a drip of… lingonberry juice
     t: "#e8a83a", // blouse
     d: "#d0701e", // long skirt
     D: "#9a4a14", // skirt, dark
@@ -43,8 +42,8 @@ export const trattis: PixelSprite = {
       ".ohswwsssswwsho.",
       ".ohswosssswosho.",
       ".ohssssssssssho.",
-      ".ohsswmmmmwssho.",
-      ".ohosrssssrsoho.",
+      ".ohssmssssmssho.",
+      ".ohossmmmmssoho.",
       ".hhhottttttohhh.",
       ".h.otttttttto.h.",
       "...otttttttto...",
