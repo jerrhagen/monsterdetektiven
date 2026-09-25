@@ -637,6 +637,9 @@ export class RoomScene extends Phaser.Scene {
       this.thingShadows[i]?.setVisible(!hidden);
 
       const { thing } = this.room.things[i];
+      // Some things change look once something has happened (the glowing eyes are gone…).
+      const look = `${thing.spriteIf?.find((l) => this.state.has(l.when))?.sprite ?? thing.sprite}-0`;
+      if (s.texture.key !== look) s.setTexture(look);
       const news = !hidden && this.state.hasNews(this.thingKey(i), thing);
       const bubble = this.thingBubbles.get(i);
       const glow = this.thingGlows.get(i);
@@ -647,7 +650,7 @@ export class RoomScene extends Phaser.Scene {
         this.thingBubbles.delete(i);
       }
       if (!thing.person && news && !glow) {
-        const g = this.addGlow(s.x, s.y - s.height / 2, `${thing.sprite}-0`);
+        const g = this.addGlow(s.x, s.y - s.height / 2, look);
         g.forEach((o) => (o as Phaser.GameObjects.Image).setDepth(s.depth - 0.1));
         this.thingGlows.set(i, g);
       } else if (!(!thing.person && news) && glow) {

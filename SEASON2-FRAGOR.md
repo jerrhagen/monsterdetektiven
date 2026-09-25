@@ -99,6 +99,9 @@ Man behöver inte svara på allt. Det som inte får något svar behåller Claude
 38. **Ska Ester ha något nytt?** Förslag: *en ny tröja* · *en ryggsäck* · *en egen detektivhatt* · *nej,
     hon är bra som hon är!*
 
+39. 🖍️ **Du har samlat hemliga monsterägg i Mystiska staden. Vad tror du finns inuti dem?** Rita det! Vad
+    ska det heta? (Förslag: *Kläckis*, *Äggis*, *Pipsan*)
+
 ---
 
 ## Svaren

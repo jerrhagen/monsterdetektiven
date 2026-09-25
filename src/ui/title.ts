@@ -1,6 +1,5 @@
 import { cases } from "../cases";
 import {
-  addMissingCards,
   type CaseRecord,
   PLAYER_COUNT,
   type SaveData,
@@ -47,8 +46,6 @@ function progress(data: SaveData): string {
 /** The title with four players to choose from. Space/Enter (or clicking the hint) starts with the chosen one. */
 export function showTitle(onStart: () => void): void {
   hideTitle();
-  // Cases marked as solved in the secret panel before it handed out cards get their cards now.
-  addMissingCards((id) => cases.find((c) => c.id === id)?.cards.map((card) => card.name) ?? []);
   titleEl = document.createElement("div");
   titleEl.className = "title";
   uiRoot.appendChild(titleEl);

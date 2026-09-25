@@ -21,7 +21,7 @@ import { case5Sprites } from "./case5";
 import { case6Sprites } from "./case6";
 import { mapSprites } from "./map";
 import { alertBubble, ester } from "./ester";
-import { magnifier, shadowEyes, trashBin, viskanGhost } from "./monsters";
+import { darkCorner, magnifier, shadowEyes, trashBin, viskanGhost } from "./monsters";
 import { customerBook, fingerDots, fladderHang, gBlock, gCurly, gDotted, gThin, gift, sleeveScrap } from "./clues";
 import { fladder } from "./fladder";
 import { dustFall, grymlan, monsterEgg, moonShard, rustle } from "./finale";
@@ -81,6 +81,7 @@ export const sprites: Record<string, PixelSprite> = {
   viskanGhost,
   trashBin,
   shadowEyes,
+  darkCorner,
   magnifier,
   grymlan,
   moonShard,

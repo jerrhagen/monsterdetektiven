@@ -377,6 +377,10 @@ body {
   transform: rotate(-3deg);
 }
 
+.notebook .photo.tilt-right {
+  transform: rotate(2.5deg);
+}
+
 .notebook .photo img {
   display: block;
   width: calc(var(--px) * 136);
@@ -1537,6 +1541,28 @@ body {
 .map-bottom .shards {
   color: #b8f0ff;
   font-weight: 700;
+}
+
+/* The secret monster eggs: one per case, the ones not found yet as dark shadows. */
+.map-bottom .eggs {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--px) * 0.5);
+  color: #ffe9a8;
+  font-weight: 700;
+}
+
+.map-bottom .eggs img {
+  width: calc(var(--px) * 6);
+  height: calc(var(--px) * 6);
+  image-rendering: pixelated;
+  filter: brightness(0);
+  opacity: 0.35;
+}
+
+.map-bottom .eggs img.found {
+  filter: none;
+  opacity: 1;
 }
 
 .map-overlay {

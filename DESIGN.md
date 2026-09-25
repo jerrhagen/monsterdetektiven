@@ -58,7 +58,7 @@ Titelskärm (välj spelare) → Stadskartan (välj fall) → Introkort → FALLE
 **Inne i ett fall:**
 1. **Uppdraget.** Någon berättar vad som hänt ("Mina bullar är borta!").
 2. **Utforska.** Nora går mellan rum, pratar med personer och monster och undersöker saker med Ctrl.
-3. **Ledtrådar.** Det Nora hittar hamnar i **Detektivboken** med en bild och en kort mening. *(Påskägg: bläddrar man till nästa sida med ▶ eller högerpil finns ett foto på Nora och Ester, kind mot kind: "Jag och Ester ♥". Det ritas i `src/ui/photo.ts`.)*
+3. **Ledtrådar.** Det Nora hittar hamnar i **Detektivboken** med en bild och en kort mening. *(Påskägg: bläddrar man till nästa sida med ▶ eller högerpil finns ett foto på Nora och Ester, kind mot kind: "Jag och Ester ♥". Det ritas i `src/ui/photo.ts`. För varje fall man har klarat dyker det i smyg upp en ny sida med ett tokigt foto av Nora och Ester med figurer och saker från fallet, `src/ui/casePhotos.ts`. Vilka foton som syns räknas fram ur de klarade fallen, så de stämmer alltid med det sparade, även efter den hemliga panelen.)*
 4. **Pussel.** De låser upp nya rum, föremål och ledtrådar (kodlås, gåtor, spår och så vidare).
 5. **Avslöjandet.** Nora samlar alla misstänkta och väljer vem som gjorde det. Svarar man fel säger Ester snällt: "Hmm, stämmer det? Titta i detektivboken!" och man får försöka igen.
 6. **Slut.** En kort avslutning, en *"Visste du att…?"*-fakta kopplad till fallet och stjärnor.
@@ -278,6 +278,7 @@ Varje monster kan ha ett eget **rop** (`cry`) som syns när det vaknar, hoppar f
 - När Nora står vid något hon kan använda syns ett **förstoringsglas** (ledtrådar och saker att undersöka) eller en **pratbubbla** (någon att prata med). Medan någon pratar syns inga andra bubblor.
 - Uppe till höger står **"Ledtrådar i rummet: 2 av 5"**, så att man vet om det finns mer att hitta. Ledtrådar som Ester ger när man kommer in räknas inte där. I detektivboken står hur många man har av alla.
 - Saker som står på en disk ritas uppe på diskens skiva, inte framför den.
+- En sak kan **byta utseende** när något har hänt (`spriteIf`). De glödande ögonen i mörka hörn försvinner till exempel när man har sett dem, och tittar man igen säger texten att ögonen är borta.
 
 ### Regler för bra monster (lärdomar från speltesterna)
 
@@ -415,6 +416,7 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 - **Boken, kartan och musiken** ligger i en kolumn till höger på mobil (i den mörka kanten bredvid spelet), och i en rad upptill på surfplattor där kanten är ovanför spelet.
 - Man trycker på pratbubblan, svaren och menyerna. Tangentbordstips döljs, och små texter och knappar blir större.
 - Håller man mobilen upprätt visas "Vänd mobilen så spelar vi!". På Android går spelet till helskärm i liggande läge när man startar.
+- **Monsteräggen** syns längst ner på stadskartan, ett per fall. De man inte har hittat är mörka skuggor. (I säsong 2 ska äggen få en större roll, se `SEASON2.md`.)
 - **Hemlig panel för vuxna:** på titelskärmen klickar man på månens prickar i ordningen liten, mellan, stor, tre gånger i rad. Då öppnas en panel där man för den valda spelaren kan ställa in vilka fall som är klara, med stjärnor och bästa tid (`src/ui/title.ts`). Tre stjärnor räknas som att monsterägget är hittat, och monsterkorten följer med: man har korten från de klara fallen och inga andra.
 - Spelet kan läggas till på hemskärmen (manifest och ikon med Nora i `public/`, ikonerna görs med `node scripts/make-icons.ts`).
 

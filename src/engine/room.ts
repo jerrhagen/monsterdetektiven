@@ -281,7 +281,10 @@ export function validateCase(c: Case): string[] {
     for (const id of usedPuzzles) {
       if (id && !c.puzzles?.[id]) errors.push(`I rummet '${room.name}': pusslet '${id}' finns inte.`);
     }
-    for (const thing of Object.values(room.things ?? {})) need(thing.puzzleWhen, `${thing.name} (pussel)`);
+    for (const thing of Object.values(room.things ?? {})) {
+      need(thing.puzzleWhen, `${thing.name} (pussel)`);
+      for (const look of thing.spriteIf ?? []) need(look.when, `${thing.name} (bild)`);
+    }
     for (const m of room.monsters ?? []) {
       const points =
         m.type === "flyer"

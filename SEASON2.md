@@ -324,3 +324,7 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
    stadskartan med en knapp för att byta mellan Mystiska staden och Hamnstaden. Säsong 2 låses upp
    när fall 6 är löst.
 6. Kör testerna, provspela varje fall i en bakgrundsflik, uppdatera `DESIGN.md`.
+7. **Monsteräggen får en större roll.** I säsong 1 samlar man bara äggen (de syns längst ner på
+   stadskartan). I säsong 2 ska de betyda något, till exempel att de kläcks till en liten monsterbebis
+   som följer med (fråga 39 i `SEASON2-FRAGOR.md`). Fundera på om säsong 2 ska ha egna ägg, och vad som
+   händer när man har alla.

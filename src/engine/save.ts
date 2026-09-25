@@ -111,22 +111,6 @@ export function setSolvedCases(index: number, records: Record<string, CaseRecord
   writeStore(store);
 }
 
-/** Gives each player any monster cards they lack from the cases they have solved. */
-export function addMissingCards(cardsOf: (caseId: string) => string[]): void {
-  const store = readStore();
-  let changed = false;
-  for (const player of store.players) {
-    const missing = Object.keys(player.data.cases)
-      .flatMap(cardsOf)
-      .filter((card, i, all) => !player.data.cards.includes(card) && all.indexOf(card) === i);
-    if (missing.length > 0) {
-      player.data.cards.push(...missing);
-      changed = true;
-    }
-  }
-  if (changed) writeStore(store);
-}
-
 /** Forgets everything a player has done (after the player confirmed it). */
 export function clearPlayer(index: number): void {
   const store = readStore();

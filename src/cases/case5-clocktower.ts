@@ -285,8 +285,10 @@ export const case5: Case = {
         x: {
           name: "Det smala fönstret",
           sprite: "shadowEyes",
+          spriteIf: [{ when: "clue:shadow", sprite: "darkCorner" }],
           talk: ["Ett smalt fönster. Därute är det mörkt…", "Två gula ögon blinkar!", "…och så är de borta. Brr, iskallt!"],
           clue: "shadow",
+          talkIf: [{ when: "clue:shadow", talk: ["Bara mörker därute nu. Ögonen är borta.", "Men det drar kallt från fönstret…"] }],
         },
       },
       clues: { "1": "oilPrints" },

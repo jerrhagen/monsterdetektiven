@@ -215,8 +215,10 @@ export const case1: Case = {
         x: {
           name: "Det mörka hörnet",
           sprite: "shadowEyes",
+          spriteIf: [{ when: "clue:shadow", sprite: "darkCorner" }],
           talk: ["Två glödande prickar blinkar i mörkret…", "…och så är de borta.", "Brr. Det är iskallt här."],
           clue: "shadow",
+          talkIf: [{ when: "clue:shadow", talk: ["Bara mörker nu. Ögonen är borta.", "Men det är fortfarande iskallt här…"] }],
         },
       },
       clues: { "1": "blood", "2": "sleeve" },

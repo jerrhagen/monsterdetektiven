@@ -76,6 +76,9 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
       }).join("")}
       <div class="map-bottom">
         <span class="shards">Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}</span>
+        <span class="eggs" title="Hemliga monsterägg">Monsterägg: ${cases
+          .map((c) => `<img src="${spriteUrl("monsterEgg")}" alt="" class="${save.cases[c.id]?.egg ? "found" : ""}">`)
+          .join("")}</span>
         <span class="map-hint">${isTouch() ? "Tryck två gånger på ett fall för att spela" : "Välj ett fall med pilarna och tryck på mellanslag"}</span>
       </div>`;
     el!.querySelectorAll<HTMLButtonElement>(".map-spot").forEach((b) => {

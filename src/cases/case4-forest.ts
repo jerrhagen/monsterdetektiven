@@ -319,7 +319,7 @@ export const case4: Case = {
           sprite: "lingonBasket",
           talk: [
             "Trattis korg är full av lingon.",
-            "Den läcker röd saft. Droppe… droppe… droppe.",
+            "Den läcker röd saft. Dropp… dropp… dropp.",
             "Samma röda droppar som på stigen!",
           ],
           clue: "lingon",
@@ -327,6 +327,7 @@ export const case4: Case = {
         h: {
           name: "Hålan under roten",
           sprite: "shadowEyes",
+          spriteIf: [{ when: "clue:hideout", sprite: "darkCorner" }],
           talk: [
             "En mörk håla under en gammal rot.",
             "Två glödande ögon blinkar i mörkret…",

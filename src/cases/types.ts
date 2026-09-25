@@ -32,6 +32,8 @@ export interface Thing extends Talk {
   puzzleIntro?: string[];
   /** The thing disappears when these flags are set (e.g. a secret egg once found). */
   hideWhen?: Flags;
+  /** It looks different once these flags are set – the first that matches wins (e.g. the eyes are gone). */
+  spriteIf?: { when: Flags; sprite: string }[];
 }
 
 export interface PuzzleOption {

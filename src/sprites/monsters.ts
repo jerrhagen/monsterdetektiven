@@ -70,6 +70,31 @@ export const trashBin: PixelSprite = {
   ],
 };
 
+/** The same dark corner once the glowing eyes are gone – just darkness, and a breath of cold. */
+export const darkCorner: PixelSprite = {
+  palette: { ".": null, d: "#0d0718", D: "#1c1230", f: "#8aa0c8" },
+  frames: [
+    [
+      E,
+      E,
+      "....dddddddd....",
+      "..dddddddddddd..",
+      ".dddDDDDDDDDddd.",
+      ".ddDDDDDDDDDDdd.",
+      ".ddDDDDDDDDDDdd.",
+      ".dddDDDDDDDDddd.",
+      "..dddddddddddd..",
+      "....dddddddd....",
+      "..f.......f.....",
+      ".....f.......f..",
+      E,
+      E,
+      E,
+      E,
+    ],
+  ],
+};
+
 /** Two glowing eyes in a dark corner. They blink now and then. */
 export const shadowEyes: PixelSprite = {
   palette: { ".": null, d: "#0d0718", D: "#1c1230", y: "#ffe27a" },

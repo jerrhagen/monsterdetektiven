@@ -1,4 +1,7 @@
+import { cases } from "../cases";
 import type { CaseState } from "../engine/caseState";
+import { loadSave } from "../engine/save";
+import { casePhoto } from "./casePhotos";
 import { uiRoot } from "./layer";
 import { photoUrl } from "./photo";
 import { playClick } from "./sound";
@@ -71,29 +74,23 @@ function openNotebook(state: CaseState): void {
       </div>
       <button class="turn next" title="Bläddra (→)">▶</button>
     </div>
-    <div class="page photo-page" hidden>
-      <button class="close" title="Stäng (B)">✕</button>
-      <figure class="photo">
-        <span class="tape left"></span><span class="tape right"></span>
-        <img src="${photoUrl()}" alt="Nora och Ester, kind mot kind">
-        <figcaption>Jag och Ester <span class="heart">♥</span></figcaption>
-      </figure>
-      <button class="turn back" title="Bläddra tillbaka (←)">◀</button>
-    </div>
+    ${photoPages()}
   `;
-  // A secret last page: flip with the corner button or the arrow keys.
-  const [first, second] = el.querySelectorAll<HTMLDivElement>(".page");
-  const turn = (toPhoto: boolean) => {
-    if (second.hidden !== toPhoto) return;
-    first.hidden = toPhoto;
-    second.hidden = !toPhoto;
+  // Secret last pages: flip with the corner buttons or the arrow keys.
+  const pages = [...el.querySelectorAll<HTMLDivElement>(".page")];
+  let shown = 0;
+  const turn = (to: number) => {
+    if (to < 0 || to >= pages.length || to === shown) return;
+    pages[shown].hidden = true;
+    pages[to].hidden = false;
+    shown = to;
     playClick();
   };
-  el.querySelector(".next")!.addEventListener("click", () => turn(true));
-  el.querySelector(".back")!.addEventListener("click", () => turn(false));
+  el.querySelectorAll(".next").forEach((b) => b.addEventListener("click", () => turn(shown + 1)));
+  el.querySelectorAll(".back").forEach((b) => b.addEventListener("click", () => turn(shown - 1)));
   onKey = (e) => {
-    if (e.key === "ArrowRight") turn(true);
-    else if (e.key === "ArrowLeft") turn(false);
+    if (e.key === "ArrowRight") turn(shown + 1);
+    else if (e.key === "ArrowLeft") turn(shown - 1);
   };
   window.addEventListener("keydown", onKey);
   el.querySelectorAll(".close").forEach((b) => b.addEventListener("click", closeNotebook));
@@ -101,6 +98,36 @@ function openNotebook(state: CaseState): void {
     if (e.target === el) closeNotebook();
   });
   uiRoot.appendChild(el);
+}
+
+/**
+ * The photo pages after the notebook: Nora and Ester cheek to cheek, then one snapshot for every
+ * case the player has solved (worked out from the save, so it always matches it).
+ */
+function photoPages(): string {
+  const solved = loadSave().cases;
+  const photos = [
+    { url: photoUrl(), alt: "Nora och Ester, kind mot kind", caption: 'Jag och Ester <span class="heart">♥</span>' },
+    ...cases.flatMap((c) => {
+      const photo = solved[c.id] ? casePhoto(c.id) : undefined;
+      return photo ? [{ url: photo.url, alt: photo.alt, caption: escape(photo.caption) }] : [];
+    }),
+  ];
+  return photos
+    .map(
+      (photo, i) => `
+    <div class="page photo-page" hidden>
+      <button class="close" title="Stäng (B)">✕</button>
+      <figure class="photo ${i % 2 ? "tilt-right" : ""}">
+        <span class="tape left"></span><span class="tape right"></span>
+        <img src="${photo.url}" alt="${escape(photo.alt)}">
+        <figcaption>${photo.caption}</figcaption>
+      </figure>
+      <button class="turn back" title="Bläddra tillbaka (←)">◀</button>
+      ${i < photos.length - 1 ? '<button class="turn next" title="Bläddra (→)">▶</button>' : ""}
+    </div>`,
+    )
+    .join("");
 }
 
 function escape(text: string): string {

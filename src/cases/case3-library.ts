@@ -385,6 +385,7 @@ export const case3: Case = {
         x: {
           name: "Det mörka hörnet",
           sprite: "shadowEyes",
+          spriteIf: [{ when: "note-read", sprite: "darkCorner" }],
           talk: ["Två glödande ögon blinkar i hörnet…", "…och så är de borta.", "På väggen sitter en lapp med konstig skrift."],
           talkIf: [
             {

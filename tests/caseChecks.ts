@@ -89,6 +89,7 @@ describe(label, () => {
       it("använder bara figurer som finns", () => {
         const used = [
           ...allThings(c).map((t) => t.sprite),
+          ...allThings(c).flatMap((t) => (t.spriteIf ?? []).map((look) => look.sprite)),
           ...Object.values(c.clues).map((cl) => cl.sprite),
           ...Object.values(c.items ?? {}).map((i) => i.sprite),
           ...Object.values(c.rooms).flatMap((r) => (r.movers ?? []).map((m) => m.sprite)),
