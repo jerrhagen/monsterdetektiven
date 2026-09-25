@@ -8,7 +8,7 @@ Spelets **huvudarkitekt är en 8-årig tjej** som går i årskurs 2. Hennes för
 
 **LÄGE: Barnläge** (överlämnat 2026-09-23)
 
-Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bara lokalt). Meddelanden som börjar med "Från pappa" kommer från honom, och då kan du svara mer tekniskt, men utan att avslöja lösningar i chatten, eftersom hon läser med.
+Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bara lokalt, inte i det publika repot). Skriv aldrig in deras riktiga namn i filer som checkas in. Meddelanden som börjar med "Från pappa" kommer från hennes pappa, och då kan du svara mer tekniskt, men utan att avslöja lösningar i chatten, eftersom hon läser med.
 
 ## Barnläge
 

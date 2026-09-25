@@ -240,7 +240,7 @@ med). Namn som huvudarkitekten bestämmer skrivs som konstanter från `src/seaso
   "färglägg sen!", försöken på ateljéväggen där färgen runnit av) · *Var är färgerna nu?* (i burkarna
   i källaren).
 - **Fånga:** Klick gömmer sig i tavlorna (krypare i `H` = tavlor). **Final:** Nora ger sina färgdroppar,
-  Pia målar Klick i alla färger (`frame` → bild 2), `recolor`, alla vänner kommer in. huvudarkitektens egen tavla
+  Pia målar Klick i alla färger (`frame` → bild 2), `recolor`, alla vänner kommer in. Huvudarkitektens egen tavla
   hänger på utställningen.
 - **Klurigheter:** blanda färger (bildval: röd + gul = ?), bildsudoku med fyra färgburkar (`grid`),
   stava färgord (`word` spell), tavlor i rader och kolumner (kodlås, multiplikation).
