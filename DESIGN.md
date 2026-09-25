@@ -415,6 +415,7 @@ Det här är spelets hjälpsystem och det viktigaste verktyget mot att man tröt
 - **Boken, kartan och musiken** ligger i en kolumn till höger på mobil (i den mörka kanten bredvid spelet), och i en rad upptill på surfplattor där kanten är ovanför spelet.
 - Man trycker på pratbubblan, svaren och menyerna. Tangentbordstips döljs, och små texter och knappar blir större.
 - Håller man mobilen upprätt visas "Vänd mobilen så spelar vi!". På Android går spelet till helskärm i liggande läge när man startar.
+- **Hemlig panel för vuxna:** på titelskärmen klickar man på månens prickar i ordningen liten, mellan, stor, tre gånger i rad. Då öppnas en panel där man för den valda spelaren kan ställa in vilka fall som är klara, med stjärnor och bästa tid (`src/ui/title.ts`). Tre stjärnor räknas som att monsterägget är hittat.
 - Spelet kan läggas till på hemskärmen (manifest och ikon med Nora i `public/`, ikonerna görs med `node scripts/make-icons.ts`).
 
 **Tekniska fallgropar:** Ctrl+W och Ctrl+R stänger respektive laddar om fliken, och det kan man inte stänga av i webbläsaren. Därför finns E och Enter också som använd-knapp. Piltangenter och mellanslag måste ha `preventDefault` så att sidan inte scrollar. När en textruta är aktiv ska spelets tangenter vara avstängda.

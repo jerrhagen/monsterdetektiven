@@ -1,5 +1,6 @@
 import { cases } from "../cases";
 import {
+  type CaseRecord,
   PLAYER_COUNT,
   type SaveData,
   clearPlayer,
@@ -7,6 +8,7 @@ import {
   listPlayers,
   renamePlayer,
   selectPlayer,
+  setSolvedCases,
 } from "../engine/save";
 import { uiRoot } from "./layer";
 import { playClick } from "./sound";
@@ -20,6 +22,17 @@ function escape(text: string): string {
   div.textContent = text;
   return div.innerHTML;
 }
+
+/**
+ * The secret grown-up panel: click the moon's craters small, middle, large – three times in a row.
+ * Positions are in game pixels and match TitleScene.drawMoon (the moon is centred at 294, 50).
+ */
+const MOON_CRATERS = [
+  { size: "small", x: 298, y: 45, r: 2.5 },
+  { size: "middle", x: 290, y: 48, r: 3 },
+  { size: "large", x: 297, y: 54, r: 4 },
+] as const;
+const CHEAT_CODE = ["small", "middle", "large", "small", "middle", "large", "small", "middle", "large"];
 
 /** "Fall 1 ★★☆ · 3 monsterkort" – or "Nytt spel". */
 function progress(data: SaveData): string {
@@ -39,6 +52,7 @@ export function showTitle(onStart: () => void): void {
 
   let chosen = currentPlayer();
   let busy = false; // a question or name box is open
+  let cheatStep = 0;
 
   const render = () => {
     const players = listPlayers();
@@ -63,7 +77,23 @@ export function showTitle(onStart: () => void): void {
           )
           .join("")}
       </div>
+      ${MOON_CRATERS.map(
+        (c) => `<button class="moon-spot" data-size="${c.size}" tabindex="-1" aria-hidden="true"
+          style="left: calc(var(--px) * ${c.x - c.r}); top: calc(var(--px) * ${c.y - c.r});
+                 width: calc(var(--px) * ${c.r * 2}); height: calc(var(--px) * ${c.r * 2})"></button>`,
+      ).join("")}
     `;
+    titleEl!.querySelectorAll<HTMLButtonElement>(".moon-spot").forEach((spot) => {
+      spot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const size = spot.dataset.size;
+        cheatStep = size === CHEAT_CODE[cheatStep] ? cheatStep + 1 : size === CHEAT_CODE[0] ? 1 : 0;
+        if (cheatStep === CHEAT_CODE.length) {
+          cheatStep = 0;
+          openCheat(chosen);
+        }
+      });
+    });
     titleEl!.querySelectorAll<HTMLDivElement>(".player").forEach((card) => {
       const i = Number(card.dataset.i);
       card.addEventListener("click", () => choose(i));
@@ -149,6 +179,50 @@ export function showTitle(onStart: () => void): void {
       box.querySelector(".cancel")!.addEventListener("click", close);
       // Enter keeps everything – clearing must be clicked on purpose.
       return close;
+    });
+
+  /** Set which cases the chosen player has solved, with stars and best time. */
+  const openCheat = (i: number) =>
+    dialog((box, close) => {
+      const records = listPlayers()[i].data.cases;
+      box.classList.add("cheat");
+      box.innerHTML = `
+        <p>🌙 Hemliga panelen – <b>${escape(listPlayers()[i].name)}</b></p>
+        <table>
+          <tr><th>Fall</th><th>Klar</th><th>Stjärnor</th><th>Tid (min:s)</th></tr>
+          ${cases
+            .map((c) => {
+              const r = records[c.id];
+              const time = r ? `${Math.floor(r.bestTime / 60)}:${String(Math.round(r.bestTime % 60)).padStart(2, "0")}` : "";
+              return `<tr data-id="${c.id}">
+                <td>${c.number}. ${escape(c.title)}</td>
+                <td><input type="checkbox" class="done" ${r ? "checked" : ""} /></td>
+                <td><select class="stars">${[1, 2, 3]
+                  .map((n) => `<option ${(r?.stars ?? 3) === n ? "selected" : ""}>${n}</option>`)
+                  .join("")}</select></td>
+                <td><input class="time" value="${time}" placeholder="10:00" /></td>
+              </tr>`;
+            })
+            .join("")}
+        </table>
+        <div class="buttons"><button class="ok">Spara</button><button class="cancel">Avbryt</button></div>`;
+      const save = () => {
+        const next: Record<string, CaseRecord> = {};
+        box.querySelectorAll<HTMLTableRowElement>("tr[data-id]").forEach((row) => {
+          if (!row.querySelector<HTMLInputElement>(".done")!.checked) return;
+          const stars = Number(row.querySelector<HTMLSelectElement>(".stars")!.value);
+          const [min, sec] = row.querySelector<HTMLInputElement>(".time")!.value.split(":").map((n) => Number(n.trim()));
+          const seconds = (Number.isFinite(min) ? min : 10) * 60 + (Number.isFinite(sec) ? sec : 0);
+          const before = records[row.dataset.id!];
+          // Three stars always include the secret egg (see starsFor).
+          next[row.dataset.id!] = { stars, bestTime: Math.max(1, seconds), egg: stars === 3 || (before?.egg ?? false) };
+        });
+        setSolvedCases(i, next);
+        close();
+      };
+      box.querySelector(".ok")!.addEventListener("click", save);
+      box.querySelector(".cancel")!.addEventListener("click", close);
+      return save;
     });
 
   onKey = (e: KeyboardEvent) => {

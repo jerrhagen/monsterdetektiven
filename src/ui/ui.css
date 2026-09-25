@@ -1259,6 +1259,53 @@ body {
   opacity: 1;
 }
 
+/* Invisible buttons on the moon's craters (the secret grown-up panel). */
+.moon-spot {
+  position: absolute;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: default;
+}
+
+.title-dialog-box.cheat {
+  width: 80%;
+  max-height: 90%;
+  overflow-y: auto;
+  font-size: calc(var(--px) * 4.5);
+}
+
+.title-dialog-box.cheat table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.title-dialog-box.cheat th,
+.title-dialog-box.cheat td {
+  padding: calc(var(--px) * 0.8) calc(var(--px) * 1.5);
+}
+
+.title-dialog-box.cheat input.done {
+  width: calc(var(--px) * 5);
+  height: calc(var(--px) * 5);
+}
+
+.title-dialog-box.cheat select,
+.title-dialog-box.cheat input.time {
+  width: auto;
+  font-family: inherit;
+  font-size: calc(var(--px) * 4.5);
+  padding: calc(var(--px) * 0.5) calc(var(--px) * 1.5);
+  border: none;
+  border-radius: calc(var(--px) * 1.5);
+}
+
+.title-dialog-box.cheat input.time {
+  width: calc(var(--px) * 18);
+}
+
 .title-dialog {
   position: absolute;
   inset: 0;

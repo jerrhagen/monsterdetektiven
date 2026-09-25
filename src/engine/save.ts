@@ -103,6 +103,13 @@ export function renamePlayer(index: number, name: string): void {
   writeStore(store);
 }
 
+/** Replaces which cases a player has solved, with stars and times (the secret grown-up panel). */
+export function setSolvedCases(index: number, records: Record<string, CaseRecord>): void {
+  const store = readStore();
+  store.players[index].data.cases = records;
+  writeStore(store);
+}
+
 /** Forgets everything a player has done (after the player confirmed it). */
 export function clearPlayer(index: number): void {
   const store = readStore();
