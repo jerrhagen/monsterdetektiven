@@ -144,6 +144,41 @@ export const bladdra: PixelSprite = {
   ],
 };
 
+/**
+ * Bläddra when Nora meets her in the library hall: shy, blushing and WITHOUT glasses (she hides
+ * them when someone looks), with an old newspaper on her back instead of a book. Standing still.
+ */
+export const bladdraShy: PixelSprite = {
+  palette: {
+    ".": null,
+    o: "#1a1024",
+    g: "#8ad86a", // body
+    G: "#5aa84a", // segments
+    y: "#d8f0a0", // belly
+    k: "#1a1024", // eyes, looking down
+    p: "#ff9ab8", // cheeks
+    m: "#7a2a3a", // mouth
+    w: "#e8e0cc", // newspaper
+    n: "#8a8496", // newspaper print
+  },
+  frames: [
+    [
+      "..........oooo..",
+      "..ooo....oggggo.",
+      ".ownwo..oggggggo",
+      ".onwno..ogkggkgo",
+      "..ooooo.oggggggo",
+      "..oggggoogpggpgo",
+      ".oggGgggGgggmgo.",
+      ".oggGgggGgggggo.",
+      "oyyyyyyyyyyyyo..",
+      ".oooooooooooo...",
+      E16,
+      E16,
+    ],
+  ],
+};
+
 /** Uppslagsboken Ugo – an encyclopedia that woke up and started flying. Frame 0: pages up, frame 1: pages down. */
 export const ugo: PixelSprite = {
   palette: {
@@ -639,6 +674,7 @@ export const case3Sprites: Record<string, PixelSprite> = {
   bodil,
   pelle,
   bladdra,
+  bladdraShy,
   ugo,
   ugoRest,
   dammis,

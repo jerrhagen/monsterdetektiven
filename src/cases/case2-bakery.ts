@@ -5,20 +5,28 @@ import type { Case } from "./types";
 //
 // Built as a "theory ladder": every room changes what Nora believes.
 //   Bakery: "Måns? Gustav? Berit herself?" – cat hairs, Gustav at the window, a half-eaten bun,
-//           and a strange tuft of blue fluff in the cat flap. Smulan is only a name on the board ("always asks nicely").
+//           and a strange tuft of blue fluff in the cat flap. Smulan is MET here, in an innocent role: she picks up
+//           crumbs for Berit, always asks first, blames Måns (and the mouse for the rustling), explains the fluff away –
+//           and says she slept in her bed up in the attic and never goes down in the cellar (the lie that cracks).
 //   Yard:   "Not a person, not the cat" – three-toed prints; Gustav's tracks show a cat has FOUR toes;
 //           Gustav saw something small carrying a glowing bun down into the cellar (early morning, still dark).
-//   Cellar: "The ghost? Gustav's black boots?" – then glowing crumbs lead to a nest of blue fluff: SMULANS HEM.
+//   Cellar: "The ghost? Gustav's black boots?" – then glowing crumbs lead to a nest of blue fluff: SMULANS HEM,
+//           down in the cellar where Smulan said she never goes. Once Nora has both the nest and Smulan's words,
+//           Smulan slips away into the bread shelves (hideWhen) and is only glimpsed from then on.
 //           The black prints walk into the wall: not Gustav's boots, but the red thread (Skuggan).
-// The reveal asks who (everything that ties the thief to Smulan: fluff, prints, Gustav, glowing crumbs, nest)
-// and why (everything about the glowing bun: Berit, Gustav, the glowing crumbs).
+// Every suspect in the reveal is met, except the little mouse that is only glimpsed – and it is innocent.
+// The reveal asks who (everything that ties the thief to Smulan: fluff, prints, Gustav, glowing crumbs, nest,
+// and Smulan's own words that the nest proves wrong) and why (everything about the glowing bun).
 // Truth not said in the finale: the thief got out through the cat flap (the door was locked), the crumbs in
-// Måns's bowl fell when Smulan ran past, the cat hairs are from Måns's daily cream, Berit's bun was her own fika.
+// Måns's bowl fell when Smulan ran past, the cat hairs are from Måns's daily cream, Berit's bun was her own fika,
+// and Smulan came back to pick up crumbs as if nothing had happened.
 // Ending: Nora bakes fresh buns from Berit's recipe, and the smell lures Smulan out of the bread shelves.
 
-const BAKERY_CLUES = ["clue:crumbs", "clue:catHair", "clue:blueFluff", "clue:regulars", "clue:beritBun"];
+const BAKERY_CLUES = ["clue:crumbs", "clue:catHair", "clue:blueFluff", "clue:regulars", "clue:beritBun", "clue:smulanSaid"];
 const YARD_CLUES = ["clue:mudPrints", "clue:catBowl", "clue:gustavBoots", "clue:gustavSaw"];
 const CELLAR_CLUES = ["clue:flourGhost", "clue:blackPrints", "clue:glowCrumbs", "clue:nest"];
+/** Smulan stays in the bakery until Nora has heard her AND found the nest – so her clue can never be missed. */
+const SMULAN_GONE = ["clue:nest", "clue:smulanSaid"];
 /** Every clue of the case (so every proof clue too) – the reveal opens when the book is full. */
 const ALL_CLUES = [...BAKERY_CLUES, "clue:glowBun", "clue:gustavWindow", ...YARD_CLUES, ...CELLAR_CLUES];
 
@@ -40,9 +48,9 @@ export const case2: Case = {
       theme: "bakery",
       layout: [
         "##############DD####",
-        "##############..####",
-        "##OOtHHHH.HHHH.3r###",
-        "##OO....2........###",
+        "##############.3####",
+        "##OOtHHHH.HHHH..r###",
+        "##OO..s.2........###",
         "##..........b..1.###",
         "##.........KKKc..###",
         "##...............###",
@@ -70,21 +78,23 @@ export const case2: Case = {
           talkIf: [
             {
               when: "caught",
-              talk: ["Tack, Nora! Och välkommen, Smulan!", "Nu har jag den bästa bagarhjälpen i hela stan."],
+              talk: ["Tack, Nora! Nu får Smulan baka med mig, inte bara plocka smulor.", "Då har jag den bästa bagarhjälpen i hela stan."],
             },
             {
               when: "solved",
               talk: [
                 "Smulan!? Lilla Smulan som alltid frågar så snällt…",
+                "Hen plockade ju smulor här alldeles nyss. Nu har hen gömt sig.",
                 "Hen är nog jättehungrig. Och rädd.",
                 "Jag vet! Vi bakar nya bullar. Doften lockar fram hen!",
                 "Receptet ligger på bakbordet vid ugnen.",
               ],
             },
             {
-              when: ["talked-to-berit", "clue:nest"],
+              when: ["talked-to-berit", ...SMULAN_GONE],
               talk: [
                 "Nora! Något blått kilade just förbi bröden!",
+                "Och vart tog Smulan vägen? Hen plockade ju smulor här nyss.",
                 "Du är nära, tror jag. Men något fattas…",
                 "Har du undersökt allt? Här, på gården och i källaren?",
               ],
@@ -117,9 +127,44 @@ export const case2: Case = {
             "BERITS STAMKUNDER:",
             "Gustav – tre kanelbullar varje morgon.",
             "Måns – en skvätt grädde. (Han är ju en katt.)",
-            "Smulan – ett litet monster. Frågar alltid snällt efter smulor.",
+            "Smulan – ett litet monster. Plockar smulor från golvet och frågar alltid snällt.",
           ],
           clue: "regulars",
+        },
+        // Smulan, met early as a sweet little helper. She is the thief – her words crack when the nest is found.
+        s: {
+          name: "Smulan",
+          sprite: "smulan",
+          person: true,
+          talk: [
+            "Hej! Jag heter Smulan. Jag plockar upp smulor från golvet åt Berit.",
+            "Är bullarna borta? Det var inte jag! Jag frågar ALLTID innan jag tar något.",
+            "I natt sov jag i min säng, högst upp på vinden.",
+            "Ner i källaren går jag aldrig. Där är det mörkt och läskigt!",
+            "Har du frågat katten Måns? Han smaskar i sig ALLT.",
+          ],
+          gives: "talked-to-smulan",
+          clue: "smulanSaid",
+          hideWhen: SMULAN_GONE,
+          talkIf: [
+            {
+              // Only heard if Nora found the nest before talking to Smulan (otherwise Smulan is gone by now).
+              when: "clue:nest",
+              talk: ["Va? Har du varit i KÄLLAREN?", "D-du såg väl inget… bo där nere?", "Jag måste plocka smulor där borta nu. Hejdå!"],
+            },
+            {
+              when: ["talked-to-smulan", "clue:mudPrints"],
+              talk: ["Spår med TRE tår? Hm… Det har väl massor av djur!", "Jag måste plocka smulor nu. Så många det är!"],
+            },
+            {
+              when: ["talked-to-smulan", "clue:blueFluff"],
+              talk: ["Blått fluff? Jag tappar fluff överallt!", "Jag är ju här och plockar smulor varje dag."],
+            },
+            {
+              when: "talked-to-smulan",
+              talk: ["Plocka, plocka… Prasslar det bland bröden? Det är nog bara musen!", "Jag tror att det var Måns."],
+            },
+          ],
         },
         c: {
           name: "Berits kaffekopp",
@@ -158,7 +203,7 @@ export const case2: Case = {
           "Vi måste prata med Berit.",
         ],
       },
-      // Something hides among the bread. Only rustling at first – after the nest, quick blue glimpses.
+      // Something hides among the bread. Only rustling at first – once Smulan has slipped away, quick blue glimpses.
       monsters: [
         {
           type: "crawler",
@@ -170,9 +215,9 @@ export const case2: Case = {
             [[13, 8], [16, 8], [16, 10]],
           ],
           shelters: [[5, 2], [11, 2], [3, 8], [14, 9]],
-          unseenUntil: "clue:nest",
+          unseenUntil: SMULAN_GONE,
         },
-        // A little mouse that scurries across the floor now and then. It has nothing to do with it.
+        // A little mouse that scurries across the floor now and then. It has nothing to do with it (an innocent suspect).
         {
           type: "crawler",
           sprite: "bakeryMouse",
@@ -227,7 +272,7 @@ export const case2: Case = {
           gives: "talked-to-gustav",
           clue: "gustavBoots",
           talkIf: [
-            { when: "caught", talk: ["Jag hörde att Smulan ska hjälpa Berit nu!", "Då blir det ännu fler bullar. Hurra!"] },
+            { when: "caught", talk: ["Jag hörde att Smulan ska få baka med Berit nu!", "Då blir det ännu fler bullar. Hurra!"] },
             { when: "solved", talk: ["Så det var Smulan! Stackarn var nog bara hungrig."] },
             {
               when: "tracks-solved",
@@ -261,7 +306,7 @@ export const case2: Case = {
         talk: [
           "Shh, Nora! Där sover gårdskatten Måns.",
           "Om du hoppar nära honom vaknar han. Och då blir han ARG!",
-          "Bäcken slingrar sig hela vägen fram till Gustav. Man kan gå runt…",
+          "Det är vattenpölar på vägen till Gustav. Gå runt dem i stället för att hoppa…",
           "…och vaknar Måns ändå: spring till Gustav! Då ger Måns upp.",
         ],
       },
@@ -282,8 +327,8 @@ export const case2: Case = {
       theme: "storage",
       layout: [
         "####################",
-        "#LL..........L.....D",
-        "#L.....2.....L.....D",
+        "#LL....2.....L.....D",
+        "#L...........L.....D",
         "#............LL..L.#",
         "#..LL..............#",
         "#..................#",
@@ -300,7 +345,7 @@ export const case2: Case = {
           sprite: "smulanNest",
           talk: [
             "Ett litet bo av BLÅTT fluff, gömt bakom säckarna.",
-            "På en skylt står det: \"SMULANS HEM\".",
+            "På en skylt står det: \"SMULANS HEM\". Här nere i källaren?",
             "Boet är tomt… Små spår med TRE tår går ut ur det.",
           ],
           clue: "nest",
@@ -403,23 +448,27 @@ export const case2: Case = {
             { id: "ghost", label: "Mjölspöket", sprite: "bakeryFlourGhost" },
             { id: "berit", label: "Bagaren Berit", sprite: "berit" },
             { id: "smulan", label: "Monstret Smulan", sprite: "smulan" },
+            { id: "mouse", label: "Musen", sprite: "bakeryMouse" },
           ],
           answer: "smulan",
           // Everything that ties the thief to Smulan: blue fluff in the cat flap, three toes in the sand,
-          // Gustav saw it go into the cellar, glowing crumbs lead to the nest – and the nest (blue, three toes, SMULANS HEM).
-          proof: ["blueFluff", "mudPrints", "gustavSaw", "glowCrumbs", "nest"],
+          // Gustav saw it go into the cellar, glowing crumbs lead to the nest, the nest (blue, three toes, SMULANS HEM)
+          // – and Smulan's own words, which the nest shows weren't true (she does live in the cellar).
+          proof: ["blueFluff", "mudPrints", "gustavSaw", "glowCrumbs", "nest", "smulanSaid"],
           missing: {
             blueFluff: "Hur kom tjuven ut ur bageriet? Dörren var ju låst. Fastnade något där?",
             mudPrints: "Tjuven sprang över gården. Lämnade hen några spår?",
             gustavSaw: "Någon på gården såg tjuven i morse. Vad sa han?",
             glowCrumbs: "Något lyste på golvet i källaren. Vart ledde det?",
             nest: "Vem bor bakom säckarna i källaren?",
+            smulanSaid: "Smulan berättade var hen sov i natt. Stämde det med det du hittade i källaren?",
           },
           whyNot: {
             mans: "Katter har FYRA tår – det såg du i Gustavs spårsamling. Tjuvens spår har bara TRE. Och Måns är grå, inte blå!",
             gustav: "Gustav har stövlar, inte tre tår. Och han är alldeles för stor för kattluckan!",
             ghost: "Mjölspöket svävar – det har inga fötter alls! Och det är vitt, inte blått.",
             berit: "Berit har inte tre tår, och hon får inte plats i kattluckan. Kaffebullen? Den får man äta i sitt eget bageri!",
+            mouse: "Musen är grå och har en lång svans. Men fluffet i kattluckan var BLÅTT – och Gustav såg något runt!",
           },
           why: {
             crumbs: "Smulorna visar att tjuven gick mot gården. Men vem som helst kan tappa smulor – de säger inte VEM.",
@@ -470,6 +519,7 @@ export const case2: Case = {
             flourGhost: "Mjölspöket säger inget om varför.",
             blackPrints: "De svarta spåren är ett annat mysterium. De säger inget om Smulan.",
             nest: "Boet visar VEM det var. Men varför tog hen bullarna?",
+            smulanSaid: "Smulan sa att hen aldrig går ner i källaren. Det stämde inte! Men det säger inte VARFÖR hen tog bullarna.",
           },
         },
       ],
@@ -498,7 +548,12 @@ export const case2: Case = {
     regulars: {
       name: "Stamkundstavlan",
       sprite: "bakeryBoard",
-      text: "Berits stamkunder: Gustav (tre kanelbullar varje morgon), Måns (grädde) och Smulan – ett litet monster som alltid frågar snällt efter smulor.",
+      text: "Berits stamkunder: Gustav (tre kanelbullar varje morgon), Måns (grädde) och Smulan – ett litet monster som plockar smulor från golvet och alltid frågar snällt.",
+    },
+    smulanSaid: {
+      name: "Smulans ord",
+      sprite: "smulan",
+      text: "Smulan: \"Jag frågar ALLTID innan jag tar något! I natt sov jag i min säng på vinden. Ner i källaren går jag aldrig.\"",
     },
     beritBun: {
       name: "Berits kaffebulle",
@@ -560,6 +615,7 @@ export const case2: Case = {
         "F-förlåt! Det var jag som tog bullarna.",
         "En bulle LYSTE så fint. Jag bara MÅSTE ha den!",
         "Och sen var jag så hungrig… Jag glömde att fråga.",
+        "Och jag bor inte på vinden. Jag bor i källaren. Förlåt att jag ljög!",
       ],
     },
     { say: "Berit", lines: ["Åh, lilla Smulan.", "Nästa gång frågar du. Då delar vi!"] },
@@ -585,6 +641,7 @@ export const case2: Case = {
     "Dörren var låst. Så Smulan kröp ut genom kattluckan – och där fastnade lite av hens BLÅA fluff.",
     "På gården fanns Smulans spår med TRE tår. Katter har fyra, så det var inte Måns. Smulorna i hans skål trillade ner när Smulan sprang förbi.",
     "Gustav såg något litet springa ner i källaren med bullen som lyste. De lysande smulorna ledde ända fram till Smulans bo: SMULANS HEM.",
+    "Sen gick Smulan tillbaka och plockade smulor i bageriet, som om ingenting hade hänt. Hen sa att hen aldrig går ner i källaren – men där låg ju hens bo! När du hittade det blev hen rädd och gömde sig bland bröden.",
     "Smulan brukar fråga snällt. Men bullen lyste så fint att hen glömde bort det. Det var biten av månen inne i bullen som lyste!",
     "Och de svarta spåren i källaren? Det var inte Gustavs stövlar – spåren gick rakt in i väggen. Någon annan har varit där…",
   ],
@@ -616,6 +673,7 @@ export const case2: Case = {
         { text: "Titta noga vid dörren till gården, längst upp. Har något fastnat där?", skipWhen: "clue:blueFluff" },
         { text: "Tavlan uppe till höger visar vilka som brukar komma hit.", skipWhen: "clue:regulars" },
         { text: "Vad står på disken bredvid Berit?", skipWhen: "clue:beritBun" },
+        { text: "Smulan plockar smulor vid brödhyllorna uppe till vänster. Prata med hen!", skipWhen: "clue:smulanSaid" },
       ],
     },
     {
@@ -634,7 +692,7 @@ export const case2: Case = {
       doneWhen: YARD_CLUES,
       hints: [
         { text: "Titta noga i sanden!", skipWhen: "clue:mudPrints" },
-        "Måns vaknar om du hoppar nära honom. Gå runt längs bäcken – eller hoppa långt ifrån honom. Vaknar han: spring till Gustav!",
+        "Måns vaknar om du hoppar nära honom. Gå runt längs vattenpölarna – eller hoppa långt ifrån honom. Vaknar han: spring till Gustav!",
         { text: "Vad står bredvid Måns?", skipWhen: "clue:catBowl" },
         { text: "Grannen Gustav står uppe till höger. Prata med honom!", skipWhen: "talked-to-gustav" },
         {
@@ -678,7 +736,7 @@ export const case2: Case = {
         "Berätta för Berit vad du har kommit fram till.",
         "Tre tår och blått fluff… vem bor i boet i källaren?",
         "Smulan brukar fråga snällt. Men en bulle LYSTE… Titta i detektivboken (B)!",
-        "VEM: följ tjuvens väg från kattluckan, över gården och ner till boet. VARFÖR: allt som handlar om bullen som lyste.",
+        "VEM: följ tjuvens väg från kattluckan, över gården och ner till boet. Och vem sa något som inte stämde? VARFÖR: allt som handlar om bullen som lyste.",
       ],
     },
     {

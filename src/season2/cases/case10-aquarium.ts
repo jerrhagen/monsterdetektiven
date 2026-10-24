@@ -116,7 +116,7 @@ export const case10: Case = {
       theme: "aquarium",
       faded: FADED,
       layout: [
-        "####DD##############",
+        "####DDb#############",
         "#HH.......o......HH#",
         "#...2......1.......#",
         "D.....HH.....HH....#",
@@ -130,6 +130,16 @@ export const case10: Case = {
         "#############DD#####",
       ],
       things: {
+        b: {
+          name: "Dykartavlan",
+          sprite: "aqDiveBoard",
+          on: "#",
+          talk: [
+            `${S2.diver}s dykartavla hänger bredvid dörren.`,
+            "Den är full av siffror – en hemlig kod!",
+            "Gå fram till dörren, så kan du knäcka koden.",
+          ],
+        },
         d: {
           name: S2.diver,
           sprite: "s2Diver",
@@ -416,7 +426,7 @@ export const case10: Case = {
         g: {
           name: "Något glittrar",
           sprite: "monsterEgg",
-          talk: ["Ett hemligt monsterägg – bland snäckorna!", "Det är svalt och blankt… och det gungar lite."],
+          talk: ["Ett hemligt monsterägg – bland stenarna!", "Det är svalt och blankt… och det gungar lite."],
           gives: "egg",
           hideWhen: "egg",
         },
@@ -483,9 +493,9 @@ export const case10: Case = {
     "seal-door": {
       type: "word",
       mode: "cipher",
-      title: "Dinas dykartavla",
+      title: `${S2.diver}s dykartavla`,
       text: [
-        "Bredvid dörren hänger Dinas dykartavla.",
+        `Bredvid dörren hänger ${S2.diver}s dykartavla.`,
         "Lösenordet står där – i hemlig sifferkod!",
         "Varje siffra är en bokstav: A = 1, B = 2 …",
       ],

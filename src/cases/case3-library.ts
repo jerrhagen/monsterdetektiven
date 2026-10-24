@@ -3,29 +3,46 @@ import type { Case } from "./types";
 // Case 3 – Spöket i biblioteket: the books move around at night, and everyone says it's a ghost.
 // SPOILER: Viskan is innocent. The books are borrowed by Bokmalen Bläddra, a bookworm who lives in
 // the cellar and practises reading at night – with a glowing piece of the Moonstone as a reading lamp.
+// Nora meets Bläddra in the hall right away, in an innocent role: a shy worm who keeps the shelves
+// clean for Bodil by eating the dust. She is ashamed that she can't read yet, so she fibs: she
+// "can't stand books" and "NEVER goes down to the cellar" – and she hides her glasses when someone
+// looks. The cellar later shows the fib. Once Nora has both her words and the trail, Bläddra has
+// slipped away (and only then is she glimpsed crawling), so the catch-in-a-shelf ending still works.
 //
 // Built as a "theory ladder": every room changes what Nora believes.
 //   Library hall:  "It's a ghost – Viskan! Or Pelle? Or Bodil, who has the only key?"
-//                  Whispers at night, books on the floor, "chewed" pink crumbs, Pelle "saw" the ghost.
-//   Reading room:  "It's no ghost!" – Ugo saw something long and soft, with glasses (like Bodil…?)
-//                  and a blue lamp, crawling off towards the cellar. The books lead down there too.
-//   Cellar:        "A bookworm that is learning to read!" – a wriggly trail without feet, a practice
-//                  sheet (the crumbs were from an eraser), a fort of whole ABC books opened at A, B, C,
-//                  and Viskan (who can't carry anything) hears someone sound out B… O… K… at night.
-// The first case with an unreliable witness: Pelle says he saw the ghost, but he only heard the rumour.
-// The reveal asks who it is (reading room + cellar) and why (library hall + cellar).
+//                  Whispers at night, books on the floor, "chewed" pink crumbs, Pelle "saw" the ghost,
+//                  and shy Bläddra, who only eats dust and hid something round and shiny.
+//   Reading room:  "It's no ghost!" – Ugo saw something long (tall?) and soft with glasses – Bodil…?
+//                  It was too dark to see feet. It carried a blue lamp off towards the cellar.
+//   Cellar:        "A bookworm that is learning to read!" – a wriggly trail without feet (so not Bodil,
+//                  and Bläddra DID go down there), a practice sheet (the crumbs were from an eraser), a
+//                  fort of whole ABC books opened at A, B, C, and Viskan hears someone sound out B… O… K…
+// Witnesses who can't be trusted: Pelle says he saw the ghost, but he only heard the rumour – and
+// Bläddra fibs because she is ashamed. Among the answers there is also a booklouse, only glimpsed.
+// The reveal asks who it is (hall + reading room + cellar) and why (library hall + cellar).
 // Route: hall →top door→ reading room →stairs down (left)→ cellar. From the hall, stairs up (right)
 // lead to the top of the library tower – optional, with nothing but the secret egg and a view.
 // Ugo only tells what it LOOKED like, Viskan only what she HEARD – so each clue shows one thing.
 
-const HALL_CLUES = ["clue:messyBooks", "clue:eraserCrumbs", "clue:missingList", "clue:locked", "clue:pelleSaw"];
+const HALL_CLUES = [
+  "clue:messyBooks",
+  "clue:eraserCrumbs",
+  "clue:missingList",
+  "clue:locked",
+  "clue:pelleSaw",
+  "clue:bladdraSays",
+];
 const READING_CLUES = ["clue:ugoSaw", "clue:bookLine", "clue:moonBook"];
 const CELLAR_CLUES = ["clue:wormTrail", "clue:practiceSheet", "clue:bookFort", "clue:viskanSaw", "clue:skuggaNote"];
 /**
  * The reveal opens when every room has been investigated (like case 1) – that covers every proof
- * clue (ugoSaw, wormTrail, missingList, practiceSheet, viskanSaw, bookFort) and keeps the goals in step.
+ * clue (bladdraSays, ugoSaw, wormTrail, missingList, practiceSheet, viskanSaw, bookFort) and keeps
+ * the goals in step.
  */
 const REVEAL_NEEDS = [...HALL_CLUES, ...READING_CLUES, ...CELLAR_CLUES];
+/** Bläddra slips away once Nora has heard her fib AND seen the trail that shows it – never before she's met. */
+const BLADDRA_GONE = ["clue:bladdraSays", "clue:wormTrail"];
 
 export const case3: Case = {
   id: "library",
@@ -46,7 +63,7 @@ export const case3: Case = {
       layout: [
         "#####DD#############",
         "#####..#############",
-        "#HHHH..HHHH...KlK..#",
+        "#HHHH..HHHHw..KlK..#",
         "#.............K.b..#",
         "#..v..........K....#",
         "#..................#",
@@ -79,9 +96,17 @@ export const case3: Case = {
             {
               when: "solved",
               talk: [
-                "En bokmal som vill lära sig läsa!? Men var är hen nu?",
+                "Bläddra!? Hon vill lära sig läsa? Men var är hon nu?",
                 "Titta – böckerna skakar på en av hyllorna…",
-                "Hen gömmer sig! Hitta hen, Nora. Men var snäll!",
+                "Hon gömmer sig! Hitta henne, Nora. Men var snäll!",
+              ],
+            },
+            {
+              when: BLADDRA_GONE,
+              talk: [
+                "Du har varit nere i källaren? Så modigt!",
+                "Men var är Bläddra? Hon dammade vid hyllan nyss… och nu är hon borta.",
+                "Har du undersökt allt? Både där nere och här uppe?",
               ],
             },
             {
@@ -98,7 +123,11 @@ export const case3: Case = {
             },
             {
               when: "talked-to-bodil",
-              talk: ["Har du hittat några ledtrådar?", "Titta på golvet, på min disk… och prata med Pelle."],
+              talk: [
+                "Har du hittat några ledtrådar?",
+                "Titta på golvet och på min disk. Och prata med Pelle och Bläddra!",
+                "Bläddra håller hyllorna rena åt mig. Hon är så blyg, stackarn.",
+              ],
             },
           ],
           puzzle: "reveal",
@@ -156,6 +185,28 @@ export const case3: Case = {
             },
           ],
         },
+        // The culprit, met early in an innocent role. Her fib (no books, never the cellar) is shown
+        // false by the cellar, and the "round, shiny thing" she hides is her glasses.
+        w: {
+          name: "Bokmalen Bläddra",
+          person: true,
+          sprite: "bladdraShy",
+          talk: [
+            "Åh! H-hej… Jag heter Bläddra.",
+            "(Bläddra gömmer snabbt något runt och blankt under tidningen.)",
+            "Jag håller hyllorna rena åt Bodil. Jag äter upp dammet på gamla tidningar. Mums!",
+            "Böcker? Usch, nej. Böcker tycker jag inte om.",
+            "Och ner i källaren går jag ALDRIG. Där är det så mörkt!",
+          ],
+          clue: "bladdraSays",
+          talkIf: [
+            {
+              when: "clue:bladdraSays",
+              talk: ["Bläddra tittar ner i golvet.", "\"Jag… jag måste damma nu.\""],
+            },
+          ],
+          hideWhen: BLADDRA_GONE,
+        },
         s: {
           name: "Skylt",
           sprite: "sign",
@@ -176,8 +227,9 @@ export const case3: Case = {
           "Vi pratar med bibliotekarien.",
         ],
       },
-      // Something hides in the shelves. Before the cellar only the books rustle;
-      // after the trail, short glimpses; after the reveal it hides in a shelf until Nora finds it.
+      // Something hides in the shelves. Before the cellar only the books rustle; once Bläddra has
+      // slipped away (after her fib and the trail), short glimpses – now with her glasses on;
+      // after the reveal she hides in a shelf until Nora finds her.
       monsters: [
         {
           type: "crawler",
@@ -189,7 +241,7 @@ export const case3: Case = {
             [[17, 8], [17, 5]],
           ],
           shelters: [[2, 2], [8, 2], [2, 6], [6, 7], [14, 6]],
-          unseenUntil: "clue:wormTrail",
+          unseenUntil: BLADDRA_GONE,
           catchWhen: "solved",
         },
       ],
@@ -285,7 +337,7 @@ export const case3: Case = {
           sprite: "ugo",
           center: [10, 5],
           size: [7, 3],
-          perch: [12, 3],
+          perch: [13, 3],
           perchSprite: "ugoRest",
           thing: {
             name: "Uppslagsboken Ugo",
@@ -297,9 +349,10 @@ export const case3: Case = {
                 when: "ugo-helped",
                 talk: [
                   "Tack! Nu är mina ord rätt igen.",
-                  "I natt kröp något över mina sidor. Något LÅNGT och MJUKT.",
-                  "Det hade inga fötter. Men det hade glasögon!",
-                  "Det bar en liten blå lampa. Sen kröp det iväg mot källaren.",
+                  "I natt kom något fram till mig. Något LÅNGT och MJUKT.",
+                  "Och det hade glasögon! De blänkte i ljuset.",
+                  "Fötter? Det såg jag inte. Det var för mörkt.",
+                  "Det bar en liten blå lampa. Sen försvann det mot källaren.",
                   "Inget spöke, alltså. Spöken lyser ju själva!",
                 ],
                 clue: "ugoSaw",
@@ -437,7 +490,8 @@ export const case3: Case = {
           path: [[1, 6], [18, 6]],
           speed: 40,
         },
-        // Once Nora has seen the trail, something long and green scuttles by now and then.
+        // Once Nora has seen the trail (and Bläddra has slipped away upstairs), something long and
+        // green scuttles by now and then.
         {
           type: "crawler",
           sprite: "bladdra",
@@ -446,7 +500,7 @@ export const case3: Case = {
             [[11, 8], [14, 8]],
             [[1, 10], [6, 10]],
           ],
-          unseenUntil: "clue:wormTrail",
+          unseenUntil: BLADDRA_GONE,
         },
       ],
       onEnter: {
@@ -643,20 +697,25 @@ export const case3: Case = {
             { id: "pelle", label: "Pelle", sprite: "pelle" },
             { id: "bodil", label: "Bodil Bok", sprite: "bodil" },
             { id: "ugo", label: "Uppslagsboken Ugo", sprite: "ugo" },
-            { id: "worm", label: "En bokmal", sprite: "bladdra" },
+            { id: "worm", label: "Bokmalen Bläddra", sprite: "bladdraShy" },
+            // Only glimpsed, never met – and innocent.
+            { id: "louse", label: "Boklusen", sprite: "libraryBooklouse" },
           ],
           answer: "worm",
-          // What it looked like (reading room) and the trail it left (cellar).
-          proof: ["ugoSaw", "wormTrail"],
+          // What it looked like (reading room), the trail it left (cellar) – and Bläddra's own fib and
+          // the round, shiny thing she hid (hall), which the trail and Ugo's glasses show up.
+          proof: ["bladdraSays", "ugoSaw", "wormTrail"],
           missing: {
+            bladdraSays: "Vad sa Bläddra själv när du träffade henne? Och vad gömde hon när du tittade?",
             ugoSaw: "Någon i läsrummet såg den i natt, på riktigt nära håll. Vad sa hen?",
             wormTrail: "Vilka spår fanns i dammet i källaren? Var det fotspår?",
           },
           whyNot: {
             viskan: "Viskan kan inte bära något – allt ramlar rakt igenom henne! Och hon svävar, så hon lämnar inga spår i dammet.",
-            pelle: "Den som kom hade inga fötter – spåret i källaren var inga fotspår. Och på natten är biblioteket låst!",
-            bodil: "Bodil har glasögon, precis som den Ugo såg. Men Bodil har fötter! Spåret i källaren var inga fotspår.",
-            ugo: "Ugo flyger – han kryper inte. Och han såg själv den som kröp över hans sidor!",
+            pelle: "Pelle har inga glasögon. Och på natten är biblioteket låst – han var inte ens här!",
+            bodil: "Bodil har glasögon, precis som den Ugo såg. Men spåret i källaren var inga fotspår – och Bodil har ju fötter!",
+            ugo: "Ugo flyger – han kryper inte. Och han såg själv den som kom fram till honom!",
+            louse: "Boklusen är mindre än ett riskorn! Den orkar inte bära en enda bok. Och den har inga glasögon.",
           },
           why: {
             whispers: "Viskningarna lät som ett spöke. Men Bodil hörde dem bara genom golvet. Hon såg inte vem det var.",
@@ -675,7 +734,7 @@ export const case3: Case = {
           },
         },
         {
-          question: "Varför tar bokmalen böckerna?",
+          question: "Varför tog Bläddra böckerna?",
           options: [
             { id: "eat", label: "För att äta upp dem" },
             { id: "nest", label: "För att bygga ett bo" },
@@ -694,12 +753,14 @@ export const case3: Case = {
             viskanSaw: "Någon i källaren hör vad som sägs där nere på nätterna. Vad sa hen?",
           },
           whyNot: {
-            eat: "Ingen bok var uppäten – böckerna i borgen var hela! Och smulorna kom från ett suddgummi.",
+            eat: "Ingen bok var uppäten – böckerna i borgen var hela! Bläddra äter ju bara damm. Och smulorna kom från ett suddgummi.",
             nest: "Böckerna i borgen låg uppslagna på A, B, C – som när man läser. Inte som ett bo!",
             scare: "Det var inget spökljud. Viskan hörde någon ljuda: B… O… K… och sucka att det var svårt.",
-            tear: "Böckerna i borgen var hela. Bara boken om Månstenen saknade sidor – och den tog bokmalen inte ens med sig.",
+            tear: "Böckerna i borgen var hela. Bara boken om Månstenen saknade sidor – och den tog Bläddra inte ens med sig.",
           },
           why: {
+            bladdraSays:
+              "Bläddra sa att hon inte tycker om böcker. Det stämde inte – hon skämdes nog. Men det visar inte VARFÖR hon tog dem. Vad hittade du i källaren?",
             whispers: "Ja, det var nog någon som ljudade! Men genom golvet lät det bara som \"Buuu… ooo…\". Vem hörde orden på nära håll?",
             messyBooks: "Böckerna på golvet visar att de har flyttats – men inte varför.",
             eraserCrumbs: "Smulorna kom från ett suddgummi! Men det är pappret i källaren som visar VAD någon suddade och övade på.",
@@ -757,7 +818,12 @@ export const case3: Case = {
     ugoSaw: {
       name: "Ugos vittnesmål",
       sprite: "ugoRest",
-      text: "Något långt och mjukt kröp över Ugo i natt. Inga fötter, men glasögon! Det bar en blå lampa och kröp iväg mot källaren.",
+      text: "Något långt och mjukt kom fram till Ugo i natt. Det hade glasögon som blänkte! Fötter såg han inte – det var för mörkt. Det bar en blå lampa och försvann mot källaren.",
+    },
+    bladdraSays: {
+      name: "Bläddras svar",
+      sprite: "bladdraShy",
+      text: "Bokmalen Bläddra är blyg. Hon håller hyllorna rena åt Bodil och äter bara damm. Hon säger att hon inte tycker om böcker – och att hon ALDRIG går ner i källaren. När Nora tittade gömde hon snabbt något runt och blankt.",
     },
     bookLine: {
       name: "Böcker i en rad",
@@ -804,22 +870,23 @@ export const case3: Case = {
   },
 
   finale: [
-    { say: "Nora", lines: ["Hittade dig!", "En bokmal… med glasögon!"] },
+    { say: "Nora", lines: ["Hittade dig, Bläddra!", "Och där är ju det runda och blanka du gömde. Dina glasögon!"] },
     {
       say: "Bläddra",
       lines: [
         "F-förlåt! Snälla, bli inte arga…",
-        "Jag heter Bläddra. Jag bor i källaren.",
-        "Alla här kan läsa. Utom jag.",
-        "Så på nätterna lånade jag böcker och övade. B… O… K…",
-        "Men det är så SVÅRT. Jag trodde aldrig att jag skulle lära mig.",
+        "Jag sa att jag aldrig går ner i källaren. Men jag BOR där.",
+        "Och jag sa att jag inte tycker om böcker. Det var inte sant.",
+        "Alla här kan läsa. Utom jag. Jag skämdes så.",
+        "Därför gömde jag glasögonen när någon tittade. Då trodde ingen att jag läste.",
+        "På nätterna lånade jag lätta böcker och övade. B… O… K… Men det är så SVÅRT.",
       ],
     },
     {
       say: "Bodil Bok",
       lines: [
         "Men lilla vän! Alla kan lära sig läsa.",
-        "Det tar bara lite tid. Och man får be om hjälp.",
+        "Det tar bara lite tid. Och man får be om hjälp. Det är inget att skämmas för!",
         "Du ska få ett eget lånekort. Och vi läser tillsammans varje dag!",
       ],
     },
@@ -846,17 +913,19 @@ export const case3: Case = {
   summary: [
     "Så här hängde allt ihop, Nora:",
     "Pelle hade bara hört ryktet. Och Viskan kan inte bära en bok – allt ramlar igenom henne. Det var inget spöke!",
-    "Ugo såg något långt och mjukt med glasögon, men utan fötter. I källaren fanns ett slingrigt spår utan fotspår. Det var en bokmal!",
-    "Biblioteket var låst på natten. Men Bläddra behövde ingen nyckel – hen bodde ju redan i källaren.",
+    "Ugo såg något långt och mjukt med glasögon. Det kunde ha varit Bodil… Men i källaren fanns ett slingrigt spår utan fotspår. Det var ingen med fötter!",
+    "Bläddra sa att hon ALDRIG går ner i källaren. Men spåret visade att hon gjorde det. Och det runda och blanka hon gömde var hennes glasögon!",
+    "Biblioteket var låst på natten. Men Bläddra behövde ingen nyckel – hon bodde ju redan i källaren.",
     "Bodils lista: bara de LÄTTA böckerna försvann. Och i borgen låg de uppslagna på A, B, C.",
     "Övningspappret och Viskan visade resten: Bläddra övade på B… O… K… och tyckte att det var så svårt.",
-    "Spökviskningarna Bodil hörde var Bläddra som ljudade. Och de rosa smulorna kom från hens suddgummi!",
+    "Hon sa att hon inte tyckte om böcker, för att hon skämdes. Hon kunde inte läsa än.",
+    "Spökviskningarna Bodil hörde var Bläddra som ljudade. Och de rosa smulorna kom från hennes suddgummi!",
   ],
 
   fact: "En \"bokmal\" är någon som älskar att läsa! Men i gamla böcker kan det bo riktiga småkryp: boklöss. De är mindre än ett riskorn och äter mögel och lim – inte orden.",
 
   cards: [
-    { sprite: "bladdra", name: "Bokmalen Bläddra", text: "En bokmal med runda glasögon. Kryper in i hyllorna och ljudar bokstäver. Snart kan hen läsa!" },
+    { sprite: "bladdra", name: "Bokmalen Bläddra", text: "En blyg bokmal med runda glasögon. Äter damm, kryper in i hyllorna och ljudar bokstäver. Snart kan hon läsa!" },
     { sprite: "ugo", name: "Uppslagsboken Ugo", text: "En uppslagsbok som vaknade och började flyga. Dyker mot den som stör – göm dig bakom en hylla!" },
     { sprite: "dammis", name: "Dammis", text: "En jättestor dammtuss med röda ögon. Rullar fram och tillbaka i källaren. Smit förbi när den vänder!" },
   ],
@@ -878,6 +947,7 @@ export const case3: Case = {
         { text: "Ledtrådar glöder lite. Titta noga på golvet!", skipWhen: ["clue:messyBooks", "clue:eraserCrumbs"] },
         { text: "Något ligger på Bodils disk. Vad saknas?", skipWhen: "clue:missingList" },
         { text: "Pojken vid bordet läser här varje dag. Prata med honom!", skipWhen: "clue:pelleSaw" },
+        { text: "Någon håller hyllorna rena, uppe vid hyllan till vänster om Bodils disk. Säg hej!", skipWhen: "clue:bladdraSays" },
         { text: "Läs skylten vid dörren längst ner.", skipWhen: "clue:locked" },
         { text: "Titta vid Pelles bord. Ligger det något på golvet?", skipWhen: "clue:eraserCrumbs" },
       ],
@@ -947,8 +1017,9 @@ export const case3: Case = {
           skipWhen: "clue:pelleAdmits",
         },
         "Berätta för Bodil vad du har kommit fram till.",
-        "Hur såg den ut som kröp över Ugo i natt? Och vilka spår fanns i källaren?",
-        "Vilka sorts böcker försvann? Och vad övade någon på i källaren? Titta i detektivboken (B)!",
+        "Hur såg den ut som kom fram till Ugo i natt? Och vilka spår fanns i källaren?",
+        "Har någon sagt något som inte stämmer med spåren i källaren? Titta i detektivboken (B)!",
+        "Vilka sorts böcker försvann? Och vad övade någon på i källaren?",
       ],
     },
     {

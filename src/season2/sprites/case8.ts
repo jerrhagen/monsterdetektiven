@@ -356,6 +356,29 @@ export const schoolYellowDrips = drawSprite(16, 16, (d) => {
   }
 });
 
+/** The art room window, set in the wall: night sky and the moon, the right half open (ajar). */
+export const schoolWindowAjar: PixelSprite = grid(
+  { F: "#d8d4c8", f: "#a8a49a", N: "#1e2a4a", n: "#2e3e66", m: "#f4ecc0", y: "#ffffff", G: "#7a7a84", g: "#5a5a62" },
+  [
+    "................",
+    "..oooooooooo....",
+    "..oFFFFFFFFFo...",
+    "..oFNNNfNNmFoo..",
+    "..oFNyNfNmmFGgo.",
+    "..oFNNNfNNNFGgo.",
+    "..oFffffNNNFGgo.",
+    "..oFnnnfnnnFGgo.",
+    "..oFnnnfnnnFGgo.",
+    "..oFnnnfnnnFGo..",
+    "..oFFFFFFFFFo...",
+    ".oFFFFFFFFFFFo..",
+    ".ooooooooooooo..",
+    "................",
+    "................",
+    "................",
+  ],
+);
+
 export const case8Sprites: Record<string, PixelSprite> = {
   s2Teacher,
   s2Janitor,
@@ -378,4 +401,5 @@ export const case8Sprites: Record<string, PixelSprite> = {
   schoolBootPrints,
   schoolSoapTrail,
   schoolYellowDrips,
+  schoolWindowAjar,
 };

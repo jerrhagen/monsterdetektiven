@@ -755,6 +755,30 @@ class Painter {
     // Deep water meets walls and the edge of the room flush, and has a muddy (or dark) bank.
     const bank = this.theme === "harbor" || this.theme === "aquarium" ? 0x3a3448 : 0x6a5a3a;
     this.liquid("water", [C.waterDark, C.water, C.waterLight], ["puddle", "wall", "door"], bank);
+    if (outdoors) this.steppingStones();
+  }
+
+  /**
+   * A ford through a stream (shallow water right next to deep water) gets flat stepping stones,
+   * so it's clear that this is where Nora hops across. Plain puddles on the grass get none.
+   */
+  private steppingStones(): void {
+    const { g } = this;
+    const sides = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+    for (let row = 0; row < ROOM_ROWS; row++) {
+      for (let col = 0; col < ROOM_COLS; col++) {
+        if (this.at(col, row) !== "puddle") continue;
+        if (!sides.some(([dc, dr]) => this.at(col + dc, row + dr) === "water")) continue;
+        const x = col * TILE + 2 + Math.floor(hash(col, row, 21) * 4);
+        const y = row * TILE + 3 + Math.floor(hash(col, row, 22) * 3);
+        g.fillStyle(C.waterLight, 0.5).fillEllipse(x + 5, y + 7, 14, 6); // ripples around the stone
+        g.fillStyle(C.outline).fillRoundedRect(x, y, 10, 9, 3);
+        g.fillStyle(0x5a5464).fillRoundedRect(x + 1, y + 1, 8, 7, 2); // wet sides
+        g.fillStyle(0x9a96a6).fillRoundedRect(x + 1, y + 1, 8, 5, 2); // dry top
+        g.fillStyle(0xc8c4d4).fillRect(x + 2, y + 2, 3, 1);
+        if (hash(col, row, 23) < 0.5) g.fillStyle(C.leafLight).fillRect(x + 6, y + 5, 2, 1); // a bit of moss
+      }
+    }
   }
 
   /** Draws one kind of liquid. `alsoWet` tiles count as liquid for the shape, but aren't painted. */

@@ -52,7 +52,10 @@ function framesOf(w: number, h: number, draws: ((d: Painter) => void)[]): PixelS
 // Nora's characters (placeholders).
 // ---------------------------------------------------------------------------------------------
 
-/** The fair's director (S2.director): tall top hat, big moustache, red coat – with a hole in the pocket. */
+/**
+ * The fair's director (S2.director): tall top hat, big moustache, and a waistcoat over his shirt.
+ * His fine red coat (with the hole in the pocket) hangs on a hook in his wagon, so he isn't wearing it.
+ */
 export const s2Director: PixelSprite = drawSprite(16, 20, (d) => {
   // Top hat with a red band.
   d.part((p) => p.rect(5, 0, 6, 5, "#2a2436").rect(5, 4, 6, 1, RED).rect(3, 5, 10, 1, "#2a2436"));
@@ -65,17 +68,15 @@ export const s2Director: PixelSprite = drawSprite(16, 20, (d) => {
       .set(8, 9, "#e0a080"),
   );
   d.part((p) => p.line(5, 10, 11, 10, "#5a3a2a").set(4, 9, "#5a3a2a").set(12, 9, "#5a3a2a"), false);
-  // Red coat over a round belly, gold buttons, and the torn pocket.
+  // A dark waistcoat over a white shirt and a round belly, with gold buttons.
   d.part((p) =>
     p
-      .ellipse(8, 14.5, 5.5, 3.5, RED)
-      .rect(4, 11, 8, 3, RED)
-      .paint((x) => x === 8, "#f4ecd8")
-      .set(8, 12, "#f2d24b")
-      .set(8, 14, "#f2d24b")
-      .set(8, 16, "#f2d24b")
-      .rect(10, 15, 3, 1, RED_DARK)
-      .set(11, 16, INK),
+      .ellipse(8, 14.5, 5.5, 3.5, "#4a3a6a")
+      .rect(4, 11, 8, 3, "#4a3a6a")
+      .paint((x) => x >= 7 && x <= 9, "#f4ecd8")
+      .set(8, 11, RED)
+      .set(8, 13, "#f2d24b")
+      .set(8, 15, "#f2d24b"),
   );
   // Legs and shoes.
   d.part((p) => p.rect(5, 18, 2, 2, "#2a2436").rect(9, 18, 2, 2, "#2a2436"));

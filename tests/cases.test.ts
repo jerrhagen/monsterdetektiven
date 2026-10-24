@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { cases } from "../src/cases";
 import type { Case, Thing } from "../src/cases/types";
-import { CaseState } from "../src/engine/caseState";
+import { CaseState, clueFlag, flagList } from "../src/engine/caseState";
 import { entryPoint, parseRoom, validateCase } from "../src/engine/room";
 import { sprites } from "../src/sprites";
 import { nearAny, reachableFrom } from "./reachable";
@@ -42,6 +42,20 @@ describe("fallen", () => {
     const door = entryPoint(yard, cases[1].rooms.yard.doors!.find((d) => d.at === "bottom")!.at);
     const gustav = yard.things.find((t) => t.thing.name === "Grannen Gustav")!;
     expect(nearAny(reachableFrom(yard, door, false), gustav.col, gustav.row)).toBe(true);
+  });
+
+  it("bageriet: Smulan är kvar tills man både pratat med hen och hittat boet (även i fel ordning)", () => {
+    const c = cases[1];
+    const smulan = c.rooms.bakery.things!.s;
+    const state = new CaseState(c);
+    // The nest first: Smulan is still there, and her own words still end up in the book.
+    state.give("clue:nest");
+    expect(state.has(smulan.hideWhen)).toBe(false);
+    const talk = state.talkFor(smulan);
+    expect(talk.clue).toContain("smulanSaid");
+    state.give(talk.gives);
+    state.give(flagList(talk.clue).map(clueFlag));
+    expect(state.has(smulan.hideWhen)).toBe(true);
   });
 
   it("hittar fel i en trasig karta", () => {

@@ -49,12 +49,12 @@ export const case6: Case = {
       layout: [
         "######DD############",
         "######..############",
-        "#HHH.l..t.p...j.HH.#",
-        "#.....3............#",
-        "#...2....UU.....4.H#",
-        "#...q....oUs..x...H#",
-        "#........UU........#",
-        "#.1.....g.....T....#",
+        "#HHH.l.1t.p...j.HH.#",
+        "#....3..........x..#",
+        "#........UU.....4.H#",
+        "#...q....oUs......H#",
+        "#...2....UU........#",
+        "#.......g.....T....#",
         "D..KKb........k....#",
         "D..KKm.........HH..#",
         "#HH.......N....HH..#",
@@ -125,7 +125,7 @@ export const case6: Case = {
         k: {
           name: "Kugg-trollet",
           person: true,
-          sprite: "kuggtroll",
+          sprite: "kuggtrollLamp",
           talk: [
             "Kugg, kugg! Jag är lykttändare i kväll.",
             "Men någon tar ljusen lika fort som jag tänder dem!",
@@ -179,7 +179,7 @@ export const case6: Case = {
             "Nora! Jag såg den igen!",
             "Något SVART med glödande ögon – vid lyktorna!",
             "Precis som i lagret, när jag tappade armen…",
-            "Var det Fladder? Hon är ju svart med lysande ögon…",
+            "Var det Fladder? Hon är ju också svart…",
           ],
           clue: "grymlanSaw",
           talkIf: [{ when: "caught", talk: ["Armen sitter kvar i kväll!", "Och jag är inte rädd längre."] }],
@@ -221,7 +221,7 @@ export const case6: Case = {
         j: {
           name: "Lyktan som lyser",
           sprite: "festLanternLit",
-          talk: ["Den enda lyktan på torget som lyser.", "Runt den fladdrar Lysa, lyktmalen."],
+          talk: ["Den enda lyktan på torget som lyser.", "Lysa, lyktmalen, fladdrar alldeles i närheten."],
         },
         l: darkLantern,
         q: darkLantern,
@@ -244,10 +244,11 @@ export const case6: Case = {
           center: [16, 4],
           size: [2, 1],
           perch: [15, 3],
+          perchSprite: "lysaRest",
           thing: {
             name: "Lysa Lyktmal",
             person: true,
-            sprite: "lysaMoth",
+            sprite: "lysaRest",
             talk: [
               "Ljus, ljus, LJUS! Jag älskar ljus!",
               "Varje gång en lykta slocknar blir jag så ledsen.",
@@ -330,7 +331,7 @@ export const case6: Case = {
         u: {
           name: "Mossungen",
           person: true,
-          sprite: "mossunge",
+          sprite: "mossungeHappy",
           talk: [
             "Shhh! Väck inte Mossjätten!",
             "Jag lekte kurragömma med Smulan på torget i kväll.",
@@ -589,7 +590,7 @@ export const case6: Case = {
           options: [
             { id: "fladder", label: "Fladder", sprite: "fladder" },
             { id: "smulan", label: "Smulan", sprite: "smulan" },
-            { id: "kuggtroll", label: "Kugg-trollet", sprite: "kuggtroll" },
+            { id: "kuggtroll", label: "Kugg-trollet", sprite: "kuggtrollLamp" },
             { id: "lysa", label: "Lysa Lyktmal", sprite: "lysaMoth" },
             { id: "skuggan", label: "Skuggan", sprite: "skuggan" },
           ],
@@ -685,7 +686,7 @@ export const case6: Case = {
     grymlanSaw: {
       name: "Grymlans vittnesmål",
       sprite: "festGrymlan",
-      text: "Grymlan såg något SVART med glödande ögon vid lyktorna. Precis som i lagret. Var det Fladder?",
+      text: "Grymlan såg något SVART med glödande ögon vid lyktorna. Precis som i lagret. Var det Fladder? Hon är ju också svart.",
     },
     moonBook: {
       name: "Sidan ur boken",
@@ -772,7 +773,7 @@ export const case6: Case = {
     { give: "moonstone" },
     { enter: "lantern1", sprite: "festLanternLit", from: [5, 2], to: [5, 2] },
     { enter: "lantern2", sprite: "festLanternLit", from: [4, 5], to: [4, 5] },
-    { enter: "lantern3", sprite: "festLanternLit", from: [14, 5], to: [14, 5] },
+    { enter: "lantern3", sprite: "festLanternLit", from: [16, 3], to: [16, 3] },
     { say: "Stina Snurr", lines: ["Månstenen är hel!", "Och titta – alla lyktor lyser igen!"] },
     { say: "Stina Snurr", lines: ["Men Skuggan… du behöver ju ljus på natten."] },
     { say: "Kugg-trollet", lines: ["Kugg, kugg! Jag har byggt något.", "Bara till dig!"] },
@@ -832,7 +833,7 @@ export const case6: Case = {
         { text: "Bläddras fråga: {shadows:hint}", skipWhen: "shadow-lesson" },
         { text: "Prata med Bläddra igen – hon vet något om Månstenen.", when: "shadow-lesson", skipWhen: "clue:moonBook" },
         {
-          text: "Ledtrådarna på marken ligger vid lyktorna: till vänster, uppe till vänster och uppe till höger. Och nere till vänster, nära bullståndet!",
+          text: "Ledtrådarna på marken ligger vid lyktorna: till vänster, uppe till vänster och uppe till höger. Och vid grinden längst upp!",
           skipWhen: ["clue:blackPrints", "clue:blueFluff", "clue:cog", "clue:mothDust"],
         },
       ],

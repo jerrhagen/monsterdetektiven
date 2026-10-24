@@ -637,7 +637,9 @@ export class RoomScene extends Phaser.Scene {
       s.setVisible(!hidden);
       this.thingShadows[i]?.setVisible(!hidden);
 
-      const { thing } = this.room.things[i];
+      const { thing, col, row } = this.room.things[i];
+      // Someone who has slipped away no longer stands in the way (hideWhen never turns back).
+      if (hidden) this.room.tiles[row][col] = this.room.base[row][col];
       // Some things change look once something has happened (the glowing eyes are gone…).
       const look = `${thing.spriteIf?.find((l) => this.state.has(l.when))?.sprite ?? thing.sprite}-0`;
       if (s.texture.key !== look) s.setTexture(look);

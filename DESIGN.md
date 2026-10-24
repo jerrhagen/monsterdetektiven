@@ -94,7 +94,8 @@ Varje fall är ett **komplett mysterium med en röd tråd**, inte bara en samlin
 2. **Utredningen, en teoritrappa.** Man hittar ledtrådar *och* löser klurigheter (pussel) som öppnar nya rum och ger nya ledtrådar.
    - **Varje rum ska ändra teorin.** Efter varje rum ska man tro något nytt eller förstå att man hade fel. Ett rum får inte bara vara en transportsträcka.
    - **Det avgörande beviset kräver flera rum.** Inget enskilt rum ska räcka för att lösa fallet. Det finns tester som kontrollerar vilka rum bevisen kommer från.
-   - **Den skyldige syns inte förrän man kan förstå vad man ser.** Först syns bara spår av något, och tydliga glimtar kommer sent.
+   - **Det som hänt syns inte förrän man kan förstå vad man ser.** Först syns bara spår av något, och tydliga glimtar kommer sent.
+   - **Den skyldige ska inte gå att gissa på vem man inte har träffat.** Huvudarkitekten märkte efter säsong 1 att det nästan alltid var monstret man inte sett som var den skyldige. Därför: den skyldige får gärna **träffas tidigt i en oskyldig roll** (pratar, hjälper till, har en ursäkt som senare spricker), och bland svarsalternativen ska det finnas misstänkta man inte har mött som är **oskyldiga**. Ofarliga småkryp som skymtar förbi gör att "den som skymtar" inte heller avslöjar något. Kontrollera alternativen i varje avslöjande: om man kan svara rätt bara genom att välja den man aldrig sett är fallet för lätt.
    - **Gärna två frågor: vad och vem.** "Vad är det?" löses i mitten av fallet, "vems/vem är det?" i slutet, så att man själv listar ut den som dyker upp i slutscenen.
    - Minst ett falskt spår per misstänkt gör att man måste tänka själv.
 3. **Faran.** Monster gör det svårt och spännande: de jagar, smyger och flyger iväg med Nora. Se avsnitt 5.
@@ -162,7 +163,7 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 **Figurer och monster:**
 - **Stina Snurr** äger affären. Hon har grått hår i knut, glasögon, rosa kofta och gult förkläde. Hon stickar med grönt garn.
 - **Nallen** är misstänkt, inte vittne.
-- **Fladder** *(flygare)* är vaken mitt på dagen och flyger runt i lagret. Man gömmer sig bakom lådor. **När hon har missat Nora två gånger blir hon trött och vilar upp och ner i taket, och då kan man prata med henne.** (Om man aldrig blir attackerad vilar hon ändå efter en halv minut.)
+- **Fladder** *(flygare)* är vaken mitt på dagen och flyger runt i lagret. Man gömmer sig bakom lådor. **När hon har missat Nora två gånger blir hon trött och vilar upp och ner i taket, och då kan man prata med henne.** (Om man aldrig blir attackerad vilar hon ändå efter en halv minut.) Hon vilar i tolv sekunder, och så länge Nora står nära flyger hon inte iväg. En flygare som vilar ska alltid se annorlunda ut (`perchSprite`), annars märker man inte att man kan prata med henne.
 - **Viskan** *(smygare)* bor i soptunnan på bakgården och hoppar fram en stund efter att man knackat på. Man vinner hennes vittnesmål med en gåta.
 - **Handen** *(krypare)*: se ovan.
 - **Grymlan** kommer in först i slutscenen, men man har listat ut honom själv.
@@ -197,25 +198,25 @@ Huvudarkitektens egen idé: *I leksaksaffären har leksakerna börjat röra sig,
 
 ### Fall 2: Vem tog bullarna? (`case2-bakery.ts`)
 
-**Rum:** Bageriet → Bakgården → Mjölkällaren. **Misstänkta:** katten Måns, grannen Gustav, Mjölspöket, Berit, Smulan.
+**Rum:** Bageriet → Bakgården → Mjölkällaren. **Misstänkta:** katten Måns, grannen Gustav, Mjölspöket, Berit, Smulan och musen (syns bara i en skymt, oskyldig).
 
-**Sanningen:** Smulan (snäll, frågar alltid) drogs till en bulle som lyste, eftersom en månstensbit var inbakad. Hen glömde fråga och bar hem bullar till sitt bo i källaren. Svarta fotspår i mjölet går in i väggen (Skuggan).
+**Sanningen:** Smulan (snäll, frågar alltid) drogs till en bulle som lyste, eftersom en månstensbit var inbakad. Hen glömde fråga, bar hem bullar till sitt bo i källaren och plockade sedan smulor i bageriet som om inget hänt. Nora träffar hen redan i början: hen skyller på Måns och musen och säger att hen sov på vinden och aldrig går ner i källaren. När man både hört det och hittat boet smiter hen och syns bara i glimtar bland bröden. Svarta fotspår i mjölet går in i väggen (Skuggan).
 
-**Teoritrappan:** katthår, Gustav i fönstret och smulor mot bakdörren (bageriet) → tretåiga spår i sanden, smulor i kattskålen, Gustavs spårpussel friar Måns (gården) → glödande smulor till ett bo av blått fluff med skylten SMULANS HEM (källaren).
+**Teoritrappan:** katthår, Gustav i fönstret, smulor mot bakdörren och Smulans ord (bageriet) → tretåiga spår i sanden, smulor i kattskålen, Gustavs spårpussel friar Måns (gården) → glödande smulor till ett bo av blått fluff med skylten SMULANS HEM, i källaren där Smulan sa att hen aldrig är (källaren).
 
-**Avslöjandet (Berit), markera alla:** *Vem tog bullarna?* Blått fluff, tretåiga spår, Gustavs vittnesmål, glödande smulor och boet. *Varför, fast hen brukar fråga?* Den lysande bullen, Gustavs vittnesmål och de glödande smulorna. (Bullarna bakades tidigt i morse medan det var mörkt; de svarta spåren i källaren är Skuggans, inte Gustavs stövlar.)
+**Avslöjandet (Berit), markera alla:** *Vem tog bullarna?* Blått fluff, tretåiga spår, Gustavs vittnesmål, glödande smulor, boet och Smulans ord. *Varför, fast hen brukar fråga?* Den lysande bullen, Gustavs vittnesmål och de glödande smulorna. (Bullarna bakades tidigt i morse medan det var mörkt; de svarta spåren i källaren är Skuggans, inte Gustavs stövlar.)
 
 **Klurigheter:** bullräkning (subtraktion till 20, bakdörren), djurspår (para ihop), receptet (ordning med beskrivningar, slutet). **Monster:** Smulan (krypare), Måns (sovare), Mjölspöket (patrullerare). **Fakta:** jäst. **Kort:** Smulan, Måns, Mjölspöket.
 
 ### Fall 3: Spöket i biblioteket (`case3-library.ts`)
 
-**Rum:** Biblioteket → Läsrummet → (trappa ner) Källaren, och ett frivilligt rum högst upp i Tornet (trappa upp från biblioteket) där monsterägget ligger. **Misstänkta:** Viskan, Pelle, bibliotekarien Bodil, Ugo (flygande uppslagsbok).
+**Rum:** Biblioteket → Läsrummet → (trappa ner) Källaren, och ett frivilligt rum högst upp i Tornet (trappa upp från biblioteket) där monsterägget ligger. **Misstänkta:** Viskan, Pelle, bibliotekarien Bodil, Ugo (flygande uppslagsbok), bokmalen Bläddra och en boklus (skymtar bara, oskyldig).
 
-**Sanningen:** Bokmalen Bläddra lånar lätta böcker på nätterna för att öva läsning ("B… O… K…" lät som ett spöke). Den blå lampan är en månstensbit. Pelle är ett opålitligt vittne som bara hört ryktet. Skuggans lapp i källarhörnet: "Jag behöver ljuset."
+**Sanningen:** Bokmalen Bläddra lånar lätta böcker på nätterna för att öva läsning ("B… O… K…" lät som ett spöke). Man träffar henne direkt i biblioteket som en blyg dammätare som håller hyllorna rena åt Bodil. Hon skäms för att hon inte kan läsa än, så hon ljuger: hon "tycker inte om böcker" och går "ALDRIG" ner i källaren, och hon gömmer glasögonen när någon tittar. När man har hört henne och sett spåret i källaren har hon smitit, och först då skymtar hon. Den blå lampan är en månstensbit. Pelle är ett opålitligt vittne som bara hört ryktet. Skuggans lapp i källarhörnet: "Jag behöver ljuset."
 
-**Avslöjandet (Bodil), markera alla:** *Vem flyttar böckerna?* Ugos vittnesmål (långt, mjukt, glasögon, inga fötter) och kryp-spåret. *Varför?* Bodils lista (bara lätta böcker), övningsbladet, bokborgen och Viskans vittnesmål (B… O… K…).
+**Avslöjandet (Bodil), markera alla:** *Vem flyttar böckerna?* Bläddras svar (aldrig i källaren, gömde något runt och blankt), Ugos vittnesmål (långt, mjukt, glasögon, men fötter såg han inte, så det kunde vara Bodil) och kryp-spåret utan fotspår. *Varför?* Bodils lista (bara lätta böcker), övningsbladet, bokborgen och Viskans vittnesmål (B… O… K…).
 
-**Klurigheter:** bokvagnen (ABC-ordning med Å Ä Ö), Ugos ord (stavning), rimlåset (para ihop), lappen i spegelskrift. **Monster:** Ugo (flygare), Viskan (smygare), Dammis (patrullerare), Bläddra (krypare, gömmer sig i en hylla). **Fakta:** boklöss. **Kort:** Bläddra, Ugo, Dammis.
+**Klurigheter:** bokvagnen (ABC-ordning med Å Ä Ö), Ugos ord (stavning), rimlåset (para ihop), lappen i spegelskrift. **Monster:** Ugo (flygare), Viskan (smygare), Dammis (patrullerare), Bläddra (först en blyg figur man pratar med, sedan krypare som gömmer sig i en hylla), boklusen (ofarligt småkryp). **Fakta:** boklöss. **Kort:** Bläddra, Ugo, Dammis.
 
 ### Fall 4: Ljuden i skogen (`case4-forest.ts`)
 
@@ -289,7 +290,7 @@ De här reglerna kommer från hur Fladder och Viskan förfinades efter huvudarki
 3. **Monstret reagerar på vad spelaren gör.** Gömmer man sig avbryter Fladder anfallet, och tittar man bort smyger Viskan. Det gör monstren levande och spelet mer dynamiskt än fasta mönster.
 4. **Visa vad monstret "tänker".** Små signaler berättar vilket läge monstret är i: "?" när det tappat bort Nora, stängda ögon när det fryser, skakningar före anfall.
 5. **Bygg upp spänning i stället för att visa allt direkt.** Viskan gömmer sig i tunnan och hoppar fram efter några sekunder, eller när man petar på tunnan. Armen syns bara i korta glimtar. Överraskningen är läskigare än ett monster som redan flyger runt.
-6. **Världen ska stämma med texten.** Om något sägs ("locket skramlar, någon bor här") ska spelvärlden visa samma sak. Motsägelser bryter illusionen direkt.
+6. **Världen ska stämma med texten.** Om något sägs ("locket skramlar, någon bor här") ska spelvärlden visa samma sak. Motsägelser bryter illusionen direkt. **Dubbelkolla varje plats som nämns i text.** När en figur, ledtråd eller ett tips säger att något är *vid*, *under*, *bredvid*, *längst upp* eller *leder mot* något, ska det stämma på kartan: spåren som "leder mot grinden" ska ligga vid grinden, och tipset "nere till vänster" ska peka dit saken faktiskt ligger. Kontrollera det varje gång en karta eller en replik ändras, och läs alla tips igen när något flyttas. Samma sak gäller bilderna: en figur får inte hålla något i handen som texten inte förklarar (Kugg-trollet höll en månstensbit i finalen, och då trodde man att det var den sista biten).
 7. **Mystiska saker ska se ut som något.** En glimt ska vara läskig och gå att tolka, som en hand som springer på fingrarna, men inte avslöja lösningen. "En grön korv" väcker bara frågan "vad är det där?" på fel sätt.
 8. **Milda och återställbara följder.** Man tappar förstoringsglaset eller blir buren till dörren, men förlorar aldrig framsteg och kan aldrig fastna. Efter en skrämsel får man några sekunders andrum.
 

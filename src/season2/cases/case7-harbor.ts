@@ -387,7 +387,7 @@ export const case7: Case = {
       theme: "tower",
       faded: FADED,
       layout: [
-        "####################",
+        "############w#######",
         "#HH......s.......HH#",
         "#..................#",
         "#..LL..........LL..#",
@@ -410,6 +410,16 @@ export const case7: Case = {
             "Men nu är glaset GRÅTT! Det är helt, inte en enda spricka.",
           ],
           clue: "greyGlass",
+        },
+        w: {
+          name: "Fönstret",
+          sprite: "towerWindow",
+          on: "#",
+          talk: [
+            "Fyrens fönster, högst upp.",
+            "Här lägger fyrvakten sin blanka trasa varje kväll.",
+            "Men fönsterbrädan är tom.",
+          ],
         },
         s: {
           name: "Kikaren",

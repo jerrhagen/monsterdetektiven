@@ -321,7 +321,7 @@ export const case11: Case = {
       onEnter: {
         name: "Ester",
         talk: [
-          "Oj! Speglar överallt, Nora.",
+          "Oj! Speglar och slingriga gångar överallt, Nora.",
           "Där är tre Noror… och fyra Ester!",
           "Titta noga. Vad är på riktigt – och vad är spegelbilder?",
         ],
@@ -772,7 +772,7 @@ export const case11: Case = {
     clownNose: {
       name: "En clownnäsa",
       sprite: "fairClownNose",
-      text: `En röd clownnäsa bakom karusellen. ${S2.clown} har varit här!`,
+      text: `En röd reservnäsa bakom karusellen. ${S2.clown} har alltid en extra i fickan – den här har trillat ur. Han har varit här!`,
     },
     pinkScales: {
       name: "Rosa fjäll",

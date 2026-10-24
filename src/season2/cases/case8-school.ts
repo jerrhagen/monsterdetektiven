@@ -9,12 +9,20 @@ import { S2 } from "../names";
 // the board gets scrubbed away with him). The teacher borrowed the class pet for the party and
 // hides him in a shoebox in the art room – and she lies about it (a kind secret, but it scares
 // the janitor). The yellow vanished for a completely different reason: a little drawn creature
-// came in through the art room window. Its torn sketch page is the red-thread piece.
+// came in through the open art room window. Its torn sketch page is the red-thread piece.
+//
+// The culprit is met first, in an innocent role: the sponge stands in the yard scrubbing the grey
+// school bus, chatty and helpful, and says he sleeps in the cleaning cupboard ALL night. He fibs to
+// keep the party secret (season 2: witnesses who lie). His bed turns out dry and made – a wet
+// sponge never slept there. Once Nora has both his words and the bed he slips off into the lockers
+// (the crawler), where he is caught at the end. The ghost is the option nobody ever meets – and
+// it's innocent – so "the one I never saw" is never the shortcut.
 //
 // Theory ladder:
-//   Yard:       "It's haunted!? And all the yellow is gone" – drawn footprints in the sunflowers.
-//   Classroom:  "Something wet moves the desks – and the teacher is hiding something."
-//   Corridor:   "The sponge wasn't in bed… and someone is planning something big and secret."
+//   Yard:       "It's haunted!? All the yellow is gone – drawn footprints in the sunflowers. And the
+//                friendly sponge scrubbing the bus sleeps all night… or did he scrub the yellow OFF?"
+//   Classroom:  "Something wet and soapy moves the desks – and the teacher is hiding something."
+//   Corridor:   "The sponge's bed is dry – he wasn't in it! He fibbed… and someone plans a big secret."
 //   Art room:   "It's a PARTY – and the yellow is a whole other mystery: a drawing that walks."
 // Reveal: who moves the desks, why, and who took the yellow – each needs clues from several rooms.
 
@@ -37,12 +45,14 @@ const CLASSROOM_CLUES = [
 const CORRIDOR_CLUES = ["clue:soapTrail", "clue:emptyBed", "clue:calendar"];
 const ART_CLUES = ["clue:hamsterBox", "clue:invitation", "clue:sketchPage", "clue:yellowDrips"];
 
-const WHO_PROOF = ["wetPrints", "kritanSaw", "soapTrail", "emptyBed"];
+const WHO_PROOF = ["suddisSays", "wetPrints", "kritanSaw", "soapTrail", "emptyBed"];
 const WHY_PROOF = ["boardCode", "calendar", "balloons", "invitation"];
 const YELLOW_PROOF = ["sunflowerPrints", "sketchPage", "yellowDrips"];
 const ALL_PROOF = [...WHO_PROOF, ...WHY_PROOF, ...YELLOW_PROOF].map((id) => `clue:${id}`);
 
 const FADED = 0.35;
+/** The sponge is in the yard until Nora has heard his story AND seen his dry bed – then he hides in the lockers. */
+const SPONGE_SLIPS_AWAY = ["clue:suddisSays", "clue:emptyBed"];
 
 export const case8: Case = {
   id: "s2-school",
@@ -64,10 +74,10 @@ export const case8: Case = {
       layout: [
         "####DD##############",
         "#T.......SSSSS...eT#",
-        "#T.....vfSS1SS....T#",
+        "#T.....vfSf1fS....T#",
         "#........SSSSS.....#",
         "#..................#",
-        "#...~~........b....#",
+        "#...~~......s.b....#",
         "#...~~.............#",
         "#..........T.......#",
         "#..T...............#",
@@ -88,7 +98,7 @@ export const case8: Case = {
             "Och i morse var allt gult grått. Solrosorna, bussen – och min mössa!",
             `Här på kvällarna finns bara jag, ${teacher} och ${chalk} i tavlan…`,
             `…skelettet Benke i korridoren, ${classPet} i buren…`,
-            `…och svampmonstret ${sponge}, som sover i städskåpet.`,
+            `…och svampmonstret ${sponge}. Han hjälper mig att städa. Där borta vid bussen!`,
             "Jag låser upp klassrummet åt dig. Var försiktig!",
           ],
           gives: "talked-viggo",
@@ -108,7 +118,7 @@ export const case8: Case = {
         f: {
           name: "Solrosorna",
           sprite: "schoolSunflowers",
-          talk: ["Solrosorna hänger med huvudet.", "I går var de knallgula. Nu är de grå som aska."],
+          talk: ["Solrosorna i rabatten hänger med huvudet.", "I går var de knallgula. Nu är de grå som aska."],
         },
         b: {
           name: "Skolbussen",
@@ -117,6 +127,34 @@ export const case8: Case = {
             "Skolbussen var gul i går. Nu är den grå – till och med lamporna.",
             "Men ingen har målat den. Det är som om färgen bara… försvunnit.",
           ],
+        },
+        s: {
+          // The culprit, met early: friendly and helpful – and his "I sleep all night" is a fib.
+          name: sponge,
+          sprite: "s2Sponge",
+          person: true,
+          talk: [
+            `Hej hej! Jag är ${sponge}, skolans svampmonster!`,
+            "Jag skrubbar skolbussen. Den var ju GUL i går!",
+            "Men hur mycket jag än skrubbar blir den bara grå…",
+            "Bänkarna i klassrummet? Nej då. Det vet jag ingenting om.",
+            "På nätterna sover jag i städskåpet. HELA natten! Jag snarkar som en dammsugare.",
+          ],
+          gives: "talked-suddis",
+          clue: "suddisSays",
+          talkIf: [
+            {
+              // Nora saw the dry bed before she talked to him.
+              when: "clue:emptyBed",
+              talk: ["Va? Är min säng torr? Öh… jag sov nog… på golvet.", "Nu måste jag skrubba något annat. Hej då!"],
+            },
+            {
+              when: "talked-suddis",
+              talk: ["Skrubba, skrubba! Bussen vill inte bli gul igen.", "Lycka till, Nora! Säg till om något ska torkas."],
+            },
+          ],
+          // He slips off into the lockers in the corridor (the crawler there).
+          hideWhen: SPONGE_SLIPS_AWAY,
         },
         e: {
           name: "Något glittrar",
@@ -129,7 +167,10 @@ export const case8: Case = {
       clues: { "1": "sunflowerPrints" },
       onEnter: {
         name: "Ester",
-        talk: ["Brr, vad mörkt det är. Och titta – solrosorna är alldeles grå!", "Vi pratar med vaktmästaren."],
+        talk: [
+          "Brr, vad mörkt det är. Och titta – solrosorna är alldeles grå!",
+          "Vi pratar med vaktmästaren. Och vem är det som skrubbar bussen där borta?",
+        ],
       },
       doors: [
         { at: "top", to: "classroom", requires: "talked-viggo", lockedText: "Dörren är låst. Vaktmästaren har nyckeln." },
@@ -197,7 +238,7 @@ export const case8: Case = {
               when: "solved",
               talk: [
                 "Åh… du har listat ut alltihop. Förlåt att jag inte sa sanningen.",
-                `Men var är ${sponge}? Han blir så rädd när någon ser honom!`,
+                `Men var är ${sponge}? Han gömmer sig nog. Han skäms för att han inte sa sanningen.`,
               ],
             },
             {
@@ -341,10 +382,16 @@ export const case8: Case = {
           talk: [
             `Städskåpet. Här bor svampmonstret ${sponge}.`,
             "En hink, en mopp och en liten säng av disktrasor.",
-            "Sängen är orörd. Ingen har sovit här i natt!",
-            `Men var är ${sponge} då? …Det prasslar i elevskåpen!`,
+            "Sängen är bäddad och alldeles torr. En blöt svamp har inte sovit här i natt!",
+            "…Det prasslar i elevskåpen!",
           ],
           clue: "emptyBed",
+          talkIf: [
+            {
+              when: "clue:suddisSays",
+              talk: [`Men ${sponge} sa ju att han sov här HELA natten!`, "Han sa inte sanningen. Varför då?"],
+            },
+          ],
         },
         f: {
           name: "Förrådsskåpet",
@@ -380,7 +427,7 @@ export const case8: Case = {
           speed: 30,
         },
         {
-          // The one who sneaks about at night. First only a rustle in the lockers, then quick glimpses.
+          // The sponge, once he has slipped away from the yard. First only a rustle in the lockers, then quick glimpses.
           type: "crawler",
           sprite: "s2Sponge",
           routes: [
@@ -408,7 +455,8 @@ export const case8: Case = {
             [8, 10],
             [16, 10],
           ],
-          unseenUntil: "clue:emptyBed",
+          // Until then he is out in the yard scrubbing the bus.
+          unseenUntil: SPONGE_SLIPS_AWAY,
           catchWhen: "solved",
         },
       ],
@@ -437,7 +485,7 @@ export const case8: Case = {
       theme: "school",
       faded: FADED,
       layout: [
-        "####################",
+        "##########w#########",
         "#HHH......1.....HHH#",
         "#......p...........#",
         "#..KKK.......KKK...#",
@@ -451,6 +499,15 @@ export const case8: Case = {
         "##############DD####",
       ],
       things: {
+        w: {
+          name: "Fönstret",
+          sprite: "schoolWindowAjar",
+          on: "#",
+          talk: [
+            "Fönstret står på glänt. Kall kvällsluft blåser in.",
+            "På fönsterbrädan finns små grå streck. Som suddigt blyerts…",
+          ],
+        },
         n: {
           name: classPet,
           sprite: "schoolShoebox",
@@ -554,9 +611,11 @@ export const case8: Case = {
             { id: "ghost", label: "Ett spöke" },
           ],
           answer: "sponge",
-          // Wet square prints with holes, a scrubbing that smells of soap, a soap trail – and an empty bed.
+          // He says he sleeps all night – but his bed is dry. Wet square prints with holes, a scrubbing
+          // that smells of soap, a soap trail from his cupboard.
           proof: WHO_PROOF,
           missing: {
+            suddisSays: "Någon på skolgården berättade var han är på nätterna. Stämmer det?",
             wetPrints: "Titta på golvet vid bänkarna i klassrummet. Har något lämnat avtryck?",
             kritanSaw: "Någon i klassrummet blir bortskrubbad varje morgon. Vad sa han?",
             soapTrail: "Titta på golvet i korridoren. Vad leder från städskåpet?",
@@ -615,8 +674,9 @@ export const case8: Case = {
             emptyCage: `Buren är tom – men varför? Det säger den inte.`,
             kritanSaw: `${chalk} berättar vad som händer med tavlan. Men inte varför!`,
             solveigSays: "Fröken säger att hon inget vet. Hon döljer något – men hennes ord säger inte vad.",
+            suddisSays: `${sponge} sa att han inget vet. Han håller något hemligt – men han säger inte vad.`,
             soapTrail: `Såpbubblorna visar vart ${sponge} gick – men inte varför.`,
-            emptyBed: `Den orörda sängen visar att ${sponge} var uppe i natt – men inte varför.`,
+            emptyBed: `Den torra sängen visar att ${sponge} var uppe i natt – men inte varför.`,
             hamsterBox: `Lappen visar att fröken bar dit ${classPet}. Men den säger inte varför.`,
             sketchPage: "Skissen handlar om det gula. Spara den till sista frågan!",
             yellowDrips: "De gula dropparna handlar om det gula. Spara dem till sista frågan!",
@@ -630,6 +690,7 @@ export const case8: Case = {
             { id: "chalk", label: chalk, sprite: "s2Chalk" },
             { id: "janitor", label: janitor, sprite: "s2Janitor" },
             { id: "pet", label: classPet, sprite: "s2ClassPet" },
+            { id: "ghost", label: "Ett spöke" },
           ],
           answer: "scribble",
           // Drawn footprints among the grey sunflowers, drawn footprints by the yellow drips – and the drawing itself.
@@ -640,10 +701,11 @@ export const case8: Case = {
             yellowDrips: "Finns det något gult kvar någonstans? Titta på golvet i bildsalen!",
           },
           whyNot: {
-            sponge: `${sponge} lämnar blöta, fyrkantiga avtryck. Fotspåren i solrosorna är små och ritade!`,
+            sponge: `${sponge} försökte skrubba FRAM det gula på bussen. Och han lämnar blöta, fyrkantiga avtryck – fotspåren i solrosorna är små och ritade!`,
             chalk: `${chalk} bor i tavlan och ritar med vit krita. Fotspåren är ritade med grå blyerts.`,
             janitor: "Vaktmästarens egen gula mössa blev grå! Och han har stora stövlar, inte små ritade fötter.",
             pet: `${classPet} sov i sin låda hela natten. Och hamstrar har inga ritade fötter!`,
+            ghost: "Spöken lämnar inga fotspår alls. Men fotspåren i solrosorna och i bildsalen är ritade – med blyerts!",
           },
           why: {
             viggoStory: "Vaktmästaren berättar att det gula försvann – men inte vem som tog det.",
@@ -654,6 +716,7 @@ export const case8: Case = {
             kritanSaw: `${chalk} berättar om tavlan och såpan – inte om det gula.`,
             solveigSays: "Fröken döljer ett kalas – inte det gula.",
             boardCode: "Koden handlar om kalaset – inte om det gula.",
+            suddisSays: `${sponge} skrubbade bussen för att få tillbaka det gula. Han tog det inte!`,
             soapTrail: `Såpbubblorna visar vart ${sponge} gick. Det har inget med det gula att göra.`,
             emptyBed: `Sängen visar att ${sponge} var uppe i natt. Men han har inga ritade fötter.`,
             calendar: "Kalendern handlar om kalaset – inte om det gula.",
@@ -676,7 +739,12 @@ export const case8: Case = {
     sunflowerPrints: {
       name: "Ritade fotspår",
       sprite: "s2ScribblePrints",
-      text: "Små grå fotspår mellan de grå solrosorna. De ser RITADE ut, som med blyerts! De går mot skolans stuprör.",
+      text: "Små grå fotspår mellan de grå solrosorna. De ser RITADE ut, som med blyerts!",
+    },
+    suddisSays: {
+      name: `Vad ${sponge} säger`,
+      sprite: "s2Sponge",
+      text: `${sponge} är skolans svampmonster. Han skrubbade den grå skolbussen, men den blev inte gul igen. Han säger att han inget vet om bänkarna – och att han sover i städskåpet HELA natten.`,
     },
     wetPrints: {
       name: "Blöta avtryck",
@@ -717,7 +785,7 @@ export const case8: Case = {
     emptyBed: {
       name: "Den orörda sängen",
       sprite: "schoolCupboard",
-      text: `${sponge}s lilla säng i städskåpet är orörd – ingen har sovit där i natt. Men det prasslar i elevskåpen…`,
+      text: `${sponge}s lilla säng i städskåpet är bäddad och alldeles torr. En blöt svamp har inte sovit där i natt! Och det prasslar i elevskåpen…`,
     },
     calendar: {
       name: "Kalendern",
@@ -767,6 +835,7 @@ export const case8: Case = {
         "Och jag suddade tavlan varje morgon, så att ingen skulle se planerna.",
         "Men i natt såg jag något grått i bildsalen. Jag blev så rädd…",
         "…att jag glömde sudda ett hörn av tavlan.",
+        "Och förlåt att jag sa att jag sov hela natten. Kalaset var ju en hemlis!",
       ],
     },
     { enter: "teacher", sprite: "s2Teacher", from: [0, 4], to: [4, 6] },
@@ -799,11 +868,12 @@ export const case8: Case = {
 
   summary: [
     "Så här hängde allt ihop, Nora:",
-    `Blöta, fyrkantiga avtryck vid bänkarna, såpbubblor från städskåpet och en orörd säng. Och ${chalk} blev bortskrubbad med såpa. Det var ${sponge}!`,
+    `${sponge} sa att han sov i städskåpet hela natten. Men hans säng var torr – där hade ingen blöt svamp sovit!`,
+    `Blöta, fyrkantiga avtryck vid bänkarna och såpbubblor från städskåpet. Och ${chalk} blev bortskrubbad med såpa. Det var ${sponge}!`,
     "Varför? Kalasordet på tavlan, \"60 år – PSST\" i kalendern, ballongerna och kortet: ett hemligt kalas för vaktmästaren!",
     `${teacher} sa att hon inget visste. Men lappen på ${classPet}s låda var hennes – han skulle vara med på kalaset.`,
-    `${sponge} sköt ihop bänkarna till ett kalasbord och suddade tavlan varje morgon. Den bleka skuggan i fönstret var han.`,
-    `Men det gula var något helt annat: ritade fotspår i solrosorna, gula droppar i bildsalen – och skissen av ${scribble}.`,
+    `${sponge} sköt ihop bänkarna till ett kalasbord och suddade tavlan varje morgon. Han ljög för att inte avslöja kalaset. Den bleka skuggan i fönstret var han.`,
+    `Men det gula var något helt annat – ${sponge} försökte till och med skrubba fram det på bussen! Ritade fotspår i solrosorna, gula droppar under fönstret i bildsalen – och skissen av ${scribble}.`,
   ],
 
   fact: "Ögat ser gult och gulgrönt lättare än andra färger – även i skymningen. Därför är skolbussar i många länder gula, och reflexvästar ofta gulgröna!",
@@ -817,11 +887,12 @@ export const case8: Case = {
   goals: [
     {
       text: "Ta reda på vad som har hänt",
-      doneWhen: "talked-viggo",
+      doneWhen: ["talked-viggo", "clue:suddisSays"],
       hints: [
-        "Vaktmästaren väntar på skolgården.",
-        "Gå fram till vaktmästaren och tryck Ctrl.",
-        "Han står nära solrosorna, uppe till vänster.",
+        { text: "Vaktmästaren väntar på skolgården.", skipWhen: "talked-viggo" },
+        { text: "Gå fram till vaktmästaren och tryck Ctrl.", skipWhen: "talked-viggo" },
+        { text: "Han står vid solrosorna, uppe till vänster.", skipWhen: "talked-viggo" },
+        { text: "Någon skrubbar skolbussen. Gå dit och säg hej!", skipWhen: "clue:suddisSays" },
       ],
     },
     {
@@ -891,6 +962,7 @@ export const case8: Case = {
       doneWhen: "solved",
       hints: [
         { text: "Har du tittat noga i solrosrabatten på skolgården?", skipWhen: "clue:sunflowerPrints" },
+        { text: "Har du pratat med alla på skolgården? Någon skrubbar bussen.", skipWhen: "clue:suddisSays" },
         { text: "Titta på tavlan i klassrummet igen. Nu vet du vad siffrorna betyder!", skipWhen: "clue:boardCode" },
         "Berätta för vaktmästaren i korridoren vad du har kommit fram till.",
         "Tänk steg för steg: vem lämnar blöta, fyrkantiga avtryck? Och vad planerar någon i hemlighet?",

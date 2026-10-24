@@ -1,3 +1,5 @@
+import { mossunge } from "./case4";
+import { kuggtroll } from "./case5";
 import type { PixelSprite } from "./pixelSprite";
 
 // Case 6 – "Monsterfesten", the finale. Everything new that the festival needs.
@@ -327,6 +329,54 @@ export const lysaMoth: PixelSprite = {
   ],
 };
 
+/**
+ * Kugg-trollet as tonight's lamplighter: the same troll, but instead of a shard he holds a
+ * long lighting stick with a little flame (the last moonstone piece is NOT his).
+ */
+export const kuggtrollLamp: PixelSprite = {
+  palette: { ...kuggtroll.palette, s: "#8a5a2a", y: "#ffe27a", r: "#ff8a3a" },
+  frameRate: kuggtroll.frameRate,
+  // Pixel edits on top of the case 5 troll: the shard in his hand becomes a stick with a flame.
+  frames: kuggtroll.frames.map((frame) =>
+    frame.map((row, y) => {
+      const edits: Record<number, [number, string]> = { 7: [13, "r"], 8: [13, "y"], 9: [13, "s"], 10: [11, "ocso"], 11: [11, "ocso"], 12: [12, ".s"] };
+      const edit = edits[y];
+      return edit ? row.slice(0, edit[0]) + edit[1] + row.slice(edit[0] + edit[1].length) : row;
+    }),
+  ),
+};
+
+/** Mossungen at the festival: home again and happy – no tears, a big smile. */
+export const mossungeHappy: PixelSprite = {
+  palette: mossunge.palette,
+  frames: mossunge.frames.map((frame) =>
+    frame.map((row, y) =>
+      y === 8 ? row.replaceAll("c", "g") : y === 9 ? "...oggmggggmgo.." : y === 10 ? "..olgggmmmmggGo." : row,
+    ),
+  ),
+};
+
+/** Lysa resting: wings folded like a little tent, eyes closed. She can be talked to now. */
+export const lysaRest: PixelSprite = {
+  palette: lysaMoth.palette,
+  frames: [
+    [
+      "................",
+      "...a........a...",
+      "....a......a....",
+      ".....offffo.....",
+      "....okkffkko....",
+      "...oWFoffoFWo...",
+      "..oWwfffffFwWo..",
+      "..oWwsfFFfswWo..",
+      "..oWwwFFFFwwWo..",
+      "...oWwFFFFwWo...",
+      "....ooFFFFoo....",
+      "......oooo......",
+    ],
+  ],
+};
+
 /** A skuggkryp – a little creature made of darkness. Faces right. Frames 0–1: walking. */
 export const skuggkryp: PixelSprite = {
   palette: { ".": null, o: O, d: "#241a38", y: "#ffe27a", w: "#ffffff" },
@@ -451,26 +501,26 @@ export const skuggNest: PixelSprite = {
 
 // ---------- Clues ----------
 
-/** Clue: small black smudges like footprints of ink – no toes. */
+/** Clue: big black footprints like ink, with long pointed toes and no shoe soles. */
 export const festInkPrints: PixelSprite = {
   palette: { ".": null, k: "#0d0718", K: "#2a1d40" },
   frames: [
     [
       E16,
-      "..kk............",
-      ".kKkk...........",
-      ".kkk............",
-      "......kk........",
-      ".....kKkk.......",
-      ".....kkk........",
+      "..k.k.k.........",
+      ".k.kk.k.........",
+      "..kkkkk.........",
+      "..kKkkk.........",
+      "...kkk..........",
+      "...kkk..........",
       E16,
-      "..........kk....",
-      ".........kKkk...",
+      "........k.k.k...",
+      ".......k.kk.k...",
+      "........kkkkk...",
+      "........kKkkk...",
+      ".........kkk....",
       ".........kkk....",
       E16,
-      ".............kk.",
-      "............kKkk",
-      "............kkk.",
       E16,
     ],
   ],
@@ -641,6 +691,9 @@ export const case6Sprites: Record<string, PixelSprite> = {
   festGrymlan,
   skuggNightLight,
   lysaMoth,
+  lysaRest,
+  kuggtrollLamp,
+  mossungeHappy,
   skuggkryp,
   skuggBed,
   skuggDrawing,

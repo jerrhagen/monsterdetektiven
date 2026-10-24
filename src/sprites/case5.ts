@@ -602,7 +602,7 @@ export const kuggtrollBed: PixelSprite = {
   ],
 };
 
-/** A map: from the tower north to the forest, then west to a red X – with two yellow dots next to it. */
+/** A map: from the tower north to the park, then east to a red X – with two yellow dots next to it. */
 export const shadowCaveMap: PixelSprite = {
   palette: {
     ".": null,
@@ -620,13 +620,13 @@ export const shadowCaveMap: PixelSprite = {
       E,
       "..oooooooooooo..",
       "..oppppppppppo..",
-      "..okpkppggggpo..",
-      "..opkprrrrggpo..",
-      "..okpkppprggpo..",
-      "..oypyppprpppo..",
-      "..opppppprpppo..",
-      "..oppppppprTpo..",
-      "..opppppppTTpo..",
+      "..opggggppkpko..",
+      "..opggrrrrpkpo..",
+      "..opggrpppkpko..",
+      "..oppprpppypyo..",
+      "..oppprppppppo..",
+      "..opTrpppppppo..",
+      "..opTTpppppppo..",
       "..oppppppppppo..",
       "..oooooooooooo..",
       E,

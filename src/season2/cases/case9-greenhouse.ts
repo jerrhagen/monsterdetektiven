@@ -10,6 +10,12 @@ import { S2 } from "../names";
 //  - The snail (S2.snail) ate the tomatoes. Snails eat at night: when she woke up, the leaves in her bowl had
 //    turned grey and tasted of nothing – the red tomatoes were the only thing left with colour. Her slime
 //    trail goes from the tomatoes down to the growing room, and her bowl of grey leaves is untouched.
+//  - Nora MEETS the snail at the start, in the garden, in an innocent role (so the culprit is not "the one we
+//    never saw"): a shy, polite snail who says she is far too slow to be a thief, that she ate up all the
+//    leaves in her bowl last night and is full, and who agrees with Surr that the flytrap did it. The bowl
+//    in the growing room cracks her story (full of untouched grey leaves), and the slime trail shows that a
+//    whole night is long enough even for a slow snail. Once Nora has both heard her and seen the bowl she
+//    slips away (`hideWhen`) and is only glimpsed as the crawler among the shelves, where she is caught.
 //  - The "ghost" on the glass was Trattis walking through with her lantern (her pointy hat makes a long,
 //    pointy shadow). She only eats lingonberries.
 //  - The bumblebee Surr says she SAW the flytrap eat the tomatoes. She is wrong – she was asleep, and she is
@@ -19,17 +25,18 @@ import { S2 } from "../names";
 //    towards the door, drawn footprints go out through the gate, and Trattis saw it.
 //
 // Theory ladder:
-//   Garden:        "A ghost with a pointy hat! And Surr says the biting plant ate the tomatoes." The notebook:
+//   Garden:        "A ghost with a pointy hat! And Surr says the biting plant ate the tomatoes." The slow snail
+//                  can't be the thief, she says – she is full – and she blames the flytrap too. The notebook:
 //                  the pots were moved on Monday, and since then they "turn". Drawn footprints at the gate.
 //   Greenhouse:    The plants all lean towards the sunny glass and keep growing. The flytrap eats only flies
 //                  (zigzag teeth) – but the tomatoes have round, slimy holes and a slime trail leads downstairs.
 //                  Green drops run towards the garden.
 //   Growing room:  Plants under the lamp lean towards the lamp – so plants grow towards the light! The snail's
-//                  bowl of grey leaves is untouched: she was hungry.
+//                  bowl of grey leaves is untouched: she wasn't full at all – she was hungry.
 //   Compost:       The ghost was Trattis and her lantern. She saw the little drawn figure dripping green.
 // The reveal asks three questions, and each needs clues from at least two rooms.
 
-const GARDEN_CLUES = ["clue:notebook", "clue:scribblePrints", "clue:surrSaw"];
+const GARDEN_CLUES = ["clue:notebook", "clue:scribblePrints", "clue:surrSaw", "clue:snailSaid"];
 const GREENHOUSE_CLUES = [
   "clue:leaning",
   "clue:grown",
@@ -50,11 +57,15 @@ const PROOF = [
   "clue:lampSprouts",
   "clue:bitten",
   "clue:slime",
+  "clue:snailSaid",
   "clue:snailBowl",
   "clue:greenDrops",
   "clue:scribblePrints",
   "clue:trattisSaw",
 ];
+
+/** The snail slips away from the garden once Nora has heard her story AND seen her untouched bowl. */
+const SNAIL_GONE = ["clue:snailSaid", "clue:snailBowl"];
 
 const FADED = 0.45;
 
@@ -82,7 +93,7 @@ export const case9: Case = {
         "#..a.......T.......#",
         "#....SSSS......T...#",
         "#.T..SSSS..........D",
-        "#....SSSS....T.....D",
+        "#..s.SSSS....T.....D",
         "#.........KK.......#",
         "D.1.....T.Kb...T...#",
         "D........r....N....#",
@@ -157,6 +168,30 @@ export const case9: Case = {
             "\"Onsdag: Ännu mer! Är det ett SPÖKE?\"",
           ],
           clue: "notebook",
+        },
+        // The culprit, met early in an innocent role. Her story cracks later (the full bowl downstairs).
+        s: {
+          name: S2.snail,
+          sprite: "s2Snail",
+          person: true,
+          talk: [
+            "Oj… hej… du skrämde mig.",
+            `Jag heter ${S2.snail}. Jag bor nere i odlingsrummet.`,
+            "Tomaterna? Inte jag! Jag är ALLDELES för långsam för att vara en tjuv.",
+            "Det tar mig en hel dag att krypa runt en kruka.",
+            "Och i natt åt jag upp alla blad i min skål. Jag är proppmätt!",
+            `Surr säger att det var ${S2.flytrap}. Det tror jag också.`,
+            "Hon har så STORA tänder… Usch!",
+          ],
+          clue: "snailSaid",
+          hideWhen: SNAIL_GONE,
+          talkIf: [
+            {
+              // Nora has already seen the bowl: she gets nervous – and slips away when the talk ends.
+              when: "clue:snailBowl",
+              talk: ["Va? Har du tittat i min skål?", "Eh… jag måste gå nu. Hej då!"],
+            },
+          ],
         },
         a: {
           name: "Skylten",
@@ -366,13 +401,20 @@ export const case9: Case = {
             "Hon har inte ätit ett enda!",
           ],
           clue: "snailBowl",
+          talkIf: [
+            {
+              when: "clue:snailSaid",
+              talk: [`Men ${S2.snail} sa ju att hon åt upp alla blad i natt…`, "Här ligger de. Inte ett enda är uppätet!"],
+            },
+          ],
         },
       },
       onEnter: {
         name: "Ester",
         talk: ["Här nere är det mörkt och varmt.", "Det prasslar i hyllorna…", "Är det någon här?"],
       },
-      // Something shy lives among the shelves. It is only glimpsed once Nora has found its trail.
+      // The snail lives among the shelves. Until she has slipped away from the garden (SNAIL_GONE) only the
+      // shelves rustle; then she is glimpsed scuttling – much faster than "far too slow" – and caught here.
       monsters: [
         {
           type: "crawler",
@@ -385,7 +427,7 @@ export const case9: Case = {
             [[16, 3], [16, 7]],
           ],
           shelters: [[2, 2], [9, 2], [16, 2], [3, 4], [10, 5], [5, 8], [14, 9], [13, 10]],
-          unseenUntil: "clue:slime",
+          unseenUntil: SNAIL_GONE,
           catchWhen: "solved",
         },
       ],
@@ -401,8 +443,8 @@ export const case9: Case = {
         "#TTTTTTTTTTTTTTTTTT#",
         "#TTTTT.......TTTTTT#",
         "#TTT.....c.....TTTT#",
-        "#TT..t.........TTTT#",
-        "D..........k.....TT#",
+        "#TT..tk........TTTT#",
+        "D................TT#",
         "D................gT#",
         "#TT..............TT#",
         "#TTTT.........TTTTT#",
@@ -471,7 +513,7 @@ export const case9: Case = {
         g: {
           name: "Något glittrar",
           sprite: "monsterEgg",
-          talk: ["Ett hemligt monsterägg, gömt i komposten!", "Det är varmt… och luktar jord."],
+          talk: ["Ett hemligt monsterägg, gömt bland buskarna!", "Det är varmt… och luktar jord."],
           gives: "egg",
           hideWhen: "egg",
         },
@@ -606,6 +648,7 @@ export const case9: Case = {
             rutStory: `${S2.gardener} berättar att plantorna rör sig. Men inte VARFÖR.`,
             scribblePrints: "Fotspåren handlar om det gröna som försvann. Spara dem till sista frågan!",
             surrSaw: "Surr pratar om tomaterna. Inte om varför plantorna lutar.",
+            snailSaid: `${S2.snail} pratar om tomaterna och sin mat. Inte om varför plantorna lutar.`,
             bitten: "De bitna tomaterna handlar om vem som äter. Spara dem till nästa fråga!",
             pollen: "Pollenet visar att någon har skakat blommorna. Inte att plantorna lutar.",
             slime: "Slemspåret handlar om vem som äter tomaterna. Spara det till nästa fråga!",
@@ -624,18 +667,21 @@ export const case9: Case = {
             { id: "trattis", label: "Trattis", sprite: "trattis" },
             { id: "surr", label: "Humlan Surr", sprite: "greenhouseBumble" },
             { id: "gardener", label: S2.gardener, sprite: "s2Gardener" },
+            { id: "ghost", label: "Spöket på glaset", sprite: "greenhouseGhost" },
           ],
           answer: "snail",
-          // Round, slimy holes → a slime trail from the tomatoes down to the growing room → and there, the
-          // snail's bowl of grey leaves, not one eaten.
-          proof: ["bitten", "slime", "snailBowl"],
+          // Round, slimy holes → a slime trail from the tomatoes down to the growing room → there, the snail's
+          // bowl of grey leaves, not one eaten → but in the garden she said she ate them all and was full.
+          proof: ["bitten", "slime", "snailBowl", "snailSaid"],
           missing: {
             bitten: "Hur ser tomaterna ut? Titta på tomatplantan i växthuset!",
             slime: "Något blankt går från tomaterna. Vart leder det? Titta vid trappan i växthuset!",
             snailBowl: "Vem bor i odlingsrummet – och har inte ätit sin mat?",
+            snailSaid: "Vem sa att hon var proppmätt? Stämmer det med skålen?",
           },
           whyNot: {
-            flytrap: `Surr sa att hon såg ${S2.flytrap}. Men ${S2.flytrap} äter bara flugor och gör sicksackmärken. Hålen i tomaterna är runda och glänser av slem. Surr hade fel!`,
+            flytrap: `Surr och ${S2.snail} sa att det var ${S2.flytrap}. Men ${S2.flytrap} äter bara flugor och gör sicksackmärken. Hålen i tomaterna är runda och glänser av slem!`,
+            ghost: "Spöket var bara Trattis skugga från lyktan. Och Trattis äter bara lingon!",
             trattis: "Trattis var i växthuset i natt – men hon äter bara lingon. Och hålen i tomaterna glänser av slem.",
             surr: "Humlor skakar tomatblommor – då blir det tomater! Surr äter pollen och nektar, inte tomater.",
             gardener: `${S2.gardener} är ju ledsen att tomaterna är borta! Och hålen glänser av slem.`,
@@ -670,7 +716,7 @@ export const case9: Case = {
           proof: ["greenDrops", "scribblePrints", "trattisSaw"],
           missing: {
             greenDrops: "Vart rann det gröna? Titta på golvet i växthuset, nära dörren ut!",
-            scribblePrints: "Har någon gått ut ur trädgården i natt? Titta vid grinden!",
+            scribblePrints: "Har någon gått ut ur trädgården i natt? Titta vid grinden till vänster, ut mot gatan!",
             trattisSaw: "Någon var vaken i natt och såg något. Fråga i komposten!",
           },
           whyNot: {
@@ -683,6 +729,7 @@ export const case9: Case = {
             rutStory: `${S2.gardener} berättar att bladen blev grå i natt. Men inte vem som tog det gröna.`,
             notebook: "Anteckningsboken handlar om plantorna som lutar.",
             surrSaw: "Surr pratar om tomaterna – och hon hade fel.",
+            snailSaid: `${S2.snail} pratar om tomaterna och sin mat. Inte om vart det gröna tog vägen.`,
             leaning: "Plantorna lutar mot ljuset. Det visar inte vart det gröna tog vägen.",
             grown: "Plantan växer fast bladen är grå. Men vem tog det gröna?",
             bitten: "De bitna tomaterna visar vem som åt. Inte vem som tog det gröna.",
@@ -719,6 +766,11 @@ export const case9: Case = {
       name: "Surrs vittnesmål",
       sprite: "greenhouseBumbleRest",
       text: `Surr skakar tomatblommorna så att det blir tomater. Hon äter pollen och nektar. Hon säger att hon SÅG ${S2.flytrap} hoppa fram och äta upp tomaterna i natt.`,
+    },
+    snailSaid: {
+      name: "Snigelns berättelse",
+      sprite: "s2Snail",
+      text: `${S2.snail} bor i odlingsrummet. Hon säger att hon är alldeles för långsam för att vara en tjuv. I natt åt hon upp alla blad i sin skål – hon är proppmätt! Hon tror, precis som Surr, att ${S2.flytrap} åt tomaterna.`,
     },
     leaning: {
       name: "Plantorna lutar",
@@ -788,10 +840,11 @@ export const case9: Case = {
     {
       say: S2.snail,
       lines: [
-        "Förlåt, förlåt!",
+        "Förlåt, förlåt! Jag var inte alls mätt.",
         "I natt när jag vaknade var bladen i min skål grå.",
         "De smakade INGENTING. Och jag var så hungrig…",
-        "Tomaterna var det enda som var kvar i färg. Så jag åt dem.",
+        "Tomaterna var det enda som var kvar i färg. Så jag kröp hela natten och åt dem.",
+        `Och förlåt, ${S2.flytrap}, att jag skyllde på dig.`,
       ],
     },
     { enter: "gardener", sprite: "s2Gardener", from: [19, 7], to: [15, 7] },
@@ -819,8 +872,10 @@ export const case9: Case = {
   summary: [
     "Så här hängde allt ihop, Nora:",
     `${S2.gardener} flyttade krukorna till solsidan. Sen lutade de mer och mer mot glaset. Och plantorna under lampan lutade mot lampan. Plantor växer mot ljuset!`,
-    `Tomaterna hade runda hål med slem runt. Slemspåret gick ner till odlingsrummet. Där stod skålen med grå blad som ${S2.snail} inte hade rört. Hon var hungrig!`,
-    `${S2.flytrap} äter bara flugor och gör sicksackmärken. Surr hade fel – hon var bara rädd.`,
+    `${S2.snail} sa att hon var för långsam för att vara en tjuv. Och att hon hade ätit upp alla sina blad.`,
+    "Men tomaterna hade runda hål med slem runt, och slemspåret gick hela vägen ner till odlingsrummet. En hel natt är lång tid, även för en snigel!",
+    `Och skålen där nere var full av grå blad som ${S2.snail} inte hade rört. Hon var inte mätt – hon var hungrig!`,
+    `${S2.flytrap} äter bara flugor och gör sicksackmärken. Surr hade fel – hon var bara rädd. Och ${S2.snail} skyllde på ${S2.flytrap} för att inte bli påkommen.`,
     "Spöket på glaset var Trattis skugga, när hon gick förbi med lyktan.",
     "Och det gröna? Gröna droppar rann mot dörren, ritade fotspår gick ut genom grinden, och Trattis såg något litet och grått som droppade grönt. Den ritade figuren tog det!",
   ],
@@ -836,7 +891,7 @@ export const case9: Case = {
     {
       sprite: "s2Snail",
       name: S2.snail,
-      text: "En blyg snigel med ett stort skal. Kilar mellan hyllorna och lämnar blanka slemspår efter sig.",
+      text: "En blyg snigel med ett stort skal. Säger att hon är jättelångsam – men när hon är hungrig kilar hon snabbt mellan hyllorna och lämnar blanka slemspår efter sig!",
     },
     {
       sprite: "greenhouseBumble",
@@ -862,6 +917,7 @@ export const case9: Case = {
         { text: "Ledtrådar glöder lite. Titta noga på marken!", skipWhen: "clue:scribblePrints" },
         { text: "Något ligger på bordet bredvid trädgårdsmästaren.", skipWhen: "clue:notebook" },
         { text: "Titta vid grinden till vänster, där man går ut mot gatan.", skipWhen: "clue:scribblePrints" },
+        { text: "Någon liten sitter till vänster i trädgården. Prata med henne!", skipWhen: "clue:snailSaid" },
         { text: "Göm dig bakom ett träd när humlan dyker!", skipWhen: "clue:surrSaw" },
         {
           text: "Om humlan missar dig två gånger blir hon trött och vilar på en blomma. Då kan du prata med henne!",
@@ -929,7 +985,7 @@ export const case9: Case = {
       hints: [
         `Berätta för ${S2.gardener} vad du har kommit fram till. Hon är i trädgården.`,
         "Plantorna på solsidan och under lampan… åt vilket håll lutar de?",
-        "Vem lämnar slem efter sig? Och vem har inte ätit sin mat?",
+        "Vem lämnar slem efter sig? Vem sa att hon var mätt – och har inte ätit sin mat?",
         "Vart gick de gröna dropparna? Vad såg Trattis? Titta i detektivboken (B)!",
       ],
     },

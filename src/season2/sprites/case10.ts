@@ -243,6 +243,16 @@ export const aqAnimalBoard: PixelSprite = drawSprite(16, 16, (d) => {
   });
 });
 
+/** Dina's dive board on the wall by the seal-pool door: rows of secret-code numbers. */
+export const aqDiveBoard: PixelSprite = drawSprite(16, 16, (d) => {
+  d.part((p) => {
+    p.rect(1, 3, 14, 10, "#5a3a1e");
+    p.rect(2, 4, 12, 8, "#2a4a7a");
+    for (let row = 0; row < 3; row++) for (let i = 0; i < 4; i++) p.rect(3 + i * 3, 5 + row * 2, 2, 1, "#f4ecd8");
+    p.set(13, 11, "#f2d24b");
+  });
+});
+
 /** The robot's charging plate, with its dust bag of sand. */
 export const aqRobotDock: PixelSprite = drawSprite(16, 16, (d) => {
   d.part((p) => p.rect(9, 2, 3, 11, "#8a8ea0").set(10, 4, "#f2d24b").set(10, 5, "#f2d24b").set(9, 6, "#f2d24b").set(10, 7, "#f2d24b"));
@@ -453,6 +463,7 @@ export const case10Sprites: Record<string, PixelSprite> = {
   aqTicketMachine,
   aqTicket,
   aqAnimalBoard,
+  aqDiveBoard,
   aqRobotDock,
   aqOctoTank,
   aqSignStand,

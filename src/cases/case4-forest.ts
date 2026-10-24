@@ -49,11 +49,11 @@ export const case4: Case = {
         "#T..h.......s....T##",
         "#.......1.....T....#",
         "D..N..........T....#",
-        "D....~~.......2....#",
+        "D....~~............#",
         "#....~~............#",
         "#.T.........b......#",
-        "#......3..T........#",
-        "#TT.....T....RT..TT#",
+        "#.........T........#",
+        "#TT....3T....RT2.TT#",
         "#TTT........TTT..TT#",
         "###############DD###",
       ],
@@ -167,7 +167,7 @@ export const case4: Case = {
         "WWWWWWWWWWWW~~WWWWWW",
         "D..R..n.......2..RR#",
         "D...1.............T#",
-        "#Tt..............TT#",
+        "#Ttk.............TT#",
         "####################",
       ],
       things: {
@@ -178,7 +178,7 @@ export const case4: Case = {
           talk: [
             "Sssss… STOPP DÄR!",
             "Jag är Trattis. Jag vaktar vägen till svampringen.",
-            "(Det droppar något rött ur korgen hon bär på…)",
+            "(Det droppar något rött ur korgen bredvid henne…)",
             "Svara rätt på min fråga, så får du gå förbi!",
           ],
           talkIf: [
@@ -189,6 +189,14 @@ export const case4: Case = {
           ],
           puzzle: "trattis-question",
           // She walks ahead to the mushroom ring once Nora may pass.
+          hideWhen: "ring-open",
+        },
+        // Her basket – what's in it is only found out at the ring (clue:lingon), so the red stays scary here.
+        k: {
+          name: "Trattis korg",
+          sprite: "lingonBasket",
+          talk: ["Trattis korg. Den är full av något rött…", "Det droppar ur den. Dropp… dropp…", "Trattis väser: \"Rör inte min korg!\""],
+          // She takes it with her to the mushroom ring.
           hideWhen: "ring-open",
         },
         n: {
@@ -265,10 +273,10 @@ export const case4: Case = {
       layout: [
         "####################",
         "#TT....T....TT...TT#",
-        "#T..h.2..o.o...Tc..#",
+        "#Th...2..o.o...Tc..#",
         "#......o.....o.....#",
-        "#..T..o...1...o..T.#",
-        "#.....o...m...o....#",
+        "#..T..o.T.1...o..T.#",
+        "#.....o...m.T.o....#",
         "#...T..o.....o..T..#",
         "#.T.....o...o...tk.#",
         "#..................D",

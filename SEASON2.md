@@ -307,6 +307,14 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
   (fall 11) och statyn Granit (fall 12) **följer efter** Nora genom dörrarna om de vaknar (`follows`). I
   stora tanken (fall 10) pilar en ofarlig eremitkräfta förbi som villospår. Fall 11 är säsongens fall där
   den skyldige är en person man träffar direkt.
+- **Fall 8 (efter speltest av säsong 1):** S2.sponge träffas tidigt i en oskyldig roll på skolgården, där han
+  skrubbar den grå bussen, och ljuger om att han sov hela natten. Sängen i städskåpet är bäddad och torr. Han blir
+  kryparen i skåpen först när Nora har både hans ord och den torra sängen. Fråga 1 och 3 har "ett spöke" som
+  oskyldigt alternativ man aldrig träffar. Bildsalen har ett riktigt fönster på glänt ovanför de gula dropparna,
+  och skolgården en solrosrabatt runt de ritade fotspåren.
+- **Fall 9:** Snigeln är inte okänd till slutet. Man träffar henne i trädgården, där hon har en ursäkt ("för
+  långsam", "proppmätt") och skyller på S2.flytrap. Ursäkten spricker vid matskålen i odlingsrummet, och sedan
+  smiter hon iväg till hyllorna. Avslöjandets fråga 2 har fått ett oskyldigt alternativ man aldrig träffar (spöket).
 - **Motorn:** klockpusslets slumpade tid kan inte användas i ledtrådstexter (`rollClock` ger inga
   `vars`). Det vore en liten förbättring att lägga till.
 

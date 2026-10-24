@@ -343,9 +343,9 @@ export const case5: Case = {
       theme: "tower",
       layout: [
         "#######w############",
-        "#HH...c..m.......HH#",
+        "#HH...c.1m.......HH#",
         "#.......2..........#",
-        "#GG......1......GG.#",
+        "#GG.............GG.#",
         "#GG....HH..HH...GG.#",
         "#......HH..HH......#",
         "#..................#",
@@ -410,8 +410,8 @@ export const case5: Case = {
           sprite: "shadowCaveMap",
           talk: [
             "Ett papper har fastnat vid fönstret. Det är en karta!",
-            "\"Från tornet: gå NORR till skogen.\"",
-            "\"Sedan VÄSTER längs bäcken. X = GROTTAN.\"",
+            "\"Från tornet: gå NORR till parken.\"",
+            "\"Sedan ÖSTER, bakom träden. X = GROTTAN.\"",
             "Bredvid krysset: två gula prickar. Som ögon…",
           ],
           clue: "caveMap",
@@ -684,7 +684,7 @@ export const case5: Case = {
     caveMap: {
       name: "Kartan",
       sprite: "shadowCaveMap",
-      text: "En karta: \"Från tornet: gå NORR till skogen. Sedan VÄSTER längs bäcken. X = GROTTAN.\" Bredvid krysset: två gula prickar.",
+      text: "En karta: \"Från tornet: gå NORR till parken. Sedan ÖSTER, bakom träden. X = GROTTAN.\" Bredvid krysset: två gula prickar.",
     },
   },
 

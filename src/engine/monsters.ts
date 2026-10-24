@@ -347,6 +347,10 @@ const DUST_TIME = 1.2;
 /** Seconds a flyer keeps flying before resting, if she never misses Nora. */
 const TIRED_AFTER = 30;
 
+/** Seconds a flyer rests on her perch – longer while Nora is within REST_NEAR pixels. */
+const REST_TIME = 12;
+const REST_NEAR = 64;
+
 class Flyer implements Monster {
   readonly kind = "flyer";
   readonly sprite: Phaser.GameObjects.Sprite;
@@ -428,7 +432,9 @@ class Flyer implements Monster {
       if (this.moveTo(this.perch!.x, this.perch!.y, 60, dt) < 1) this.land();
     } else if (this.mode === "perched") {
       // Resting, hanging upside down – she won't attack now, and can be talked to.
-      if (this.modeTime > 7 && !calm) this.takeOff();
+      // She stays as long as Nora is close, so a slow walker still gets there in time.
+      if (toNora < REST_NEAR) this.modeTime = Math.min(this.modeTime, REST_TIME - 2);
+      if (this.modeTime > REST_TIME && !calm) this.takeOff();
     } else if (this.mode === "windup") {
       // Hovers and shivers for a moment before diving – time to hide!
       shake = Math.sin(time / 25) * 1.5;
@@ -452,7 +458,7 @@ class Flyer implements Monster {
     const bob = this.mode === "perched" ? 0 : Math.sin(time / 120) * 2;
     this.sprite.setPosition(Math.round(this.x + shake), Math.round(this.y - FLY_HEIGHT + bob));
     this.talkHint
-      .setVisible(this.mode === "perched" && !!this.thing && toNora < 64)
+      .setVisible(this.mode === "perched" && !!this.thing && toNora < REST_NEAR)
       .setPosition(this.sprite.x, this.sprite.y - 8 + Math.round(Math.sin(time / 200)));
     this.shadow.setPosition(Math.round(this.x), Math.round(this.y));
     this.puzzledFor = Math.max(0, this.puzzledFor - dt);
