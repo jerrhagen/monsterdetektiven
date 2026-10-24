@@ -1842,3 +1842,60 @@ html.touch .hud .music-button {
   0%, 30% { transform: rotate(0deg); }
   60%, 100% { transform: rotate(-90deg); }
 }
+
+/* All cases solved: a golden ribbon at the top of the town map that opens the well-done box. */
+.map-done {
+  position: absolute;
+  top: calc(var(--px) * 19);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: calc(var(--px) * 1.2) calc(var(--px) * 4);
+  font: inherit;
+  font-size: calc(var(--px) * 4.6);
+  font-weight: 700;
+  color: #231736;
+  background: #ffd66b;
+  border: calc(var(--px) * 0.6) solid #231736;
+  border-radius: calc(var(--px) * 3);
+  box-shadow: 0 calc(var(--px) * 0.8) 0 #14101c;
+  cursor: pointer;
+  animation: map-done-glow 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes map-done-glow {
+  from {
+    box-shadow: 0 calc(var(--px) * 0.8) 0 #14101c;
+  }
+  to {
+    box-shadow:
+      0 calc(var(--px) * 0.8) 0 #14101c,
+      0 0 calc(var(--px) * 5) #ffd66b;
+  }
+}
+
+.done-overlay p {
+  margin: calc(var(--px) * 2) 0;
+  font-size: calc(var(--px) * 5);
+  line-height: 1.4;
+}
+
+.done-overlay .done-stats {
+  list-style: none;
+  margin: calc(var(--px) * 3) 0;
+  padding: 0;
+  font-size: calc(var(--px) * 5.5);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.done-overlay .done-stats img {
+  width: calc(var(--px) * 6);
+  height: calc(var(--px) * 6);
+  image-rendering: pixelated;
+  vertical-align: middle;
+}
+
+.done-overlay .teaser {
+  color: #b8f0ff;
+  font-style: italic;
+}

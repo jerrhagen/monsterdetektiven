@@ -331,8 +331,22 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
    `tests/season2.test.ts`) – fall 7–12 i spelets fallista (efter fall 6), deras figurer i figurregistret,
    stadskartan med en knapp för att byta mellan Mystiska staden och Hamnstaden. Säsong 2 låses upp
    när fall 6 är löst.
-6. Kör testerna, provspela varje fall i en bakgrundsflik, uppdatera `DESIGN.md`.
-7. **Monsteräggen får en större roll.** I säsong 1 samlar man bara äggen (de syns längst ner på
+6. **Övergången från säsong 1 (viktig, så att del 2 känns som en fortsättning och inte bara fler fall):**
+   - Stadskartan har redan ett guldband och en ruta när alla fall i säsong 1 är lösta (`showDone` i
+     `src/ui/cityMap.ts`), med raden *"Ester har hört att något konstigt är på gång på andra sidan bäcken.
+     Fortsättning följer…"*. Byt den raden mot en riktig inbjudan när säsong 2 kopplas in, och se till att
+     `allSolved`/"sista fallet" i `cityMap.ts` fortfarande betyder säsong 1 (inte alla tolv fallen).
+   - **En kort mellanscen första gången säsong 2 öppnas** (ett introkort som fallens `intro`): kvällen efter
+     Monsterfesten. Ester läser i tidningen att en ny stadsdel, Hamnstaden, har öppnat på andra sidan bäcken med
+     en ny bro. Samtidigt ringer telefonen: fyrvakten (S2.keeper) behöver en detektiv. Nora och Ester går över
+     bron. Inga ledtrådar om Klick här, bara stämning: *"Det här ser ut att bli ett nytt mysterium…"*.
+   - **Bron syns på kartan:** på Mystiska stadens karta byggs en bro över bäcken mot kanten när fall 6 är löst,
+     och knappen för att byta till Hamnstaden glöder första gången (*"Ny stadsdel!"*).
+   - **Gamla vänner följer med:** fall 7:s intro nämner festen kort (*"Månstenen lyser fortfarande över
+     staden…"*), och säsong 1-figurerna dyker upp som redan planerat (Trattis, Fladder, Smulan).
+   - Spara att mellanscenen är sedd per spelare (ett nytt fält i sparningen, bakåtkompatibelt i `readStore`).
+7. Kör testerna, provspela varje fall i en bakgrundsflik, uppdatera `DESIGN.md`.
+8. **Monsteräggen får en större roll.** I säsong 1 samlar man bara äggen (de syns längst ner på
    stadskartan). I säsong 2 ska de betyda något, till exempel att de kläcks till en liten monsterbebis
    som följer med (fråga 39 i `SEASON2-FRAGOR.md`). Fundera på om säsong 2 ska ha egna ägg, och vad som
    händer när man har alla.

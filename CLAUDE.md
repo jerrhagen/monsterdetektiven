@@ -56,7 +56,7 @@ med säsong 2 gör du så här:
      sessionen tar slut.
 3. **Bygg in svaren.** Namn byts i `src/season2/names.ts`, där alla fall hämtar sina namn. Figurer ritas om
    i `src/season2/sprites/`. `SEASON2.md` avsnitt 6 visar vilken sprite-nyckel varje fråga hör till.
-4. **Koppla in säsongen** enligt `SEASON2.md` avsnitt 7: fallen, figurerna, Hamnstadens karta och
+4. **Koppla in säsongen** enligt `SEASON2.md` avsnitt 7: fallen, figurerna, Hamnstadens karta, övergången från säsong 1 (mellanscen och bro) och
    upplåsningen efter fall 6. Kör `npm test`. Provspela bara i bakgrundsflik. Uppdatera `DESIGN.md`.
 
 ## Teknik i korthet

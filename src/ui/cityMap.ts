@@ -1,6 +1,7 @@
 import { cases } from "../cases";
 import type { Case } from "../cases/types";
-import { type HelpLevel, formatTime, isUnlocked, loadSave, loadSettings, saveSettings } from "../engine/save";
+import { type HelpLevel, type SaveData, formatTime, isUnlocked, loadSave, loadSettings, saveSettings } from "../engine/save";
+import { session } from "../engine/session";
 import { uiRoot } from "./layer";
 import { isMusicOn, toggleMusic } from "./music";
 import { playClick } from "./sound";
@@ -19,6 +20,10 @@ export const MAP_SPOTS: { x: number; y: number; place: string }[] = [
 
 let el: HTMLDivElement | null = null;
 let onKey: ((e: KeyboardEvent) => void) | null = null;
+/** The "all cases solved" box has popped up after the last case was just solved (it only does so once). */
+let celebrated = false;
+
+const allSolved = (save: SaveData) => cases.every((c) => save.cases[c.id]);
 
 function escape(text: string): string {
   const div = document.createElement("div");
@@ -51,7 +56,9 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   const render = () => {
     const save = loadSave();
     const shards = cases.slice(0, 5).filter((c) => save.cases[c.id]).length;
+    const done = allSolved(save);
     el!.innerHTML = `
+      ${done ? `<button class="map-done">🏆 Alla fall lösta! Bra jobbat!</button>` : ""}
       <div class="map-top">
         <h1>Mystiska staden</h1>
         <div class="map-buttons">
@@ -75,7 +82,7 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
         </button>`;
       }).join("")}
       <div class="map-bottom">
-        <span class="shards">Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}</span>
+        <span class="shards">${done ? "🌕 Månstenen är hel!" : `Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}`}</span>
         <span class="eggs" title="Hemliga monsterägg">Monsterägg: ${cases
           .map((c) => `<img src="${spriteUrl("monsterEgg")}" alt="" class="${save.cases[c.id]?.egg ? "found" : ""}">`)
           .join("")}</span>
@@ -85,6 +92,7 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
       const i = Number(b.dataset.i);
       b.addEventListener("click", () => (i === chosen ? start() : choose(i)));
     });
+    el!.querySelector(".map-done")?.addEventListener("click", showDone);
     el!.querySelector(".cards-button")!.addEventListener("click", showCards);
     el!.querySelector(".settings-button")!.addEventListener("click", showSettings);
     el!.querySelector(".players-button")!.addEventListener("click", () => {
@@ -147,6 +155,34 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
     );
   };
 
+  /** Well done! Everything the player has collected, and something new to try. */
+  const showDone = () => {
+    const save = loadSave();
+    const records = cases.map((c) => save.cases[c.id]);
+    const stars = records.reduce((sum, r) => sum + (r?.stars ?? 0), 0);
+    const eggs = records.filter((r) => r?.egg).length;
+    const cardNames = new Set(cases.flatMap((c) => c.cards.map((card) => card.name)));
+    const cards = save.cards.filter((name) => cardNames.has(name)).length;
+    const challenge =
+      stars < cases.length * 3
+        ? "Kan du få tre stjärnor på alla fall?"
+        : eggs < cases.length
+          ? "Kan du hitta alla hemliga monsterägg?"
+          : "Kan du slå dina egna rekordtider?";
+    overlay(
+      "done-overlay",
+      `<h2>🏆 Bra jobbat, detektiv!</h2>
+      <p>Du har löst alla fall i Mystiska staden.<br>Månstenen är hel, och alla monster är lugna igen.</p>
+      <ul class="done-stats">
+        <li>⭐ ${stars} av ${cases.length * 3} stjärnor</li>
+        <li>🃏 ${cards} av ${cardNames.size} monsterkort</li>
+        <li><img src="${spriteUrl("monsterEgg")}" alt=""> ${eggs} av ${cases.length} monsterägg</li>
+      </ul>
+      <p>${challenge}</p>
+      <p class="teaser">Psst… Ester har hört att något konstigt är på gång på andra sidan bäcken.<br>Fortsättning följer…</p>`,
+    );
+  };
+
   const showSettings = () => {
     const settings = loadSettings();
     const help: [HelpLevel, string][] = [
@@ -198,6 +234,12 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   };
   window.addEventListener("keydown", onKey);
   render();
+  // Just solved the last case? Then the well-done box pops up by itself (once).
+  const last = cases.length - 1;
+  if (!celebrated && session.caseIndex === last && session.state.has("caught") && allSolved(loadSave())) {
+    celebrated = true;
+    showDone();
+  }
   return {
     tap: (i) => {
       if (busy) return;

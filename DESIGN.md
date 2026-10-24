@@ -441,6 +441,8 @@ Dessutom (huvudarkitekten tyckte särskilt mycket om monsterkorten och faktan, s
 - **Monsterkort** (huvudarkitektens val): varje monster man mött i ett klarat fall blir ett kort med bild, namn och lite läskig fakta. Korten samlas i en **monstersamling** som man kan titta i från stadskartan.
 - *Detektivmärken valdes bort.*
 
+**När alla fall är lösta** står Månstenen som hel längst ner på stadskartan, och ett guldband överst säger "🏆 Alla fall lösta! Bra jobbat!". Bandet öppnar en ruta med stjärnor, monsterkort och ägg, en ny utmaning (tre stjärnor överallt, alla ägg eller rekordtider) och en liten fortsättning-följer-rad om något konstigt på andra sidan bäcken. Rutan öppnar sig själv en gång, direkt efter att man löst det sista fallet.
+
 ---
 
 ## 10. Grafik, ljud och text
