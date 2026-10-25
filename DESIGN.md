@@ -55,6 +55,8 @@ Titelskärm (välj spelare) → Stadskartan (välj fall) → Introkort → FALLE
 
 **Stadskartan** är ritad efter huvudarkitektens teckning (`assets/bilder/teckningar/stadskarta.jpg`): bäcken som slingrar sig runt ängen, leksaksaffären med det runda orangea taket, bageriet med regnbågstaket, det höga klocktornet med rosa spira, det orangea biblioteket, festtältet och skogen med röda bär och kantareller. Byggnaderna är pixelbilder i `src/sprites/map.ts`. På kartan finns sex platser. Nästa fall låses upp när det förra är löst. Kartan visar stjärnor per fall, hur många **månstensbitar** man har (◆), knappen **🃏 Monsterkort** (K) som visar hela samlingen (kort man inte har visas som svarta skuggor), **⚙️ Inställningar** (I) för hur snart Ester ger tips och för musiken, och **👥** för att byta spelare.
 
+**Del 2 – Havsstaden.** När alla fall i säsong 1 är lösta byggs en ny bro över bäcken uppe till höger, och knappen **🌉 Havsstaden** glöder ("Ny stadsdel!") tills man har varit där. Första gången visas en kort mellanscen (Ester läser i tidningen, fyrvakten ringer, de går över bron). Havsstadens karta är ritad efter huvudarkitektens teckning: havet längst ner med brygga, den röd-vit randiga fyren i hörnet, tivolit och akvariet vid stranden, en lång väg tvärs över staden, skolan högst upp till vänster, museet och växthuset till höger, och bäcken med bron tillbaka till Mystiska staden till vänster. Byggnaderna ligger i `src/season2/sprites/map.ts`. Längst ner visas **färgdroppar** i stället för månstensbitar. Fallen i del 2 öppnas allt eftersom huvudarkitekten har svarat på frågorna (`PLAYABLE_CASES` i `src/engine/config.ts`); de andra står som "Kommer snart".
+
 **Inne i ett fall:**
 1. **Uppdraget.** Någon berättar vad som hänt ("Mina bullar är borta!").
 2. **Utforska.** Nora går mellan rum, pratar med personer och monster och undersöker saker med Ctrl.
@@ -441,7 +443,7 @@ Dessutom (huvudarkitekten tyckte särskilt mycket om monsterkorten och faktan, s
 - **Monsterkort** (huvudarkitektens val): varje monster man mött i ett klarat fall blir ett kort med bild, namn och lite läskig fakta. Korten samlas i en **monstersamling** som man kan titta i från stadskartan.
 - *Detektivmärken valdes bort.*
 
-**När alla fall är lösta** står Månstenen som hel längst ner på stadskartan, och ett guldband överst säger "🏆 Alla fall lösta! Bra jobbat!". Bandet öppnar en ruta med stjärnor, monsterkort och ägg, en ny utmaning (tre stjärnor överallt, alla ägg eller rekordtider) och en liten fortsättning-följer-rad om något konstigt på andra sidan bäcken. Rutan öppnar sig själv en gång, direkt efter att man löst det sista fallet.
+**När alla fall är lösta** står Månstenen som hel längst ner på stadskartan, och ett guldband överst säger "🏆 Alla fall lösta! Bra jobbat!". Bandet öppnar en ruta med stjärnor, monsterkort och ägg, en ny utmaning (tre stjärnor överallt, alla ägg eller rekordtider) och en inbjudan till Havsstaden med en knapp över bron. Rutan öppnar sig själv en gång, direkt efter att man löst det sista fallet.
 
 ---
 

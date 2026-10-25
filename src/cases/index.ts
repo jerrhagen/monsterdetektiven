@@ -5,6 +5,10 @@ import { case4 } from "./case4-forest";
 import { case5 } from "./case5-clocktower";
 import { case6 } from "./case6-festival";
 import type { Case } from "./types";
+import { season2Cases } from "../season2";
 
-/** All cases, in the order they are played. */
-export const cases: Case[] = [case1, case2, case3, case4, case5, case6];
+/** Season 1, in Mystiska staden. */
+export const season1Cases: Case[] = [case1, case2, case3, case4, case5, case6];
+
+/** All cases, in the order they are played: season 1, then season 2 in the new district. */
+export const cases: Case[] = [...season1Cases, ...season2Cases];

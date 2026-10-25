@@ -13,11 +13,9 @@ import { case9Sprites } from "./sprites/case9";
 import { case10Sprites } from "./sprites/case10";
 import { case11Sprites } from "./sprites/case11";
 import { case12Sprites } from "./sprites/case12";
+import { harbourMapSprites } from "./sprites/map";
 
-/**
- * Season 2 – prepared but NOT plugged into the game yet (see SEASON2.md, spoilers).
- * Integration: add these cases after season 1's and merge `season2Sprites` into the sprite registry.
- */
+/** Season 2 (see SEASON2.md – spoilers): cases 7–12 in the new district. */
 export const season2Cases: Case[] = [case7, case8, case9, case10, case11, case12];
 
 /** Every sprite set of season 2, kept apart so the test can check that no key is defined twice. */
@@ -29,6 +27,7 @@ export const season2SpriteSets: Record<string, PixelSprite>[] = [
   case10Sprites,
   case11Sprites,
   case12Sprites,
+  harbourMapSprites,
 ];
 
 export const season2Sprites: Record<string, PixelSprite> = Object.assign({}, ...season2SpriteSets);

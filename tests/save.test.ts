@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { cases } from "../src/cases";
-import { formatTime, recordSolved, starsFor } from "../src/engine/save";
+import { season1Cases as cases } from "../src/cases";
+import { PLAYABLE_CASES } from "../src/engine/config";
+import { formatTime, isUnlocked, recordSolved, starsFor } from "../src/engine/save";
+import { season2Cases } from "../src/season2";
 import { sprites } from "../src/sprites";
 
 describe("stjärnor och tid", () => {
@@ -67,5 +69,21 @@ describe("fotona i detektivboken", () => {
     const { PHOTO_CASES, PHOTO_SPRITES } = await import("../src/ui/casePhotos");
     expect(PHOTO_CASES.sort()).toEqual(cases.map((c) => c.id).sort());
     for (const key of PHOTO_SPRITES) expect(sprites, key).toHaveProperty(key);
+  });
+});
+
+describe("del 2 öppnas fall för fall", () => {
+  const all = [...cases, ...season2Cases];
+  const ids = all.map((c) => c.id);
+  const solved = (n: number) => ({ cases: Object.fromEntries(ids.slice(0, n).map((id) => [id, { stars: 1, bestTime: 1, egg: false }])), cards: [] });
+
+  it("fall 7 öppnas när fall 6 är löst", () => {
+    expect(isUnlocked(ids, 6, solved(5))).toBe(false);
+    expect(isUnlocked(ids, 6, solved(6))).toBe(true);
+  });
+
+  it("fall som inte är klara att spela är låsta, även om fallet före är löst", () => {
+    expect(isUnlocked(ids, PLAYABLE_CASES - 1, solved(PLAYABLE_CASES - 1))).toBe(true);
+    expect(isUnlocked(ids, PLAYABLE_CASES, solved(PLAYABLE_CASES))).toBe(false);
   });
 });

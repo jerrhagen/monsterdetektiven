@@ -35,11 +35,12 @@ Namnen på huvudarkitekten och hennes pappa står i `CLAUDE.local.md` (finns bar
 - Pedagogiken ska vävas in i klurigheterna enligt den pedagogiska planen (avsnitt 6 i `DESIGN.md`). Claude får gärna hitta på eget innehåll, men Noras idéer och monster ska finnas med genom spelet.
 - Det som byggts hittills är **test av byggstenar**, och fall 1 i koden är en testbana. De färdiga mysterierna, även fall 1, ska tänkas igenom ordentligt och får göras om från grunden (steg 6).
 
-## Säsong 2 – förberedd, väntar på Nora
+## Säsong 2 – Havsstaden (pågår)
 
-Säsong 2 (fall 7–12, i en ny stadsdel) är **färdigskriven men inte inkopplad i spelet**. Allt ligger i
-`src/season2/` och testas i `tests/season2.test.ts`. När pappa eller huvudarkitekten säger att det är dags att börja
-med säsong 2 gör du så här:
+Säsong 2 (fall 7–12, i stadsdelen Havsstaden) är **färdigskriven och inkopplad**: kartan, bron, mellanscenen och
+upplåsningen efter fall 6 finns. Fallen öppnas ett i taget när huvudarkitekten har svarat på frågorna för dem
+(`PLAYABLE_CASES` i `src/engine/config.ts`, just nu fall 7–8). Allt ligger i `src/season2/` och testas i
+`tests/season2.test.ts`. Så här fortsätter du:
 
 1. **Läs `SEASON2.md` tyst.** Den innehåller lösningarna. Citera eller sammanfatta den aldrig i chatten.
    Varken huvudarkitekten eller pappa ska få veta något om vad som händer i fallen. Fråga pappa hur långt de har

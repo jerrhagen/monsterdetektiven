@@ -24,14 +24,19 @@ function escape(text: string): string {
 
 /** The title card before a case starts: number, name and the hook. Space, Enter or a click starts. */
 export function showCaseIntro(c: Case, onStart: () => void): void {
+  showStoryCard(`Fall ${c.number}`, c.title, c.intro, "Börja!", onStart);
+}
+
+/** A card with a small label, a title and a few lines of story – case intros and the scene before season 2. */
+export function showStoryCard(label: string, title: string, lines: string[], button: string, onStart: () => void): void {
   close();
   const el = document.createElement("div");
   el.className = "case-screen case-intro";
   el.innerHTML = `
-    <div class="case-number">Fall ${c.number}</div>
-    <h1>${escape(c.title)}</h1>
-    <div class="case-text">${c.intro.map((l) => `<p>${escape(l)}</p>`).join("")}</div>
-    <button class="start">Börja! <kbd>mellanslag</kbd></button>`;
+    <div class="case-number">${escape(label)}</div>
+    <h1>${escape(title)}</h1>
+    <div class="case-text">${lines.map((l) => `<p>${escape(l)}</p>`).join("")}</div>
+    <button class="start">${escape(button)} <kbd>mellanslag</kbd></button>`;
   const start = () => {
     window.removeEventListener("keydown", onKey);
     close();

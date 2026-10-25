@@ -1482,6 +1482,28 @@ body {
   cursor: pointer;
 }
 
+/* Over the bridge to the other district. Glows until the player has been to the new one. */
+.map-buttons .district-button {
+  border-color: #8fd0f5;
+}
+
+.map-buttons .district-button b {
+  color: #ffd66b;
+}
+
+.map-buttons .district-button.new {
+  animation: district-glow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes district-glow {
+  from {
+    box-shadow: 0 0 calc(var(--px) * 1) rgba(143, 208, 245, 0.4);
+  }
+  to {
+    box-shadow: 0 0 calc(var(--px) * 5) rgba(255, 214, 107, 0.95);
+  }
+}
+
 .map-buttons kbd {
   font-family: inherit;
   font-size: calc(var(--px) * 3.2);

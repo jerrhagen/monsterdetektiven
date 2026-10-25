@@ -27,6 +27,7 @@ import { fladder } from "./fladder";
 import { dustFall, grymlan, monsterEgg, moonShard, rustle } from "./finale";
 import { nora } from "./nora";
 import type { PixelSprite } from "./pixelSprite";
+import { season2Sprites } from "../season2";
 import {
   arm,
   chair,
@@ -45,7 +46,8 @@ import {
 import { hintBubble, lookBubble, questionBubble, sign, teddy, zzz } from "./things";
 
 /** Every pixel sprite in the game, by texture key. */
-export const sprites: Record<string, PixelSprite> = {
+/** Every sprite of season 1 (season 2 keeps its own in src/season2). */
+export const season1Sprites: Record<string, PixelSprite> = {
   fladder,
   fladderSleep,
   nora,
@@ -109,3 +111,6 @@ export const sprites: Record<string, PixelSprite> = {
   ...case6Sprites,
   ...mapSprites,
 };
+
+/** Every sprite in the game. */
+export const sprites: Record<string, PixelSprite> = { ...season1Sprites, ...season2Sprites };

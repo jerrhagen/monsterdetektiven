@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { cases } from "../src/cases";
+import { season1Cases as cases } from "../src/cases";
 import { season2Cases, season2SpriteSets, season2Sprites } from "../src/season2";
-import { sprites } from "../src/sprites";
+import { season1Sprites as sprites } from "../src/sprites";
 import { checkCases } from "./caseChecks";
 
 checkCases("säsong 2", season2Cases, { ...sprites, ...season2Sprites }, 7);

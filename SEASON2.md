@@ -4,9 +4,9 @@
 > Allt nedan är hemligt: berättelsen, de skyldiga och lösningarna i fall 7–12.
 > Frågorna som huvudarkitekten ska svara på finns i ett eget dokument utan spoilers: **`SEASON2-FRAGOR.md`**.
 
-Säsong 2 är förberedd men **inte inkopplad** i spelet. Koden ligger i `src/season2/` och testas med
-samma tester som säsong 1 (`tests/season2.test.ts`), men ingenting därifrån syns i spelet förrän vi
-kopplar in den (se "Så kopplar vi in säsong 2" längst ner).
+Säsong 2 är **inkopplad** (2026-10-25): Havsstadens karta, bron, mellanscenen och upplåsningen efter fall 6 finns.
+Fallen öppnas ett i taget när huvudarkitekten har svarat på deras frågor (`PLAYABLE_CASES` i `src/engine/config.ts`,
+just nu fall 7–8). Koden ligger i `src/season2/` och testas i `tests/season2.test.ts`.
 
 ---
 

@@ -1,8 +1,10 @@
 import * as Phaser from "phaser";
 import { cases } from "../../cases";
-import { MAP_SPOTS, hideCityMap, showCityMap } from "../../ui/cityMap";
+import { S2 } from "../../season2/names";
+import { DISTRICTS, allSolved, districtOf, hideCityMap, showCityMap } from "../../ui/cityMap";
+import { showStoryCard } from "../../ui/caseScreens";
 import { GAME_HEIGHT, GAME_WIDTH } from "../config";
-import { isUnlocked, loadSave } from "../save";
+import { isUnlocked, loadSave, markDistrictSeen } from "../save";
 import { newGame, session } from "../session";
 import { registerSprites } from "../textures";
 
@@ -66,6 +68,26 @@ const TREES: { x: number; y: number; round?: boolean }[] = [
 /** The buildings, in case order, standing on their map spot. */
 const BUILDINGS = ["mapToyShop", "mapBakery", "mapLibrary", null, "mapClockTower", "mapTent"];
 
+/** The road from the bakery to the new bridge over the stream, once season 1 is solved. */
+const BRIDGE_ROAD: Point[] = [[220, 60], [244, 52], [272, 46], [300, 42], [330, 40]];
+
+// ---- The new district (season 2) ----
+
+const SAND = 0xf0d890;
+/** Where the sea starts, along the bottom of the map. */
+const SEA_TOP = 154;
+/** Its buildings, in case order: lighthouse, school, greenhouse, aquarium, fair, museum. */
+const HARBOUR_BUILDINGS = ["mapLighthouse", "mapSchool", "mapGreenhouse", "mapAquarium", "mapFair", "mapMuseum"];
+const HARBOUR_ROADS: Point[][] = [
+  [[0, 104], [80, 104], [160, 104], [240, 104], [320, 104]], // across the town, from the bridge
+  [[160, 34], [160, 70], [160, 104], [160, 130], [160, SEA_TOP]], // down to the jetty
+  [[112, 84], [112, 104]], // school
+  [[290, 56], [290, 104], [286, 130], [282, 146]], // greenhouse – lighthouse
+  [[228, 98], [228, 104]], // museum
+  [[204, 104], [204, 142]], // aquarium
+  [[84, 104], [84, 142]], // fair
+];
+
 /** Small pseudo-random number from a position, so the map looks the same every time. */
 function hash(x: number, y: number): number {
   const n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
@@ -100,6 +122,8 @@ function inForest(x: number, y: number): boolean {
 /** The town map: choose which case to play. */
 export class MapScene extends Phaser.Scene {
   private marker!: Phaser.GameObjects.Sprite;
+  /** 0: Mystiska staden (season 1), 1: the new district (season 2). */
+  private district = 0;
   /** The building image for each place (the forest has none). */
   private buildings: (Phaser.GameObjects.Image | undefined)[] = [];
 
@@ -107,49 +131,85 @@ export class MapScene extends Phaser.Scene {
     super("map");
   }
 
-  create(): void {
+  create(data: { district?: number } = {}): void {
     registerSprites(this);
     this.input.keyboard!.clearCaptures();
     this.buildings = [];
-    this.drawTown();
 
     const save = loadSave();
     const ids = cases.map((c) => c.id);
-    // Start on the newest case the player can play.
+    // Start on the newest case the player can play, in the district asked for (or the one with that case).
     let selected = session.caseIndex;
     if (!save.cases[ids[selected]]) {
       selected = Math.max(0, ...cases.map((_, i) => i).filter((i) => isUnlocked(ids, i, save)));
     }
+    this.district = data.district ?? (allSolved(save) ? districtOf(selected) : 0);
+    const here = DISTRICTS[this.district];
+    if (districtOf(selected) !== this.district) {
+      const open = here.spots.map((_, i) => here.first + i).filter((i) => isUnlocked(ids, i, save));
+      selected = open.length ? Math.max(...open) : here.first;
+    }
+
+    if (this.district === 0) this.drawTown();
+    else this.drawHarbourTown();
 
     this.marker = this.add.sprite(0, 0, "nora-0").setOrigin(0.5, 1).setDepth(1000);
     this.moveMarker(selected, false);
 
-    const map = showCityMap(selected, {
+    const map = showCityMap(selected, this.district, {
       play: (index) => {
         newGame(index);
         this.scene.start("room", {});
       },
       select: (index) => this.moveMarker(index, true),
       players: () => this.scene.start("title"),
+      switchDistrict: () => this.switchDistrict(),
     });
     this.makePlacesTappable((i) => map.tap(i));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, hideCityMap);
     this.cameras.main.fadeIn(200);
   }
 
+  /** Over the bridge. The first time, a little scene shows how Nora and Ester find the new district. */
+  private switchDistrict(): void {
+    const next = 1 - this.district;
+    const go = () => this.scene.restart({ district: next });
+    if (next === 1 && !loadSave().seenDistrict) {
+      hideCityMap();
+      showStoryCard(
+        "Del 2",
+        "En ny stadsdel",
+        [
+          "Kvällen efter Monsterfesten läser Ester tidningen. Månstenen lyser fortfarande över staden.",
+          `"Titta, Nora! På andra sidan bäcken har en ny stadsdel öppnat: ${S2.district}! Med hamn och fyr, skola, tivoli och museum. Och en alldeles ny bro!"`,
+          "Då ringer telefonen. Det är fyrvakten nere i hamnen. Hon behöver en detektiv – på en gång!",
+          "Nora tar förstoringsglaset. Ester tar ryggsäcken. Tillsammans går de över bron.",
+          "Det här ser ut att bli ett nytt mysterium…",
+        ],
+        "Gå över bron!",
+        () => {
+          markDistrictSeen();
+          go();
+        },
+      );
+    } else go();
+  }
+
   /** The whole building (and the forest) can be tapped, not just the sign under it. */
   private makePlacesTappable(tap: (index: number) => void): void {
-    MAP_SPOTS.forEach((spot, i) => {
-      const building = this.buildings[i];
+    const here = DISTRICTS[this.district];
+    here.spots.forEach((spot, local) => {
+      const building = this.buildings[local];
       const zone = building
         ? this.add.zone(building.x, building.y - building.height / 2, building.width, building.height)
         : this.add.zone(spot.x + 6, spot.y - 14, 76, 56); // the forest around the spot
-      zone.setInteractive({ useHandCursor: true }).on("pointerdown", () => tap(i));
+      zone.setInteractive({ useHandCursor: true }).on("pointerdown", () => tap(here.first + local));
     });
   }
 
   private moveMarker(index: number, animate: boolean): void {
-    const spot = MAP_SPOTS[index];
+    const here = DISTRICTS[this.district];
+    const spot = here.spots[index - here.first];
     const x = spot.x;
     const y = spot.y + 4;
     this.tweens.killTweensOf(this.marker);
@@ -198,8 +258,42 @@ export class MapScene extends Phaser.Scene {
     this.tweens.add({ targets: glints, alpha: { from: 1, to: 0.3 }, duration: 1400, yoyo: true, repeat: -1, ease: "Sine.InOut" });
 
     // Wooden bridges.
-    const b = this.add.graphics();
-    for (const { x, y, across } of BRIDGES) {
+    this.drawBridges(this.add.graphics(), BRIDGES);
+
+    // Things standing on the map, drawn front to back.
+    const put = (key: string, x: number, y: number) => this.add.image(x, y, `${key}-0`).setOrigin(0.5, 1).setDepth(y);
+    for (const t of TREES) put(t.round ? "mapTreeRound" : "mapTree", t.x, t.y);
+    for (const [x, y] of [[82, 120], [87, 123], [79, 125], [91, 118], [48, 118]]) put("mapChanterelle", x, y);
+    put("mapCave", 76, 101);
+    for (const [x, y] of [[198, 90], [208, 94], [218, 90]]) put("mapTulip", x, y);
+    for (const [x, y] of [[100, 66], [150, 60], [284, 104], [284, 140], [190, 140]]) put("mapBush", x, y);
+
+    const save = loadSave();
+    const ids = cases.map((c) => c.id);
+    DISTRICTS[0].spots.forEach((spot, i) => {
+      const key = BUILDINGS[i];
+      if (!key) return;
+      const building = put(key, spot.x, spot.y);
+      this.buildings[i] = building;
+      const open = !!cases[i] && isUnlocked(ids, i, save);
+      if (!open) building.setTint(0x6a6480);
+    });
+
+    // When season 1 is solved, a new bridge leads over the stream to the new district (top right).
+    if (allSolved(save)) {
+      const road = smooth(BRIDGE_ROAD);
+      for (const [x, y] of road) g.fillStyle(ROAD_EDGE).fillCircle(x, y, 4);
+      for (const [x, y] of road) g.fillStyle(ROAD).fillCircle(x, y, 3);
+      this.drawBridges(this.add.graphics().setDepth(1), [{ x: 314, y: 42, across: "horizontal" }]);
+      this.add
+        .zone(314, 42, 26, 18)
+        .setInteractive({ useHandCursor: true })
+        .on("pointerdown", () => this.switchDistrict());
+    }
+  }
+
+  private drawBridges(b: Phaser.GameObjects.Graphics, bridges: typeof BRIDGES): void {
+    for (const { x, y, across } of bridges) {
       const [w, h] = across === "vertical" ? [10, 18] : [18, 10];
       const left = x - w / 2;
       const top = y - h / 2;
@@ -214,24 +308,76 @@ export class MapScene extends Phaser.Scene {
         b.fillRect(left, top, w, 1).fillRect(left, top + h - 1, w, 1);
       }
     }
+  }
 
-    // Things standing on the map, drawn front to back.
+  /**
+   * The new district, after the head architect's map: the sea along the bottom with a jetty and the
+   * striped lighthouse in the corner, a long road across the town and one down to the sea, and the
+   * stream with the bridge back to Mystiska staden on the left.
+   */
+  private drawHarbourTown(): void {
+    const g = this.add.graphics();
+    g.fillStyle(MEADOW).fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    for (let y = 0; y < GAME_HEIGHT; y += 3) {
+      for (let x = 0; x < GAME_WIDTH; x += 3) {
+        const h = hash(x, y);
+        if (h < 0.12) g.fillStyle(MEADOW_DARK).fillRect(x, y, 1, 2);
+        else if (h < 0.17) g.fillStyle(MEADOW_LIGHT).fillRect(x + 1, y, 1, 1);
+        else if (h > 0.992) g.fillStyle([0xffffff, 0xffd66b, 0xf28ac0][Math.floor(h * 1000) % 3]).fillRect(x, y, 1, 1);
+      }
+    }
+
+    // The beach and the sea.
+    g.fillStyle(SAND).fillRect(0, SEA_TOP - 7, GAME_WIDTH, 7);
+    g.fillStyle(WATER_EDGE).fillRect(0, SEA_TOP - 1, GAME_WIDTH, 1);
+    g.fillStyle(WATER).fillRect(0, SEA_TOP, GAME_WIDTH, GAME_HEIGHT - SEA_TOP);
+
+    // The stream on the left, running into the sea.
+    const stream = smooth([[8, 0], [6, 40], [9, 90], [6, 130], [8, SEA_TOP + 4]]);
+    for (const [x, y] of stream) g.fillStyle(WATER_EDGE).fillCircle(x, y, 6);
+    for (const [x, y] of stream) g.fillStyle(WATER).fillCircle(x, y, 5);
+
+    const roads = HARBOUR_ROADS.map(smooth);
+    for (const pts of roads) for (const [x, y] of pts) g.fillStyle(ROAD_EDGE).fillCircle(x, y, 4);
+    for (const pts of roads) for (const [x, y] of pts) g.fillStyle(ROAD).fillCircle(x, y, 3);
+
+    // Glints on the water, and the jetty at the end of the road.
+    const glints = this.add.graphics();
+    for (let i = 0; i < 70; i++) {
+      const x = Math.floor(hash(i, 7) * GAME_WIDTH);
+      const y = SEA_TOP + 3 + Math.floor(hash(7, i) * (GAME_HEIGHT - SEA_TOP - 4));
+      glints.fillStyle(WATER_LIGHT).fillRect(x, y, 3, 1);
+    }
+    this.tweens.add({ targets: glints, alpha: { from: 1, to: 0.3 }, duration: 1400, yoyo: true, repeat: -1, ease: "Sine.InOut" });
+    const jetty = this.add.graphics();
+    jetty.fillStyle(PLANK_DARK).fillRect(154, SEA_TOP - 2, 12, 22);
+    jetty.fillStyle(PLANK).fillRect(155, SEA_TOP - 2, 10, 21);
+    jetty.fillStyle(PLANK_DARK);
+    for (let y = SEA_TOP; y < SEA_TOP + 19; y += 3) jetty.fillRect(155, y, 10, 1);
+    this.drawBridges(this.add.graphics(), [{ x: 7, y: 104, across: "horizontal" }]);
+    this.add
+      .zone(7, 104, 20, 18)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => this.switchDistrict());
+
+    // Gulls gliding over the water.
+    for (const [x, y] of [[60, 166], [120, 176], [236, 170], [270, 160]]) {
+      const gull = this.add.image(x, y, "mapGull-0").setDepth(500);
+      this.tweens.add({ targets: gull, x: x + 14, y: y - 3, duration: 2600 + x * 7, yoyo: true, repeat: -1, ease: "Sine.InOut" });
+    }
+
     const put = (key: string, x: number, y: number) => this.add.image(x, y, `${key}-0`).setOrigin(0.5, 1).setDepth(y);
-    for (const t of TREES) put(t.round ? "mapTreeRound" : "mapTree", t.x, t.y);
-    for (const [x, y] of [[82, 120], [87, 123], [79, 125], [91, 118], [48, 118]]) put("mapChanterelle", x, y);
-    put("mapCave", 76, 101);
-    for (const [x, y] of [[198, 90], [208, 94], [218, 90]]) put("mapTulip", x, y);
-    for (const [x, y] of [[100, 66], [150, 60], [284, 104], [284, 140], [190, 140]]) put("mapBush", x, y);
+    for (const [x, y] of [[40, 60], [190, 54], [150, 80], [36, 128]]) put("mapTreeRound", x, y);
+    for (const [x, y] of [[60, 98], [140, 124], [248, 124], [312, 96]]) put("mapBush", x, y);
 
     const save = loadSave();
     const ids = cases.map((c) => c.id);
-    MAP_SPOTS.forEach((spot, i) => {
-      const key = BUILDINGS[i];
-      if (!key) return;
-      const building = put(key, spot.x, spot.y);
-      this.buildings[i] = building;
-      const open = !!cases[i] && isUnlocked(ids, i, save);
-      if (!open) building.setTint(0x6a6480);
+    const here = DISTRICTS[1];
+    here.spots.forEach((spot, local) => {
+      const i = here.first + local;
+      const building = put(HARBOUR_BUILDINGS[local], spot.x, spot.y);
+      this.buildings[local] = building;
+      if (!isUnlocked(ids, i, save)) building.setTint(0x6a6480);
     });
   }
 }

@@ -1,6 +1,8 @@
-import { cases } from "../cases";
+import { cases, season1Cases } from "../cases";
 import type { Case } from "../cases/types";
+import { PLAYABLE_CASES, SEASON1_CASES } from "../engine/config";
 import { type HelpLevel, type SaveData, formatTime, isUnlocked, loadSave, loadSettings, saveSettings } from "../engine/save";
+import { S2 } from "../season2/names";
 import { session } from "../engine/session";
 import { uiRoot } from "./layer";
 import { isMusicOn, toggleMusic } from "./music";
@@ -8,22 +10,52 @@ import { playClick } from "./sound";
 import { isTouch } from "./touch";
 import { spriteUrl } from "./spriteImage";
 
-/** Where each case lies on the town map (game pixels), in case order. */
-export const MAP_SPOTS: { x: number; y: number; place: string }[] = [
-  { x: 60, y: 62, place: "Leksaksaffären" },
-  { x: 220, y: 58, place: "Bageriet" },
-  { x: 268, y: 94, place: "Biblioteket" },
-  { x: 70, y: 134, place: "Skogen" },
-  { x: 170, y: 116, place: "Klocktornet" },
-  { x: 232, y: 158, place: "Torget" },
+export interface District {
+  name: string;
+  /** Index of the district's first case. */
+  first: number;
+  /** Where each of its cases lies on the town map (game pixels), in case order. */
+  spots: { x: number; y: number; place: string }[];
+}
+
+/** Season 1 in Mystiska staden, season 2 in the new district across the stream (Nora's map). */
+export const DISTRICTS: District[] = [
+  {
+    name: "Mystiska staden",
+    first: 0,
+    spots: [
+      { x: 60, y: 62, place: "Leksaksaffären" },
+      { x: 220, y: 58, place: "Bageriet" },
+      { x: 268, y: 94, place: "Biblioteket" },
+      { x: 70, y: 134, place: "Skogen" },
+      { x: 170, y: 116, place: "Klocktornet" },
+      { x: 232, y: 158, place: "Torget" },
+    ],
+  },
+  {
+    name: S2.district,
+    first: SEASON1_CASES,
+    spots: [
+      { x: 282, y: 148, place: "Fyren" },
+      { x: 112, y: 84, place: "Skolan" },
+      { x: 284, y: 56, place: "Växthuset" },
+      { x: 204, y: 146, place: "Akvariet" },
+      { x: 84, y: 146, place: "Tivolit" },
+      { x: 228, y: 98, place: "Museet" },
+    ],
+  },
 ];
+
+/** Which district a case belongs to. */
+export const districtOf = (index: number): number => (index >= SEASON1_CASES ? 1 : 0);
 
 let el: HTMLDivElement | null = null;
 let onKey: ((e: KeyboardEvent) => void) | null = null;
 /** The "all cases solved" box has popped up after the last case was just solved (it only does so once). */
 let celebrated = false;
 
-const allSolved = (save: SaveData) => cases.every((c) => save.cases[c.id]);
+/** Season 1 is solved – then the bridge to the new district is open. */
+export const allSolved = (save: SaveData) => season1Cases.every((c) => save.cases[c.id]);
 
 function escape(text: string): string {
   const div = document.createElement("div");
@@ -37,13 +69,15 @@ export interface MapActions {
   /** Nora's marker should move to a spot. */
   select(index: number): void;
   players(): void;
+  /** Go to the other district. */
+  switchDistrict(): void;
 }
 
 /**
  * Labels, stars, moonstone pieces and the buttons for monster cards, settings and players.
  * Returns `tap`, for tapping a place on the map itself (a building): choose it, or play it if chosen.
  */
-export function showCityMap(selected: number, actions: MapActions): { tap(index: number): void } {
+export function showCityMap(selected: number, district: number, actions: MapActions): { tap(index: number): void } {
   hideCityMap();
   el = document.createElement("div");
   el.className = "city-map";
@@ -53,22 +87,41 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   let busy = false;
   let chosen = selected;
 
+  const here = DISTRICTS[district];
+  const spots = here.spots;
+  const localCases = cases.slice(here.first, here.first + spots.length);
   const render = () => {
     const save = loadSave();
     const shards = cases.slice(0, 5).filter((c) => save.cases[c.id]).length;
     const done = allSolved(save);
+    const other = DISTRICTS[1 - district];
+    // The button over the bridge glows until the player has been to the new district.
+    const fresh = district === 0 && !save.seenDistrict;
+    const switcher = done
+      ? `<button class="district-button ${fresh ? "new" : ""}">🌉 ${escape(other.name)}${fresh ? " <b>Ny stadsdel!</b>" : ""}</button>`
+      : "";
+    // Season 2: a drop of colour for every solved case, in the case's colour.
+    const drops = ["#e04040", "#f2d24b", "#4aa85a", "#3a8ad8", "#f08a30", "#9a5ad0"];
+    const bottomLeft =
+      district === 0
+        ? `<span class="shards">${done ? "🌕 Månstenen är hel!" : `Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}`}</span>`
+        : `<span class="shards">Färgdroppar: ${localCases
+            .map((c, i) => (save.cases[c.id] ? `<span style="color: ${drops[i]}">●</span>` : "○"))
+            .join("")}</span>`;
     el!.innerHTML = `
-      ${done ? `<button class="map-done">🏆 Alla fall lösta! Bra jobbat!</button>` : ""}
+      ${done && district === 0 ? `<button class="map-done">🏆 Alla fall lösta! Bra jobbat!</button>` : ""}
       <div class="map-top">
-        <h1>Mystiska staden</h1>
+        <h1>${escape(here.name)}</h1>
         <div class="map-buttons">
+          ${switcher}
           <button class="cards-button">🃏 Monsterkort <kbd>K</kbd></button>
           <button class="settings-button">⚙️ <kbd>I</kbd></button>
           <button class="players-button">👥</button>
         </div>
       </div>
-      ${MAP_SPOTS.map((spot, i) => {
-        const c = cases[i];
+      ${spots.map((spot, local) => {
+        const i = here.first + local;
+        const c = i < PLAYABLE_CASES ? cases[i] : undefined;
         const open = !!c && isUnlocked(ids, i, save);
         const record = c ? save.cases[c.id] : undefined;
         // Stars and the best time to beat, e.g. "★★★ · ⏱️ 6 min 12 s".
@@ -82,8 +135,8 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
         </button>`;
       }).join("")}
       <div class="map-bottom">
-        <span class="shards">${done ? "🌕 Månstenen är hel!" : `Månstensbitar: ${"◆".repeat(shards)}${"◇".repeat(5 - shards)}`}</span>
-        <span class="eggs" title="Hemliga monsterägg">Monsterägg: ${cases
+        ${bottomLeft}
+        <span class="eggs" title="Hemliga monsterägg">Monsterägg: ${localCases
           .map((c) => `<img src="${spriteUrl("monsterEgg")}" alt="" class="${save.cases[c.id]?.egg ? "found" : ""}">`)
           .join("")}</span>
         <span class="map-hint">${isTouch() ? "Tryck två gånger på ett fall för att spela" : "Välj ett fall med pilarna och tryck på mellanslag"}</span>
@@ -93,6 +146,9 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
       b.addEventListener("click", () => (i === chosen ? start() : choose(i)));
     });
     el!.querySelector(".map-done")?.addEventListener("click", showDone);
+    el!.querySelector(".district-button")?.addEventListener("click", () => {
+      if (!busy) actions.switchDistrict();
+    });
     el!.querySelector(".cards-button")!.addEventListener("click", showCards);
     el!.querySelector(".settings-button")!.addEventListener("click", showSettings);
     el!.querySelector(".players-button")!.addEventListener("click", () => {
@@ -138,7 +194,8 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   /** Every monster card in the game – the ones you haven't got yet are shadows with a "?". */
   const showCards = () => {
     const save = loadSave();
-    const all = cases.flatMap((c: Case) => c.cards.map((card) => ({ card, from: c })));
+    const shown = cases.filter((_, i) => i < SEASON1_CASES || (i < PLAYABLE_CASES && allSolved(save)));
+    const all = shown.flatMap((c: Case) => c.cards.map((card) => ({ card, from: c })));
     const seen = new Set<string>();
     const unique = all.filter(({ card }) => (seen.has(card.name) ? false : (seen.add(card.name), true)));
     const got = unique.filter(({ card }) => save.cards.includes(card.name)).length;
@@ -158,15 +215,15 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   /** Well done! Everything the player has collected, and something new to try. */
   const showDone = () => {
     const save = loadSave();
-    const records = cases.map((c) => save.cases[c.id]);
+    const records = season1Cases.map((c) => save.cases[c.id]);
     const stars = records.reduce((sum, r) => sum + (r?.stars ?? 0), 0);
     const eggs = records.filter((r) => r?.egg).length;
-    const cardNames = new Set(cases.flatMap((c) => c.cards.map((card) => card.name)));
+    const cardNames = new Set(season1Cases.flatMap((c) => c.cards.map((card) => card.name)));
     const cards = save.cards.filter((name) => cardNames.has(name)).length;
     const challenge =
-      stars < cases.length * 3
+      stars < season1Cases.length * 3
         ? "Kan du få tre stjärnor på alla fall?"
-        : eggs < cases.length
+        : eggs < season1Cases.length
           ? "Kan du hitta alla hemliga monsterägg?"
           : "Kan du slå dina egna rekordtider?";
     overlay(
@@ -174,13 +231,18 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
       `<h2>🏆 Bra jobbat, detektiv!</h2>
       <p>Du har löst alla fall i Mystiska staden.<br>Månstenen är hel, och alla monster är lugna igen.</p>
       <ul class="done-stats">
-        <li>⭐ ${stars} av ${cases.length * 3} stjärnor</li>
+        <li>⭐ ${stars} av ${season1Cases.length * 3} stjärnor</li>
         <li>🃏 ${cards} av ${cardNames.size} monsterkort</li>
-        <li><img src="${spriteUrl("monsterEgg")}" alt=""> ${eggs} av ${cases.length} monsterägg</li>
+        <li><img src="${spriteUrl("monsterEgg")}" alt=""> ${eggs} av ${season1Cases.length} monsterägg</li>
       </ul>
       <p>${challenge}</p>
-      <p class="teaser">Psst… Ester har hört att något konstigt är på gång på andra sidan bäcken.<br>Fortsättning följer…</p>`,
+      <p class="teaser">Psst… Ester har hört att en ny stadsdel har öppnat på andra sidan bäcken: ${escape(S2.district)}!<br>Gå över bron och se vad som är på gång där.</p>
+      <div class="choices"><button class="to-district">🌉 Till ${escape(S2.district)}</button></div>`,
     );
+    el!.querySelector(".to-district")?.addEventListener("click", () => {
+      closeOverlay?.();
+      actions.switchDistrict();
+    });
   };
 
   const showSettings = () => {
@@ -222,9 +284,10 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
       return;
     }
     const n = Number(e.key);
-    if (Number.isInteger(n) && n >= 1 && n <= MAP_SPOTS.length) choose(n - 1);
-    else if (e.key === "ArrowRight" || e.key === "ArrowDown") choose((chosen + 1) % MAP_SPOTS.length);
-    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") choose((chosen + MAP_SPOTS.length - 1) % MAP_SPOTS.length);
+    const local = chosen - here.first;
+    if (Number.isInteger(n) && n >= 1 && n <= spots.length) choose(here.first + n - 1);
+    else if (e.key === "ArrowRight" || e.key === "ArrowDown") choose(here.first + ((local + 1) % spots.length));
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") choose(here.first + ((local + spots.length - 1) % spots.length));
     else if (e.key === "k" || e.key === "K") showCards();
     else if (e.key === "i" || e.key === "I") showSettings();
     else if (e.key === " " || e.key === "Enter") {
@@ -235,8 +298,8 @@ export function showCityMap(selected: number, actions: MapActions): { tap(index:
   window.addEventListener("keydown", onKey);
   render();
   // Just solved the last case? Then the well-done box pops up by itself (once).
-  const last = cases.length - 1;
-  if (!celebrated && session.caseIndex === last && session.state.has("caught") && allSolved(loadSave())) {
+  const last = SEASON1_CASES - 1;
+  if (!celebrated && district === 0 && session.caseIndex === last && session.state.has("caught") && allSolved(loadSave())) {
     celebrated = true;
     showDone();
   }

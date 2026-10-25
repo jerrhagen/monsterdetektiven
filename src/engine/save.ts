@@ -3,7 +3,9 @@
  * Everything is wrapped in try/catch: storage can be blocked, and the game must still work.
  */
 
-const KEY = "monsterdetektiven-v2";
+import { PLAYABLE_CASES } from "./config";
+
+const KEY ="monsterdetektiven-v2";
 const OLD_KEY = "monsterdetektiven-v1";
 export const PLAYER_COUNT = 4;
 
@@ -18,6 +20,8 @@ export interface SaveData {
   cases: Record<string, CaseRecord>;
   /** Names of the monster cards collected. */
   cards: string[];
+  /** The player has seen the little scene before the first visit to the new district (season 2). */
+  seenDistrict?: boolean;
 }
 
 export interface Player {
@@ -59,6 +63,7 @@ function readStore(): Store {
       if (saved.settings?.help) store.settings.help = saved.settings.help;
       saved.players?.slice(0, PLAYER_COUNT).forEach((p, i) => {
         store.players[i] = { name: p.name || defaultName(i), data: { cases: p.data?.cases ?? {}, cards: p.data?.cards ?? [] } };
+        if (p.data?.seenDistrict) store.players[i].data.seenDistrict = true;
       });
       return store;
     }
@@ -128,9 +133,17 @@ export function saveSettings(settings: Settings): void {
   writeStore(store);
 }
 
-/** A case can be played when it's the first one or the one before it is solved. */
+/** A case can be played when it's ready, and it's the first one or the one before it is solved. */
 export function isUnlocked(caseIds: string[], index: number, data: SaveData = loadSave()): boolean {
+  if (index >= PLAYABLE_CASES) return false;
   return index === 0 || !!data.cases[caseIds[index - 1]];
+}
+
+/** Remembers that the current player has seen the scene before the new district. */
+export function markDistrictSeen(): void {
+  const store = readStore();
+  store.players[store.current].data.seenDistrict = true;
+  writeStore(store);
 }
 
 /** The current player's progress. */
