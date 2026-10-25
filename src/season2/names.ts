@@ -10,6 +10,10 @@ export const S2 = {
   /** The new part of town across the harbour, where season 2 takes place. */
   district: "Hamnstaden",
 
+  /** Nora's own parents, who pop up in season 2 (the parents said it's fine to use their first names). */
+  dad: "Pappa Aron",
+  mom: "Mamma Lisa",
+
   // Fall 7 – Hamnen
   fisher: "Fiskar-Frans",
   keeper: "Fyrvakten Tora",

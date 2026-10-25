@@ -168,6 +168,71 @@ export const s2Crab: PixelSprite = animated(
   { frameRate: 8 },
 );
 
+/**
+ * Nora's dad (S2.dad), on his way to a morning swim: tall and slim, curly light-brown hair, dark
+ * sunglasses and a short stubble beard, a white T-shirt, green striped swim shorts and bare feet.
+ * A yellow-and-white striped beach towel hangs over his shoulders, and he carries a rolled-up
+ * beach mat. Only a friendly face on the quay – he has no part in the mystery.
+ */
+export const s2Dad: PixelSprite = drawSprite(16, 20, (d) => {
+  const TOWEL = "#f2d24b";
+  const SHORTS = "#4e9a72";
+  const STUBBLE = "#c99670";
+  const SHADES = "#14141c";
+  /** Where the towel lies: over both shoulders and hanging down in front, a bit below the T-shirt. */
+  const towel = (x: number, y: number) => x >= 4 && x <= 11 && y <= 12 && (y === 9 ? x !== 7 && x !== 8 : x <= 5 || x >= 10);
+  // Long legs and bare feet.
+  d.part((p) => p.rect(5, 15, 2, 4, SKIN).rect(9, 15, 2, 4, SKIN).rect(4, 19, 3, 1, SKIN).rect(9, 19, 3, 1, SKIN));
+  // White T-shirt, bare arms, the striped beach towel and green striped swim shorts.
+  d.part((p) =>
+    p
+      .rect(4, 9, 8, 4, WHITE)
+      .rect(5, 13, 6, 2, SHORTS)
+      .rect(3, 10, 1, 3, SKIN)
+      .rect(12, 10, 1, 3, SKIN)
+      .paint((x, y) => y >= 12 && x >= 5 && x <= 10 && !towel(x, y), SHORTS)
+      .paint((x, y) => y >= 12 && x >= 5 && x <= 10 && !towel(x, y) && x % 2 === 0, "#2e6a4c")
+      .paint(towel, TOWEL)
+      .paint((x, y) => towel(x, y) && y > 9 && y % 2 === 0, WHITE),
+  );
+  // Face: dark sunglasses, a big smile and a short stubble beard.
+  d.part((p) =>
+    p
+      .ellipse(8, 5, 3, 3, SKIN)
+      .rect(5, 5, 3, 1, SHADES)
+      .rect(9, 5, 3, 1, SHADES)
+      .set(8, 5, SHADES)
+      .set(6, 5, "#4a5a7a")
+      .set(10, 5, "#4a5a7a")
+      .set(8, 6, "#e0a47c")
+      .set(6, 7, "#7a3434")
+      .set(10, 7, "#7a3434")
+      .set(7, 7, WHITE)
+      .set(8, 7, WHITE)
+      .set(9, 7, WHITE)
+      .rect(7, 8, 3, 1, STUBBLE),
+  );
+  // Curly light-brown hair, bumpy on top.
+  d.part((p) =>
+    p
+      .rect(4, 1, 9, 2, "#a8783e")
+      .set(5, 0, "#a8783e")
+      .set(6, 0, "#a8783e")
+      .set(8, 0, "#a8783e")
+      .set(10, 0, "#a8783e")
+      .set(11, 0, "#a8783e")
+      .rect(4, 3, 1, 2, "#a8783e")
+      .rect(12, 3, 1, 2, "#a8783e")
+      .set(6, 3, "#a8783e")
+      .set(9, 3, "#a8783e")
+      .paint((x, y) => (x * 3 + y * 2) % 5 === 0, "#d4a462")
+      .paint((x, y) => (x * 3 + y * 2) % 5 === 3 && y > 0, "#7e5428"),
+  );
+  // The rolled-up beach mat in his hand: the rolled end shows, and a mint strap holds it together.
+  d.part((p) => p.rect(0, 12, 3, 3, "#46606e").rect(0, 12, 1, 3, "#7a98a8").set(0, 13, "#2e4250").line(2, 12, 2, 14, "#8ad0b0"));
+  d.part((p) => p.set(3, 12, SKIN), false);
+});
+
 // ---------- Things and clues ----------
 
 /** The fisherman's boat, drained of its red: grey hull, grey cabin roof, in the water. */
@@ -270,6 +335,7 @@ export const case7Sprites: Record<string, PixelSprite> = {
   s2Seagull,
   s2SeaMonster,
   s2Crab,
+  s2Dad,
   harborBoat,
   harborWetPrints,
   harborFishScraps,

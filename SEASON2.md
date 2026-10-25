@@ -315,6 +315,14 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
 - **Fall 9:** Snigeln är inte okänd till slutet. Man träffar henne i trädgården, där hon har en ursäkt ("för
   långsam", "proppmätt") och skyller på S2.flytrap. Ursäkten spricker vid matskålen i odlingsrummet, och sedan
   smiter hon iväg till hyllorna. Avslöjandets fråga 2 har fått ett oskyldigt alternativ man aldrig träffar (spöket).
+- **Noras pappa och mamma** (`S2.dad`, `S2.mom`, önskat av pappa): i spelet heter de "Pappa Aron" och "Mamma Lisa"
+  (föräldrarna har sagt att det är okej). **Fall 7:** pappa (sprite `s2Dad`) står längst ut på
+  bryggan på kajen (12, 1) på väg till ett morgondopp – bara för att prata lite, ingen ledtråd och ingen roll i mysteriet.
+  **Fall 11:** mamma (sprite `s2Mom`) har ett grillstånd längst upp bakom karusellen. En grillpinne vid kontrollådan
+  pekar mot henne en stund, och hon finns som svar i fråga 1 ("petade ut nyckeln med en grillpinne"). Men pinnen kom
+  från den långa kön, och kvittona vid grillen visar att hon grillade utan paus från fem till nio. Hon ljuger aldrig.
+  Hennes orange grillsås har blivit grå, så det orange försvann även för henne. Efteråt bjuder hon "sin lilla detektiv"
+  på ett spett.
 - **Motorn:** klockpusslets slumpade tid kan inte användas i ledtrådstexter (`rollClock` ger inga
   `vars`). Det vore en liten förbättring att lägga till.
 

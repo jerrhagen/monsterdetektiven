@@ -55,7 +55,7 @@ export const case7: Case = {
       faded: FADED,
       layout: [
         "####################",
-        "#WWWWWWWW....WWWWWW#",
+        "#WWWWWWWW...aWWWWWW#",
         "#WWoWWWbW.t..WWWWW.D",
         "#.............k..L.D",
         "#..L...1...........#",
@@ -155,6 +155,27 @@ export const case7: Case = {
             "Inga penseldrag syns. Bojarna bredvid är också grå.",
           ],
           clue: "greyBoat",
+        },
+        // Nora's own dad, out on the far end of the pier for a morning swim (water on his right).
+        // Only for fun: no clue, no flag, nothing to do with the mystery.
+        a: {
+          name: S2.dad,
+          sprite: "s2Dad",
+          person: true,
+          talk: [
+            "Där är ju min detektiv!",
+            "Jag ska ta ett morgondopp från bryggan. Handduk och badmatta har jag med mig!",
+            "Fast jag doppade tån nyss. BRRR! Vattnet är iskallt!",
+            "Vet du varför fiskar bor i saltvatten? För att pepparvatten får dem att nysa! Ha ha!",
+            "Konstigt förresten… allt ser så grått ut i dag. Det är nog mina solglasögon.",
+          ],
+          talkIf: [
+            {
+              when: "caught",
+              talk: ["Bra jobbat, detektiven! Jag är så stolt!", "Ska vi bada nu? Vattnet är inte ALLS kallt.", "…Okej. Lite kallt."],
+            },
+            { when: "solved", talk: ["Har du löst mysteriet? Jag visste det!", "Det är min detektiv, det!"] },
+          ],
         },
         k: {
           name: "Skylt",

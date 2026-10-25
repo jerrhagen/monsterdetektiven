@@ -2,7 +2,8 @@ import { type Painter, drawSprite } from "../../sprites/pixelDraw";
 import type { PixelSprite } from "../../sprites/pixelSprite";
 
 // Sprites for case 11 – the fair (see SEASON2.md – spoilers).
-// s2Director, s2Clown and s2MirrorGhost are placeholders until Nora has drawn them.
+// s2Director, s2Clown and s2MirrorGhost are placeholders until Nora has drawn them. s2Mom is Nora's
+// own mum, drawn after a photo.
 
 const INK = "#1a1024";
 const GOLD = "#e0b040";
@@ -81,6 +82,58 @@ export const s2Director: PixelSprite = drawSprite(16, 20, (d) => {
   // Legs and shoes.
   d.part((p) => p.rect(5, 18, 2, 2, "#2a2436").rect(9, 18, 2, 2, "#2a2436"));
 });
+
+/**
+ * Nora's mum (S2.mom), who runs a grill stand at the fair: light blonde hair in a loose bun with
+ * a few wisps sticking out, a big smile, small yellow earrings, a pink-and-orange striped top under
+ * a chunky black knitted cardigan, and black trousers. She holds up a chicken skewer – she offers
+ * one to Nora when they talk.
+ */
+export const s2Mom: PixelSprite = {
+  palette: {
+    ".": null,
+    o: INK,
+    y: "#f2e2a8", // light blonde hair
+    Y: "#d4c080", // hair, shade
+    s: SKIN,
+    p: "#f0a0a0", // rosy cheeks
+    m: "#a03a3a", // mouth
+    w: WHITE, // teeth – a big smile
+    e: "#f2d24b", // small yellow earrings
+    k: "#2c2834", // chunky black cardigan
+    K: "#4a4454", // the knit
+    r: "#f4a6c0", // pink stripe
+    n: ORANGE, // orange stripe
+    t: "#2a2436", // black trousers
+    b: WOOD_DARK, // skewer stick
+    c: "#a8602e", // grilled chicken
+    C: "#d8925a", // chicken, light
+  },
+  frames: [
+    [
+      ".....oooo.......",
+      "..y.oyyyyo.y....",
+      "...yoyYyyoy.....",
+      "..ooyyyyyyoo..b.",
+      ".oyyyyYyyyyyoccc",
+      ".oyyssssssyyocCc",
+      ".oysossssosyo.b.",
+      ".oypsssssspyoccc",
+      ".oysmwwwwmsyocCc",
+      ".eossmmmmssoe.b.",
+      "...osssssso...b.",
+      ".okkkrnrnkkkkss.",
+      ".okKkrnrnkKkko..",
+      ".okkkrnrnkkko...",
+      ".okKkrnrnkkKo...",
+      ".okkkrnrnkkko...",
+      ".okKkttttkKko...",
+      "...otto.otto....",
+      "...otto.otto....",
+      "..oooo..oooo....",
+    ],
+  ],
+};
 
 function drawClown(d: Painter, step: number): void {
   // Big shoes.
@@ -345,6 +398,51 @@ export const fairClownNose: PixelSprite = drawSprite(16, 16, (d) => {
   d.part((p) => p.ellipse(8, 9, 3.5, 3.5, "#e03040").set(6, 7, "#ff9aa0").set(7, 7, "#ff9aa0").set(6, 8, "#ff9aa0"));
 });
 
+/**
+ * The grill at the stand of Nora's mum: a black grill with chicken skewers, a little smoke, a jar of
+ * grill sauce that has turned grey, and a long curly strip of receipts hanging over the edge.
+ */
+export const fairGrill: PixelSprite = drawSprite(16, 16, (d) => {
+  // A wisp of smoke.
+  d.part((p) => p.set(4, 0, "#d8d4e0").set(5, 1, "#d8d4e0").set(4, 2, "#d8d4e0").set(8, 1, "#d8d4e0").set(9, 2, "#d8d4e0"), false);
+  // Two chicken skewers on top.
+  for (const y of [4, 6]) {
+    d.part((p) => p.line(0, y, 12, y, WOOD_DARK).rect(2, y, 2, 1, "#a8602e").rect(5, y, 2, 1, "#d8925a").rect(8, y, 2, 1, "#a8602e"));
+  }
+  // The black grill with glowing coals, and its legs.
+  d.part((p) =>
+    p
+      .rect(1, 8, 11, 3, "#2a2436")
+      .paint((_, y) => y === 8, "#e05a2a")
+      .paint((x, y) => y === 8 && x % 3 === 0, "#f2d24b")
+      .rect(2, 11, 1, 4, "#2a2436")
+      .rect(10, 11, 1, 4, "#2a2436"),
+  );
+  // The jar of grill sauce – grey now.
+  d.part((p) => p.rect(13, 6, 3, 4, GREY).rect(13, 5, 3, 1, GREY_DARK));
+  // The strip of receipts, curling down over the edge.
+  d.part((p) => p.rect(12, 11, 3, 2, PAPER).rect(13, 13, 2, 3, PAPER).set(13, 11, "#8a8494").set(14, 14, "#8a8494"));
+});
+
+/** A long strip of receipts from the grill, with a time on every one. */
+export const fairReceipts: PixelSprite = drawSprite(16, 16, (d) => {
+  d.part((p) => {
+    for (let y = 0; y < 16; y++) p.rect(4 + Math.round(Math.sin(y / 2.5) * 2), y, 7, 1, PAPER);
+  });
+  d.part((p) => {
+    for (const y of [2, 5, 8, 11, 14]) {
+      const x = 5 + Math.round(Math.sin(y / 2.5) * 2);
+      p.rect(x, y, 3, 1, "#5a566e").set(x + 4, y, RED);
+    }
+  }, false);
+});
+
+/** A sticky wooden grill stick, eaten clean – dropped by the carousel's control box. */
+export const fairGrillStick: PixelSprite = drawSprite(16, 16, (d) => {
+  d.part((p) => p.line(2, 13, 13, 2, WOOD).line(3, 13, 14, 2, WOOD));
+  d.part((p) => p.set(6, 9, "#8a5a3a").set(9, 6, "#8a5a3a").set(10, 5, "#8a5a3a"), false);
+});
+
 // ---------------------------------------------------------------------------------------------
 // The director's wagon.
 // ---------------------------------------------------------------------------------------------
@@ -384,6 +482,7 @@ export const fairNotes: PixelSprite = drawSprite(16, 16, (d) => {
 
 export const case11Sprites: Record<string, PixelSprite> = {
   s2Director,
+  s2Mom,
   s2Clown,
   s2MirrorGhost,
   fairVaddis,
@@ -405,6 +504,9 @@ export const case11Sprites: Record<string, PixelSprite> = {
   fairSugarKey,
   fairBunCrumbs,
   fairClownNose,
+  fairGrill,
+  fairReceipts,
+  fairGrillStick,
   fairCoat,
   fairPhoto,
   fairNotes,

@@ -17,13 +17,26 @@ import { S2 } from "../names";
 //             mirrors make ghosts, and the clown's mirror-writing note names S2.scribble and the museum.
 //   Carousel: "The key was never stolen!" – it lies in the cotton-candy machine, and Fladder saw
 //             the director alone there, searching his pocket. Drawn footprints lead away.
+//             Nora's mum (S2.mom, innocent) grills skewers behind the carousel. A grill stick by the
+//             control box points at her for a while, but it came from her long queue, and her
+//             receipts show she grilled without a break all evening. She never lies.
 //   Wagon:    "He lost it himself." – the hole in his coat pocket.
 // The reveal asks three questions: why the carousel won't start, who isn't telling the truth,
 // and who takes the colours and where it is going. Each needs clues from several rooms.
 
 const SQUARE_CLUES = ["clue:directorClaim", "clue:schedule", "clue:greyOrange", "clue:orangeDrops", "clue:poster", "clue:ghostFace"];
 const MIRROR_CLUES = ["clue:clownNote", "clue:siggeMirrors", "clue:mirrorTrick"];
-const CAROUSEL_CLUES = ["clue:sugarKey", "clue:fladderSaw", "clue:scribblePrints", "clue:bunCrumbs", "clue:clownNose", "clue:pinkScales"];
+const CAROUSEL_CLUES = [
+  "clue:sugarKey",
+  "clue:fladderSaw",
+  "clue:scribblePrints",
+  "clue:bunCrumbs",
+  "clue:clownNose",
+  "clue:pinkScales",
+  "clue:momStory",
+  "clue:grillStick",
+  "clue:grillReceipts",
+];
 const WAGON_CLUES = ["clue:pocketHole", "clue:friendsPhoto"];
 
 const FADED = 0.65;
@@ -359,9 +372,9 @@ export const case11: Case = {
       layout: [
         "####################",
         "####################",
-        "#r...........KvK...#",
+        "#r..mKgK.....KvK...#",
         "#.......3..........#",
-        "#..LL..............#",
+        "#..LL......4.......#",
         "#..LL..hci.k....HH.#",
         "#...........2...HH.#",
         "#.....1............#",
@@ -410,17 +423,69 @@ export const case11: Case = {
           clue: "sugarKey",
           talkIf: [{ when: "carousel-key", talk: ["Sockervaddsmaskinen.", "Mums… men så KLIBBIGT."] }],
         },
+        m: {
+          name: S2.mom,
+          person: true,
+          sprite: "s2Mom",
+          talk: [
+            "Men hej, min lilla detektiv! Är du på jobbet nu?",
+            "Jag har ett grillstånd på tivolit i helgen. Kycklingspett!",
+            "I går stod jag här bakom karusellen och grillade hela kvällen.",
+            "Kön var SÅ lång. Den ringlade ända bort till kontrollådan!",
+            "Jag tittade bara på spetten. Annars blir de brända.",
+            "Och titta på min grillsås. I går var den orange. Nu är den GRÅ!",
+            "Vill du ha ett spett? …Nej, först jobbet. Sen spett!",
+          ],
+          clue: "momStory",
+          talkIf: [
+            {
+              when: "caught",
+              talk: ["Där är du ju, min lilla detektiv!", "Här – ett extra stort spett. Gratis för den bästa detektiven!", "Mums, va?"],
+            },
+            {
+              when: "solved",
+              talk: ["Har du löst det? Klart att du har!", `Men stackars ${S2.clown}. Gå och hitta honom nu – spetten kan vänta.`],
+            },
+            {
+              when: "clue:grillStick",
+              talk: [
+                "En grillpinne vid kontrollådan? Misstänker du mig nu?",
+                "Bra! En riktig detektiv misstänker alla. Även sin mamma.",
+                "Men alla i kön åt spett medan de väntade.",
+                "Titta på kvittona vid grillen. Där ser du när jag grillade.",
+              ],
+            },
+            {
+              when: "clue:momStory",
+              talk: ["Hej igen, min lilla detektiv!", "Fladder åkte berg-och-dalbana hela kvällen. Hon har nog sett mer än jag!"],
+            },
+          ],
+        },
+        g: {
+          name: "Grillen",
+          sprite: "fairGrill",
+          on: "K",
+          talk: [
+            `${S2.mom}s grill. Det doftar kyckling!`,
+            "Bredvid står en burk grillsås. Den är grå.",
+            "Över kanten hänger en lång remsa med kvitton.",
+            "Det står en tid på varje kvitto: från klockan fem till klockan nio.",
+            "Spett efter spett – utan en enda paus!",
+          ],
+          clue: "grillReceipts",
+        },
         r: {
           name: "Berg-och-dalbanan",
           sprite: "fairCoaster",
           talk: ["Berg-och-dalbanan! Vagnarna står på rad.", "Varje vagn har två platser.", "\"WIIII!\" hörs det uppifrån."],
         },
       },
-      clues: { "1": "scribblePrints", "2": "bunCrumbs", "3": "clownNose" },
+      clues: { "1": "scribblePrints", "2": "bunCrumbs", "3": "clownNose", "4": "grillStick" },
       onEnter: {
         name: "Ester",
         talk: [
           "Karusellen står helt still. Och hästarna är grå.",
+          "Och där uppe vid grillen… är det inte din mamma, Nora?",
           "Titta – på berg-och-dalbanan! Det är ju Fladder!",
           "Hon är inte rädd för någonting. Göm dig bakom stånden när hon dyker!",
         ],
@@ -583,6 +648,7 @@ export const case11: Case = {
             { id: "sigge", label: `${S2.mirrorGhost} trollade bort den`, sprite: "s2MirrorGhost" },
             { id: "smulan", label: "Smulan åt upp nyckeln", sprite: "smulan" },
             { id: "fladder", label: "Fladder flög sönder motorn", sprite: "fladder" },
+            { id: "mom", label: `${S2.mom} petade ut nyckeln med en grillpinne`, sprite: "s2Mom" },
             { id: "candy", label: "Direktören tappade nyckeln i sockervadden", sprite: "fairSugarKey" },
           ],
           answer: "candy",
@@ -598,6 +664,7 @@ export const case11: Case = {
             sigge: `${S2.mirrorGhost} kan inte gå ut ur speglarna. Och nyckeln är inte bortrollad – den låg i sockret!`,
             smulan: "Smulan äter bullar, inte nycklar! Nyckeln låg kvar – i sockervadden.",
             fladder: "Motorn är hel. Det är nyckeln som fattas – och den låg i sockervaddsmaskinen.",
+            mom: `Kvittona visar att ${S2.mom} grillade hela kvällen, utan paus. Pinnen kom från kön – och nyckeln låg ju i sockervadden!`,
           },
           why: {
             directorClaim: "Det här är vad direktören SÄGER. Men nyckeln låg ju inte hos clownen – den låg i sockret!",
@@ -614,6 +681,9 @@ export const case11: Case = {
             clownNose: `Näsan visar att ${S2.clown} var vid karusellen. Men nyckeln låg inte hos honom – den låg i sockret.`,
             pinkScales: "Fladder satt på en häst. Men hon har inga händer – hon kan inte ta en nyckel.",
             friendsPhoto: "Fotot visar att de är vänner. Men inte var nyckeln hamnade.",
+            momStory: `${S2.mom} tittade bara på spetten hela kvällen. Hon såg inte vart nyckeln tog vägen.`,
+            grillStick: "Grillpinnen kom från någon i kön till grillen. Och nyckeln låg inte vid kontrollådan – den låg i sockret!",
+            grillReceipts: `Kvittona visar att ${S2.mom} grillade hela kvällen. Men de säger inte var nyckeln är.`,
           },
         },
         {
@@ -655,6 +725,9 @@ export const case11: Case = {
             clownNose: `${S2.clown} var vid karusellen – det skriver han själv. Det är inte att ljuga.`,
             pinkScales: "Fladder satt på en häst. Det säger inget om vem som ljuger.",
             friendsPhoto: "Fotot visar att de är vänner. Men det visar inte vem som ljuger.",
+            momStory: `Allt ${S2.mom} sa stämmer med kvittona. Hon säger sanningen!`,
+            grillStick: "Grillpinnen visar bara att någon i kön åt ett spett vid kontrollådan. Inte vem som ljuger.",
+            grillReceipts: `Kvittona visar att ${S2.mom} säger sanningen. Men vem gör inte det?`,
           },
         },
         {
@@ -696,6 +769,9 @@ export const case11: Case = {
             clownNose: `Näsan visar bara att ${S2.clown} var vid karusellen. Det var där han såg den som tog färgen.`,
             pinkScales: "Fjällen är Fladders. De säger inget om färgerna.",
             friendsPhoto: `Fotot handlar om direktören och ${S2.clown}. Inte om färgerna.`,
+            momStory: `Det orange försvann från ${S2.mom}s grillsås också. Men hon såg inte vem som tog det.`,
+            grillStick: "Grillpinnen kom från kön till grillen. Den säger inget om färgerna.",
+            grillReceipts: "Kvittona handlar om spett – inte om färgerna.",
           },
         },
       ],
@@ -779,6 +855,21 @@ export const case11: Case = {
       sprite: "pinkScales",
       text: "Rosa, glittriga fjäll på en karusellhäst. Precis som Fladders vingar…",
     },
+    momStory: {
+      name: `${S2.mom}s berättelse`,
+      sprite: "s2Mom",
+      text: `${S2.mom} grillade kycklingspett bakom karusellen hela kvällen. Kön ringlade ända bort till kontrollådan, och hon tittade bara på spetten. Hennes orange grillsås har blivit grå!`,
+    },
+    grillStick: {
+      name: "En grillpinne",
+      sprite: "fairGrillStick",
+      text: "En kladdig grillpinne ligger alldeles vid karusellens kontrollåda. Vem grillar spett här vid karusellen?",
+    },
+    grillReceipts: {
+      name: "Kvittona från grillen",
+      sprite: "fairReceipts",
+      text: `En lång remsa med kvitton från ${S2.mom}s grill. Det står en tid på varje: spett efter spett från klockan fem till klockan nio – utan en enda paus.`,
+    },
     pocketHole: {
       name: "Hålet i fickan",
       sprite: "fairCoat",
@@ -818,6 +909,7 @@ export const case11: Case = {
     },
     { say: S2.clown, lines: ["Förlåtelse godkänd!", "…eller som jag säger: DNÄKDOG!"] },
     { say: "Smulan", lines: ["Då firar vi med bullar! Mums."] },
+    { say: S2.mom, lines: ["Och med kycklingspett!", "Det största får min lilla detektiv."] },
     {
       say: S2.clown,
       lines: [
@@ -840,6 +932,7 @@ export const case11: Case = {
     "Och Fladder såg att ingen tog någon nyckel. Direktören åt sockervadd – och letade i fickan.",
     "Nyckeln låg i sockervaddsmaskinen, och i hans rock fanns ett hål. Han tappade den själv – och skämdes så att han ljög.",
     `Smulans vita "spöke" med röd prick var nog ${S2.clown} i spegeln. Hon tog fel, men hon ljög inte.`,
+    `Grillpinnen vid kontrollådan kom från kön till ${S2.mom}s grill. Kvittona visar att hon grillade hela kvällen – hon rörde aldrig nyckeln.`,
     `Det orange tog ${S2.scribble}. De ritade spåren och dropparna gick mot utgången – och den vägen leder till museet.`,
   ],
 
@@ -913,7 +1006,12 @@ export const case11: Case = {
           text: "\"Fem i halv fyra\" är fem minuter före halv fyra. \"Tjugo i fyra\" är tjugo minuter före fyra.",
           skipWhen: "gate-open",
         },
-        { text: "Titta noga på marken runt karusellen!", when: "gate-open", skipWhen: ["clue:scribblePrints", "clue:bunCrumbs", "clue:clownNose"] },
+        { text: "Någon grillar bakom karusellen, längst upp. Gå och säg hej!", when: "gate-open", skipWhen: "clue:momStory" },
+        {
+          text: "Titta noga på marken runt karusellen!",
+          when: "gate-open",
+          skipWhen: ["clue:scribblePrints", "clue:bunCrumbs", "clue:clownNose", "clue:grillStick"],
+        },
         { text: "Sockervaddsmaskinen uppe till höger är så klibbig. Titta i den!", when: "gate-open", skipWhen: "clue:sugarKey" },
         {
           text: "Fladder vilar när hon har missat dig två gånger. Göm dig bakom stånden! Sen hänger hon vid berg-och-dalbanan.",
@@ -921,6 +1019,7 @@ export const case11: Case = {
           skipWhen: "clue:fladderSaw",
         },
         { text: "Titta på karusellhästarna.", when: "gate-open", skipWhen: "clue:pinkScales" },
+        { text: "Titta på grillen. Vad hänger över kanten?", when: "gate-open", skipWhen: "clue:grillReceipts" },
       ],
     },
     {
