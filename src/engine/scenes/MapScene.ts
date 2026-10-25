@@ -78,14 +78,15 @@ const SAND = 0xf0d890;
 const SEA_TOP = 154;
 /** Its buildings, in case order: lighthouse, school, greenhouse, aquarium, fair, museum. */
 const HARBOUR_BUILDINGS = ["mapLighthouse", "mapSchool", "mapGreenhouse", "mapAquarium", "mapFair", "mapMuseum"];
+/** Nearly straight, like in the drawing, but with a little wobble. */
 const HARBOUR_ROADS: Point[][] = [
-  [[0, 104], [80, 104], [160, 104], [240, 104], [320, 104]], // across the town, from the bridge
-  [[160, 34], [160, 70], [160, 104], [160, 130], [160, SEA_TOP]], // down to the jetty
-  [[112, 84], [112, 104]], // school
-  [[290, 56], [290, 104], [286, 130], [282, 146]], // greenhouse – lighthouse
+  [[0, 104], [40, 102], [80, 105], [120, 103], [160, 104], [200, 106], [240, 103], [280, 105], [320, 102]], // across the town, from the bridge
+  [[160, 34], [158, 52], [161, 70], [159, 88], [160, 104], [162, 120], [159, 136], [160, SEA_TOP]], // down to the jetty
+  [[112, 84], [110, 94], [112, 104]], // school
+  [[290, 56], [288, 72], [291, 88], [290, 104], [287, 118], [286, 132], [282, 146]], // greenhouse – lighthouse
   [[228, 98], [228, 104]], // museum
-  [[204, 104], [204, 142]], // aquarium
-  [[84, 104], [84, 142]], // fair
+  [[204, 104], [202, 116], [205, 130], [204, 142]], // aquarium
+  [[84, 104], [86, 116], [83, 130], [84, 142]], // fair
 ];
 
 /** Small pseudo-random number from a position, so the map looks the same every time. */

@@ -8,17 +8,24 @@ import type { PixelSprite } from "./pixelSprite";
 
 const OUTLINE = "#1a1024";
 
-/** 3 × 5 pixel letters for signs. */
+/** 3 × 5 pixel letters for signs (M is wider, and Ä has its dots above the line). */
 const FONT: Record<string, string[]> = {
   A: [".#.", "#.#", "###", "#.#", "#.#"],
   B: ["##.", "#.#", "##.", "#.#", "##."],
   E: ["###", "#..", "##.", "#..", "###"],
   G: [".##", "#..", "#.#", "#.#", ".##"],
+  H: ["#.#", "#.#", "###", "#.#", "#.#"],
   I: ["###", ".#.", ".#.", ".#.", "###"],
   K: ["#.#", "#.#", "##.", "#.#", "#.#"],
   L: ["#..", "#..", "#..", "#..", "###"],
+  M: ["#...#", "##.##", "#.#.#", "#...#", "#...#"],
   R: ["##.", "#.#", "##.", "#.#", "#.#"],
   S: [".##", "#..", ".#.", "..#", "##."],
+  T: ["###", ".#.", ".#.", ".#.", ".#."],
+  U: ["#.#", "#.#", "#.#", "#.#", "###"],
+  V: ["#.#", "#.#", "#.#", "#.#", ".#."],
+  X: ["#.#", "#.#", ".#.", "#.#", "#.#"],
+  Ä: ["#.#", "...", ".#.", "#.#", "###", "#.#", "#.#"],
 };
 
 export class Part {
@@ -82,16 +89,23 @@ export class Part {
     return this;
   }
 
-  /** Capital letters from the little 3 × 5 font, one pixel apart. */
+  /** Capital letters from the little pixel font, one pixel apart; `y` is the top of a plain letter. */
   text(x: number, y: number, s: string, c: string): this {
-    [...s].forEach((ch, i) => {
-      FONT[ch]?.forEach((row, ry) => {
+    for (const ch of s) {
+      const glyph = FONT[ch] ?? ["...", "...", "...", "...", "..."];
+      glyph.forEach((row, ry) => {
         [...row].forEach((p, rx) => {
-          if (p === "#") this.set(x + i * 4 + rx, y + ry, c);
+          if (p === "#") this.set(x + rx, y + ry - (glyph.length - 5), c);
         });
       });
-    });
+      x += glyph[0].length + 1;
+    }
     return this;
+  }
+
+  /** How many pixels wide a text is. */
+  static textWidth(s: string): number {
+    return [...s].reduce((w, ch) => w + (FONT[ch]?.[0].length ?? 3) + 1, -1);
   }
 }
 
