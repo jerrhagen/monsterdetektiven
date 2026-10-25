@@ -3,7 +3,7 @@ import type { PixelSprite } from "../../sprites/pixelSprite";
 
 // Case 7 – "Fyren som tappade färgen": the quay, the fish shed and the lighthouse.
 // Everything that was red in the harbour has turned grey, so the boat, the lamp glass and the
-// paint are drawn grey on purpose. Nora's characters (s2Keeper, s2Fisher, s2Seagull, s2SeaMonster,
+// paint are drawn grey on purpose. Nora's characters (s2Fisher, s2Seagull, s2SeaMonster,
 // s2Crab) are placeholders until she has drawn them.
 
 const K = "#1a1024";
@@ -50,23 +50,37 @@ function animated(
 
 // ---------- Nora's characters (placeholders) ----------
 
-/** The lighthouse keeper (S2.keeper): yellow raincoat, navy knitted cap, a long grey braid. */
+/**
+ * The lighthouse keeper (S2.keeper), from Ester's drawing: big yellow hair, green eyes, a red
+ * mouth, arms held out wide and a blue triangle dress with a purple V and yellow down the middle.
+ */
 export const s2Keeper: PixelSprite = drawSprite(16, 20, (d) => {
-  d.part((p) => p.rect(11, 7, 2, 7, "#c8c4d4").set(11, 14, "#4a90e2").set(12, 14, "#4a90e2"));
+  d.part((p) => p.ellipse(8, 5.5, 5.5, 5, "#f2d530").ellipse(3.5, 8.5, 1.5, 1.5, "#f2d530").ellipse(12.5, 8.5, 1.5, 1.5, "#f2d530").set(5, 1, "#ffe870").set(7, 0, "#ffe870"));
+  d.part((p) => p.line(0, 13, 6, 11, "#f0a830").line(0, 12, 6, 10, "#f0a830").line(10, 11, 15, 13, "#f0a830").line(10, 10, 15, 12, "#f0a830"));
   d.part((p) =>
     p
-      .rect(4, 10, 8, 7, "#f2d24b")
-      .rect(3, 11, 1, 5, "#f2d24b")
-      .rect(12, 11, 1, 5, "#f2d24b")
-      .paint((x, y) => x === 8 && y > 10, "#c9a020")
-      .set(6, 12, "#c9a020")
-      .set(6, 14, "#c9a020")
-      .set(3, 15, SKIN)
-      .set(12, 15, SKIN),
+      .tri(8, 10, 1, 19, 15, 19, "#3aa8e0")
+      .paint((x, y) => Math.abs(x + 0.5 - 8) >= (y - 10) * 0.3 && Math.abs(x + 0.5 - 8) <= (y - 10) * 0.3 + 1.1, "#5a2a9a")
+      .paint((x, y) => Math.abs(x + 0.5 - 8) < (y - 10) * 0.3, "#f2d530")
+      .rect(6, 10, 4, 1, "#b02060")
+      .set(7, 11, "#d04020")
+      .set(8, 11, "#d04020"),
   );
-  d.part((p) => p.rect(5, 17, 2, 3, "#2d3a6a").rect(9, 17, 2, 3, "#2d3a6a"));
-  d.part((p) => p.ellipse(8, 6, 3.5, 3.5, SKIN).set(6, 6, K).set(10, 6, K).set(7, 8, "#c07060").set(8, 8, "#c07060").set(5, 7, "#f0a0a0").set(11, 7, "#f0a0a0"));
-  d.part((p) => p.rect(4, 0, 8, 2, "#2d3a6a").rect(4, 2, 8, 1, "#1c2448").paint((x, y) => y === 1 && x % 2 === 0, "#3e4e8a"));
+  d.part((p) =>
+    p
+      .ellipse(8, 6, 3.5, 3.5, "#f5c090")
+      .set(5, 6, "#2a9a4a")
+      .set(6, 6, K)
+      .set(7, 6, "#2a9a4a")
+      .set(9, 6, "#2a9a4a")
+      .set(10, 6, K)
+      .set(11, 6, "#2a9a4a")
+      .set(6, 5, "#2a9a4a")
+      .set(10, 5, "#2a9a4a")
+      .set(7, 8, "#c0305a")
+      .set(8, 8, "#c0305a")
+      .set(9, 8, "#c0305a"),
+  );
 });
 
 /** The fisherman (S2.fisher): green sou'wester, bushy grey beard, blue sweater, rubber boots. */
@@ -126,31 +140,47 @@ export const s2Seagull: PixelSprite = animated(
   { animations: { "": { frames: [1, 2], frameRate: 6 } } },
 );
 
-/** The sea monster (S2.seaMonster): green and huge, glowing yellow eyes, far too many teeth. */
-export const s2SeaMonster: PixelSprite = drawSprite(24, 20, (d) => {
-  // A hump of its tail behind it.
-  d.part((p) => p.ellipse(4, 15, 3.5, 3, "#3a8a7a", 17).paint((x, y) => y <= 13 && x % 2 === 0, "#2a6a5a"));
-  // Spiky fin crest.
-  d.part((p) => p.tri(9, 5, 11, 0, 13, 4, "#8ad0b0").tri(17, 3, 21, 0, 21, 6, "#8ad0b0"));
-  // Neck, with a pale belly.
-  d.part((p) => p.rect(11, 9, 9, 9, "#3a8a7a").rect(14, 11, 4, 7, "#8ad0b0").paint((x, y) => x === 11 && y % 2 === 0, "#2a6a5a"));
-  // Head.
+/**
+ * The sea monster (S2.seaMonster), from Nora's drawing: a giant octopus with green horns, a tall
+ * pale head with salmon spots, black eyes, a smile with its tongue out, and six long arms spread out wide
+ * with magenta spots. It lies half in the water.
+ */
+export const s2SeaMonster: PixelSprite = drawSprite(32, 24, (d) => {
+  const ARM = "#fbefe8";
+  const SPOT = "#b0206a";
+  // Six long arms resting on the water and curling up at the tips – each its own part so they
+  // stay apart. They start inside the head, which is drawn on top.
+  const arm = (points: [number, number][]) =>
+    d.part((p) => {
+      for (let i = 1; i < points.length; i++) {
+        const [[ax, ay], [bx, by]] = [points[i - 1], points[i]];
+        p.line(ax, ay, bx, by, ARM).line(ax, ay + 1, bx, by + 1, ARM);
+      }
+      p.paint((x, y) => (x + y) % 3 === 0, SPOT);
+    });
+  for (const side of [-1, 1]) {
+    const at = (dx: number, y: number): [number, number] => [16 + side * dx, y];
+    arm([at(3, 16), at(14, 17), at(15, 14)]);
+    arm([at(4, 13), at(9, 16), at(11, 12)]);
+    arm([at(4, 10), at(6, 13), at(7, 9)]);
+  }
+  // Green horns.
+  d.part((p) => p.line(13, 5, 11, 1, "#a8d860").line(14, 5, 12, 1, "#a8d860").line(19, 5, 21, 1, "#a8d860").line(18, 5, 20, 1, "#a8d860"));
+  // The tall head with salmon spots, and the smiling face.
   d.part((p) =>
     p
-      .ellipse(15, 6, 6.5, 4.5, "#3a8a7a")
-      .paint((x, y) => y <= 3 && (x + y) % 3 === 0, "#2a6a5a")
-      .rect(10, 3, 3, 2, "#ffe27a")
-      .set(11, 4, K)
-      .rect(17, 3, 3, 2, "#ffe27a")
-      .set(18, 4, K)
-      .rect(10, 8, 11, 2, "#4a1a2a")
-      .paint((x, y) => y === 8 && x % 2 === 0 && x >= 10 && x <= 20, "#fff6e0")
-      .paint((x, y) => y === 9 && x % 2 === 1 && x >= 10 && x <= 20, "#fff6e0")
-      .set(8, 6, "#2a6a5a")
-      .set(9, 6, K),
+      .ellipse(16, 12, 5, 8.5, ARM)
+      // Spots, but none right next to the eyes and the mouth so the face stays clear.
+      .paint((x, y) => y > 2 && ((x >> 1) * 2 + (y >> 1)) % 3 === 0 && !(y >= 8 && y <= 15 && x >= 13 && x <= 19), "#f4a080")
+      .rect(14, 9, 1, 2, K)
+      .rect(18, 9, 1, 2, K)
+      .set(14, 13, K)
+      .line(15, 14, 17, 14, K)
+      .set(18, 13, K)
+      .set(17, 15, "#e06040"),
   );
-  // Ripples in the water around it.
-  d.part((p) => p.rect(0, 18, 24, 2, "#6ab0f0").paint((x, y) => (x + y * 3) % 5 === 0, "#b8dcff"), false);
+  // It sits deep in the water, which covers its lower half and the ends of its arms.
+  d.part((p) => p.rect(0, 19, 32, 5, "#6ab0f0").paint((x, y) => (x + y * 3) % 5 === 0, "#b8dcff"), false);
 });
 
 /** The crab (S2.crab): brown and grumpy, with one big claw. Two frames: scuttling. */

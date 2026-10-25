@@ -125,7 +125,7 @@ export const case7: Case = {
           on: "W",
           talk: [
             "GRRRRMMMBL…",
-            "Sjöodjuret stirrar på dig med gula ögon. Vilka tänder!",
+            "Sjöodjuret stirrar på dig med svarta ögon. Vilka horn! Och sex långa armar…",
             "Magen kurrar så att vattnet skvätter.",
             "Det ser hungrigt ut…",
           ],
@@ -136,7 +136,7 @@ export const case7: Case = {
               when: "bought-mackerel",
               talk: [
                 "*SMASK!* Makrill! Blubb, tack!",
-                "Alla tror att jag klättrade upp i fyren. Men jag kan inte gå i trappor – jag har fenor!",
+                "Alla tror att jag klättrade upp i fyren. Men jag är alldeles för stor – jag får inte ens plats i fyrens dörr!",
                 "I natt kröp jag bara upp och åt fiskrens vid boden. Sen simmade jag hem.",
                 "Men då såg jag något… något litet och grått som klättrade på fyren.",
                 "Det såg inte ut som ett djur. Det såg RITAT ut. Blubb…",
@@ -541,7 +541,7 @@ export const case7: Case = {
             forgot: "Loggboken säger att hon tände lampan som vanligt – och att den lyste rött först.",
             broken: "Lampan lyser ju! Och glaset är helt, utan en enda spricka.",
             painted: "Färgburken var full – ingen hade målat. Och båten var grå ända in i springorna, dit ingen pensel når.",
-            monster: "Fyren var inte släckt – den lyste VITT. Och sjöodjuret kan inte gå i trappor.",
+            monster: "Fyren var inte släckt – den lyste VITT. Och sjöodjuret får inte ens plats i fyren.",
           },
           why: {
             keeperSays: "Fyrvakten berättar VAD som hände. Men inte varför.",
@@ -575,7 +575,7 @@ export const case7: Case = {
             bubbelSaw: "Någon på kajen såg något klättra på fyren i natt. Kanske vill den ha något att äta först…",
           },
           whyNot: {
-            monster: "Sjöodjuret har fenor och kan inte gå i trappor. Och de blöta spåren slutade vid vattnet.",
+            monster: "Sjöodjuret är för stort för fyrens dörr. Och de blöta spåren slutade vid vattnet.",
             gull: "Måsen har stora fötter med tre tår. Spåren i trappan var pyttesmå och såg RITADE ut.",
             fisher: "Fiskaren har jättestora stövlar. Spåren i trappan var pyttesmå – och inte alls stövelspår.",
             keeper: "Fyrvakten tände lampan och gick hem. Hennes skor gör inga små ritade spår – och hon vässar inga pennor där uppe.",
@@ -665,7 +665,7 @@ export const case7: Case = {
     bubbelSaw: {
       name: "Sjöodjurets vittnesmål",
       sprite: "s2SeaMonster",
-      text: "Sjöodjuret kan inte gå i trappor – det har fenor. I natt åt det fiskrens vid boden och simmade hem. Då såg det något litet och grått klättra på fyren. Det såg RITAT ut!",
+      text: "Sjöodjuret är för stort för att komma in i fyren. I natt åt det fiskrens vid boden och simmade hem. Då såg det något litet och grått klättra på fyren. Det såg RITAT ut!",
     },
     gullSays: {
       name: "Måsens vittnesmål",
@@ -760,7 +760,7 @@ export const case7: Case = {
     "Loggboken visade att fyrvakten tände lampan som vanligt – och att den lyste rött. Sen blev glaset grått, och då lyste fyren vitt.",
     "Båten var grå ända in i springorna, och färgburken var full men grå. Ingen hade målat! Det röda hade bara försvunnit.",
     "I trappan fanns pyttesmå ritade fotspår, och högst upp låg pennspån. Sjöodjuret såg något litet och grått som såg ritat ut klättra på fyren.",
-    `Sjöodjuret kan inte gå i trappor, och de blöta spåren slutade vid vattnet. Så ${S2.seagull} ljög om trappan.`,
+    `Sjöodjuret får inte plats i fyren, och de blöta spåren slutade vid vattnet. Så ${S2.seagull} ljög om trappan.`,
     `Varför? Fyrvaktens trasa låg i hennes bo. ${S2.seagull} var rädd att bli påkommen – och skyllde på den som såg farligast ut.`,
   ],
 
@@ -775,7 +775,7 @@ export const case7: Case = {
     {
       sprite: "s2SeaMonster",
       name: S2.seaMonster,
-      text: "Ett sjöodjur med gula ögon och alldeles för många tänder. Ser farligt ut – men vill mest ha makrill och en kompis.",
+      text: "Ett jättestort sjöodjur med horn och sex prickiga armar. Ser farligt ut – men vill mest ha makrill och en kompis.",
     },
     {
       sprite: "s2Crab",

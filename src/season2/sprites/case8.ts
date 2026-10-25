@@ -14,45 +14,53 @@ function grid(palette: Record<string, string | null>, ...frames: string[][]): Pi
 
 // ---------- Placeholders for Nora's characters ----------
 
-/** The teacher (S2.teacher): auburn bun, round glasses, green cardigan, purple skirt. */
-export const s2Teacher: PixelSprite = grid(
-  {
-    h: "#b0503a",
-    s: "#f5c8a0",
-    e: "#2a1a2e",
-    g: "#cfe8ff",
-    m: "#c05060",
-    c: "#4aa870",
-    C: "#2f7a50",
-    w: "#f4f0e4",
-    k: "#7a4aa8",
-    K: "#5a3480",
-    l: "#5a4a6a",
-    f: "#3a2a3a",
-  },
-  [
-    "......oooo......",
-    ".....ohhhho.....",
-    "....oohhhhoo....",
-    "...ohhhhhhhhho..",
-    "..ohhssssssshho.",
-    "..ohsgegsgegsho.",
-    "..ohsssssssssho.",
-    "...ossssmmssso..",
-    "....ossssssso...",
-    "...occcwwwccco..",
-    "..occcwwwwwccco.",
-    "..oCccwwwwwccCo.",
-    "..osCcwwwwwcCso.",
-    "...occcccccccco.",
-    "...okkkkkkkkkko.",
-    "..okkKkkkkkKkko.",
-    "..oKKKKKKKKKKKo.",
-    "....olo...olo...",
-    "...offo...offo..",
-    "....oo.....oo...",
-  ],
-);
+/**
+ * The teacher (S2.teacher), from Nora's drawing: yellow hair to her shoulders, big round eyes and
+ * a smile, a rainbow-striped shirt with a purple heart, short striped sleeves with red cuffs, jeans and black shoes.
+ */
+export const s2Teacher: PixelSprite = drawSprite(16, 20, (d) => {
+  const SKIN = "#e8a868";
+  d.part((p) => p.ellipse(8, 4, 5, 4, "#ecc840").rect(3, 4, 10, 5, "#ecc840").paint((x, y) => y > 5 && (x === 3 || x === 12), "#d4ac30"));
+  d.part((p) =>
+    p
+      .line(4, 9, 2, 12, "#2ab0a0")
+      .line(4, 10, 2, 13, "#2ab0a0")
+      .line(11, 9, 13, 12, "#2ab0a0")
+      .line(11, 10, 13, 13, "#2ab0a0")
+      .paint((_, y) => y % 3 === 1, "#f08a30")
+      .paint((_, y) => y % 3 === 2, "#3a9a4a")
+      .paint((_, y) => y === 13, "#902030")
+      .rect(1, 14, 2, 2, SKIN)
+      .rect(13, 14, 2, 2, SKIN),
+  );
+  d.part((p) =>
+    p
+      // Rainbow stripes, one colour per column, and a little purple heart.
+      .rect(5, 9, 6, 6, "#d83a3a")
+      .paint((x) => x === 6, "#f08a30")
+      .paint((x) => x === 7, "#ecd040")
+      .paint((x) => x === 8, "#3a9a4a")
+      .paint((x) => x === 9, "#2a8ad8")
+      .paint((x) => x === 10, "#9a5ad0")
+      .set(7, 11, "#3a1a6a")
+      .set(9, 11, "#3a1a6a")
+      .set(8, 12, "#3a1a6a"),
+  );
+  d.part((p) => p.rect(5, 15, 2, 4, "#3a9ad8").rect(9, 15, 2, 4, "#3a9ad8").rect(4, 19, 3, 1, "#3a3a44").rect(9, 19, 3, 1, "#3a3a44"));
+  d.part((p) =>
+    p
+      .ellipse(8, 5.5, 3, 3, SKIN)
+      .set(6, 5, "#ffffff")
+      .set(7, 5, O)
+      .set(9, 5, "#ffffff")
+      .set(10, 5, O)
+      .set(7, 7, "#a02a3a")
+      .set(8, 7, "#a02a3a")
+      .set(9, 7, "#a02a3a")
+      .set(8, 9, SKIN),
+  );
+  d.part((p) => p.rect(5, 2, 7, 1, "#ecc840").set(8, 1, "#ecc840"), false);
+});
 
 /** The janitor (S2.janitor): his cap was yellow – now it's grey. Blue overalls, key ring. */
 export const s2Janitor: PixelSprite = grid(

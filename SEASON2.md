@@ -263,7 +263,7 @@ Varje figur huvudarkitekten ritar ligger i **en** sprite-nyckel, så en ny teckn
 |---|---|---|---|
 | 7 | fyrvaktaren `keeper` | `s2Keeper` | 5 |
 | 7 | fiskaren `fisher` | `s2Fisher` | 6 |
-| 7 | sjöodjuret `seaMonster` | `s2SeaMonster` (24×20) | 7 |
+| 7 | sjöodjuret `seaMonster` | `s2SeaMonster` (32×24) | 7 |
 | 7 | måsen `seagull` | `s2Seagull` (ruta 0 sitter, 1–2 flyger) | 8 |
 | 7 | krabbmonstret `crab` | `s2Crab` | 9 |
 | 8 | fröken `teacher` | `s2Teacher` | 11 |

@@ -8,21 +8,21 @@
  */
 export const S2 = {
   /** The new part of town across the harbour, where season 2 takes place. */
-  district: "Hamnstaden",
+  district: "Havsstaden",
 
   /** Nora's own parents, who pop up in season 2 (the parents said it's fine to use their first names). */
   dad: "Pappa Aron",
   mom: "Mamma Lisa",
 
   // Fall 7 – Hamnen
-  fisher: "Fiskar-Frans",
-  keeper: "Fyrvakten Tora",
-  seagull: "Snattemåsen",
+  fisher: "Kapten Kalle",
+  keeper: "Fyrvakten Maja",
+  seagull: "Glimma",
   seaMonster: "Bubbel",
-  crab: "Klo",
+  crab: "Krabbot",
 
   // Fall 8 – Skolan
-  teacher: "Fröken Solveig",
+  teacher: "Fröken Josefin",
   janitor: "Vaktmästare Viggo",
   sponge: "Suddis",
   classPet: "Hamstern Nöt",

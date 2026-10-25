@@ -110,4 +110,13 @@ Man behöver inte svara på allt. Det som inte får något svar behåller Claude
 
 | # | Svar |
 |---|---|
-| | |
+| 1 | Stadsdelen heter **Havsstaden**. |
+| 2 | Vädret: **sol och måsar**. |
+| 3 | 🖍️ Nora ritade kartan (fotot låg på sidan; vänt rätt så att texten går att läsa): **havet** är ett brett band längst ner, med en liten **brygga**. Längst ner till höger vid havet står **fyren** (röd och vit randig). Ovanför havet till vänster ligger **tivolit** (randigt tält, karusell med hästar, en kö/biljettlucka) och till höger **akvariet** (grönt, med en fisk i ett runt fönster). En bred **väg** går tvärs över staden från vänster till höger, och en väg går från havet rakt upp och korsar den. Ovanför vägen till höger ligger **museet** (lila och runt, med gröna prickar) och högst upp till höger **växthuset** (med plantor). Högst upp till vänster ligger **skolan** (gul och orange, med många fönster och spetsigt tak). Bäcken och bron till Mystiska staden finns inte med på teckningen, men Nora vill ha **bron till vänster**. |
+| 4 | Fyren är **röd och vit randig**. |
+| 5 | Fyrvaktaren heter **Maja**. 🖍️ Ester ritade henne: gult hår, gröna ögon, röd mun, blå klänning (triangel) med lila kant och gult i mitten. |
+| 6 | Fiskaren heter **Kapten Kalle**. |
+| 7 | Sjöodjuret ser ut **som en jättebläckfisk med horn**. Det heter **Bubbel**. 🖍️ Nora ritade det: gröna horn, högt ljust huvud med laxrosa prickar, svarta ögon, glad mun med tunga, sex långa armar med rosa prickar. |
+| 8 | Måsen heter **Glimma**. |
+| 9 | Krabbmonstret är **litet och snabbt** och heter **Krabbot**. (Ester: Bubbels armar ska vara längre och synas mer, sex stycken.) |
+| 11 | Fröken heter **Fröken Josefin**. 🖍️ Nora ritade henne: gult hår till axlarna, stora ögon och ett leende, regnbågsrandig tröja med ett lila hjärta, korta randiga ärmar med röda muddar, jeans och svarta skor. |
