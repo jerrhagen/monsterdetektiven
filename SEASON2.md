@@ -295,7 +295,7 @@ Figurer som fallen har hittat på själva (inte i `names.ts`): Humlan Surr (fall
 
 - **Fall 7:** måsen fångas genom att man tröttar ut henne och pratar med henne på pollaren (inte en
   krypare i näten).
-- **Fall 8:** Kritan är smygaren man kan prata med, och Suddis är kryparen i skåpen som fångas.
+- **Fall 8:** Kritan är smygaren man kan prata med, och S2.sponge är kryparen i skåpen som fångas.
   Skelettet Benke patrullerar korridoren.
 - **Fall 10:** Glim är en flygare (vittne när hon vilar), städroboten patrullerar och valrossen Betan
   sover vid sälbassängen.

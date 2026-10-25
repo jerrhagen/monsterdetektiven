@@ -62,46 +62,32 @@ export const s2Teacher: PixelSprite = drawSprite(16, 20, (d) => {
   d.part((p) => p.rect(5, 2, 7, 1, "#ecc840").set(8, 1, "#ecc840"), false);
 });
 
-/** The janitor (S2.janitor): his cap was yellow – now it's grey. Blue overalls, key ring. */
-export const s2Janitor: PixelSprite = grid(
-  {
-    c: "#9a9aa4",
-    C: "#6e6e7a",
-    h: "#c8c4d4",
-    s: "#f0c090",
-    e: "#2a1a2e",
-    m: "#e0e0e8",
-    r: "#b05050",
-    b: "#3a6ab0",
-    B: "#2a4a88",
-    k: "#d8d8e0",
-    f: "#3a2a2a",
-  },
-  [
-    "................",
-    "....oooooooo....",
-    "...occccccccoo..",
-    "..oCCCCCCCCCCCo.",
-    "..ohsssssssssho.",
-    "..ohsesssssesho.",
-    "..ossssssssssso.",
-    "...osmmmmmmmso..",
-    "....ossrrsso....",
-    "....obbbbbbo....",
-    "...obBbbbbBbo...",
-    "..obbBbbbbBbbo..",
-    "..osbBbbbbBbso..",
-    "..okbbbbbbbbbo..",
-    "...obbbbbbbbo...",
-    "...oBBBBBBBBo...",
-    "....obo..obo....",
-    "....obo..obo....",
-    "...offo..offo...",
-    "....oo....oo....",
-  ],
-);
+/**
+ * The janitor (S2.janitor), from the kids' drawing: a big cap (it was yellow – now it's grey), an
+ * open, cheerful mouth, a magenta shirt, brown trousers, big boots and a broom.
+ */
+export const s2Janitor: PixelSprite = drawSprite(16, 20, (d) => {
+  const SKIN = "#f0b060";
+  d.part((p) => p.line(1, 5, 1, 15, "#8a5a2a").tri(1, 14, -1, 19, 4, 19, "#e0902a").paint((x, y) => y > 15 && x % 2 === 0, "#b86a1a"));
+  d.part((p) => p.line(5, 15, 5, 17, "#9a6a40").line(6, 15, 6, 17, "#9a6a40").line(9, 15, 10, 17, "#9a6a40").line(10, 15, 11, 17, "#9a6a40"));
+  d.part((p) => p.rect(3, 18, 4, 2, "#4a2a1a").rect(9, 18, 4, 2, "#4a2a1a"));
+  d.part((p) => p.line(4, 12, 2, 13, SKIN).line(4, 13, 2, 14, SKIN).line(11, 12, 13, 13, SKIN).line(11, 13, 13, 14, SKIN).ellipse(13.5, 14, 1.5, 1.5, SKIN).rect(1, 12, 2, 2, SKIN));
+  d.part((p) => p.rect(5, 11, 6, 4, "#b02070").paint((x, y) => y === 14 && x % 2 === 0, "#8a1858"));
+  d.part((p) =>
+    p
+      .ellipse(8, 7.5, 4, 3, SKIN)
+      .set(6, 7, O)
+      .set(10, 7, O)
+      .rect(7, 9, 3, 1, O)
+      .set(8, 10, "#e05080"),
+  );
+  d.part((p) => p.ellipse(8, 2.5, 4.5, 2.5, "#9a9aa4", 4).rect(3, 4, 11, 1, "#6e6e7a").paint((x, y) => y < 2 && x % 3 === 0, "#b4b4c0"));
+});
 
-/** The sponge monster (S2.sponge): a light blue sponge with a green scrubby top. Frames 0–1: scuttling. */
+/**
+ * The sponge monster (S2.sponge): a light yellow sponge with a green scrubby top. Like everything
+ * yellow at the school its colour has faded, so it is drawn washed-out. Frames 0–1: scuttling.
+ */
 export const s2Sponge: PixelSprite = (() => {
   const body = [
     "................",
@@ -120,7 +106,7 @@ export const s2Sponge: PixelSprite = (() => {
     "..oooooooooooo..",
   ];
   return grid(
-    { g: "#4aa85a", G: "#2a6a3a", b: "#9ad0ec", B: "#5a98c0", w: "#ffffff", e: O, m: "#c04060" },
+    { g: "#4aa85a", G: "#2a6a3a", b: "#e6e2b8", B: "#c2be96", w: "#ffffff", e: O, m: "#c04060" },
     [...body, "...o.o....o.o...", "..oo......oo...."],
     [...body, "....o.o..o.o....", "....oo....oo...."],
   );
@@ -173,28 +159,37 @@ export const s2Chalk: PixelSprite = (() => {
   );
 })();
 
-/** The class pet (S2.classPet): a round orange hamster with a white belly. */
+/** The class pet (S2.classPet): a white rabbit with grey-brown spots and long ears. */
 export const s2ClassPet: PixelSprite = grid(
-  { a: "#d89048", A: "#a86830", w: "#fff0dc", e: O, n: "#ff8ab0", p: "#f0a0a0" },
+  { w: "#f4f0ec", s: "#8a7a68", p: "#f0a0b0", e: O, n: "#ff8ab0" },
   [
-    "................",
-    "................",
-    "................",
     "....oo....oo....",
-    "...opao..oapo...",
-    "...oaaaooaaao...",
-    "..oaaaaaaaaaao..",
-    "..oaeaaaaaaeao..",
-    "..owaaannaaawo..",
-    "..owwaaaaaawwo..",
-    ".oaawwwwwwwwaao.",
-    ".oaawwwwwwwwaao.",
-    ".oAaawwwwwwaaAo.",
-    "..oAaaaaaaaaAo..",
-    "...opo....opo...",
-    "................",
+    "...owwo..owwo...",
+    "...owpo..opso...",
+    "...owpo..opwo...",
+    "...oswo..owwo...",
+    "...owwwwwwwwo...",
+    "..owwwwwwwsswo..",
+    "..owewwwwwwewo..",
+    "..owwwwnnwwwwo..",
+    "...owwwwwwwwo...",
+    "..owwsswwwwwwo..",
+    ".owwssswwwwswwo.",
+    ".owwwwwwwssssso.",
+    ".owsswwwwwsswwo.",
+    "..oowwoooowwoo..",
+    "...oooo..oooo...",
   ],
 );
+
+/** The class's turtle (S2.turtle) in his glass terrarium, with sand and a lettuce leaf. */
+export const s2Turtle = drawSprite(16, 16, (d) => {
+  d.part((p) => p.rect(1, 12, 14, 3, "#c05050"));
+  d.part((p) => p.rect(2, 5, 12, 7, "#d8f0f8").rect(2, 10, 12, 2, "#e8d49a").set(4, 6, "#ffffff").set(5, 7, "#ffffff"));
+  d.part((p) => p.rect(12, 9, 2, 1, "#6ac050").set(13, 8, "#6ac050"));
+  d.part((p) => p.ellipse(7, 10, 3.5, 3, "#3a8a4a", 9).paint((x, y) => (x + y) % 2 === 0, "#2a6a3a").rect(4, 10, 1, 1, "#8ac070").rect(9, 10, 1, 1, "#8ac070"));
+  d.part((p) => p.rect(10, 8, 2, 2, "#8ac070").set(11, 8, O), false);
+});
 
 // ---------- Other characters ----------
 
@@ -263,14 +258,14 @@ export const schoolBoard = drawSprite(24, 16, (d) => {
   d.part((p) => p.rect(2, 13, 20, 2, "#6a4220").set(6, 13, "#f4f4f0").set(7, 13, "#f4f4f0"));
 });
 
-/** The empty hamster cage – the latch is shut. */
+/** The empty rabbit cage – the latch is shut and the carrot is untouched. */
 export const schoolCage = drawSprite(16, 16, (d) => {
   d.part((p) => p.rect(1, 12, 14, 3, "#c05050"));
   d.part((p) => {
     p.rect(2, 4, 12, 1, "#a0a0b0").rect(2, 4, 1, 8, "#a0a0b0").rect(13, 4, 1, 8, "#a0a0b0");
     for (let x = 4; x < 13; x += 2) p.line(x, 4, x, 11, "#a0a0b0");
-    p.ellipse(10, 9, 2, 2, "#707080").set(10, 9, "#c05050");
-    p.rect(5, 11, 3, 1, "#e0c890").set(8, 7, "#f2d24b");
+    p.line(9, 11, 12, 11, "#f08a30").set(13, 10, "#4aa85a").set(13, 11, "#4aa85a");
+    p.rect(4, 11, 4, 1, "#c8b878").set(8, 7, "#c8c8d0");
   }, false);
 });
 
@@ -393,6 +388,7 @@ export const case8Sprites: Record<string, PixelSprite> = {
   s2Sponge,
   s2Chalk,
   s2ClassPet,
+  s2Turtle,
   schoolSkeleton,
   schoolBus,
   schoolSunflowers,

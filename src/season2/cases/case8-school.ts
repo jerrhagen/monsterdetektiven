@@ -189,7 +189,7 @@ export const case8: Case = {
         "#..................D",
         "#..KKKKKKKKK.......D",
         "#..........1.......#",
-        "#..KKKKKKKKK....c..#",
+        "#..KKKKKKKKK....c.s#",
         "#..................#",
         "#.HH...........HH..#",
         "#..................#",
@@ -229,7 +229,7 @@ export const case8: Case = {
             "Åh! Nora… vad gör du här så sent?",
             "Jag? Jag rättar bara prov. Jag ska precis gå hem.",
             "Bänkarna? Ingen aning! De står väl som vanligt.",
-            `${classPet}? Han har nog rymt. Jag vet ingenting! Ingenting alls!`,
+            `${classPet}? Hon har nog rymt. Jag vet ingenting! Ingenting alls!`,
           ],
           clue: "solveigSays",
           talkIf: [
@@ -252,11 +252,21 @@ export const case8: Case = {
           sprite: "schoolCage",
           on: "K",
           talk: [
-            "Buren är tom! Hjulet står stilla.",
+            "Buren är tom! Morotsbiten ligger kvar, inte ens påbörjad.",
             "Men haken på luckan är stängd.",
-            "Ingen hamster kan stänga en hake bakom sig…",
+            "Ingen kanin kan stänga en hake bakom sig…",
           ],
           clue: "emptyCage",
+        },
+        s: {
+          name: S2.turtle,
+          sprite: "s2Turtle",
+          on: "K",
+          talk: [
+            "Klassens andra djur bor i ett terrarium. Sköldpaddan tuggar långsamt på ett salladsblad.",
+            "Han tittar på dig. Sen tuggar han vidare.",
+            "Han har inte rymt i alla fall. Han är alldeles för långsam!",
+          ],
         },
       },
       clues: { "1": "wetPrints", "2": "chalkDust", "3": "bootPrints" },
@@ -514,12 +524,12 @@ export const case8: Case = {
           person: true,
           on: "K",
           talk: [
-            "En skokartong med lufthål. Det snarkar därinne…",
-            `Det är ${classPet}! Han sover gott på en bädd av sågspån.`,
+            "En stor kartong med lufthål. Det snarkar därinne…",
+            `Det är ${classPet}! Hon sover gott på en bädd av hö.`,
             `På locket står det: "Stör ej! / ${teacher}"`,
           ],
           clue: "hamsterBox",
-          talkIf: [{ when: "caught", talk: ["Lådan är tom. Bara sågspån kvar.", `${classPet} har sprungit iväg till kalaset!`] }],
+          talkIf: [{ when: "caught", talk: ["Lådan är tom. Bara hö kvar.", `${classPet} har sprungit iväg till kalaset!`] }],
         },
         i: {
           name: "Ett kort",
@@ -624,7 +634,7 @@ export const case8: Case = {
           whyNot: {
             chalk: `${chalk} har bara pinnarmar – och han blir själv bortskrubbad varje morgon!`,
             janitor: "Vaktmästaren går hem på kvällen. Och stövlar gör inga blöta, fyrkantiga avtryck med hål i.",
-            pet: `${classPet} sover i en låda i bildsalen. Han är alldeles för liten för att flytta bänkar!`,
+            pet: `${classPet} sover i en låda i bildsalen. Hon är alldeles för liten för att flytta bänkar!`,
             ghost: "Spöken lämnar inga blöta avtryck – och de luktar inte såpa!",
           },
           why: {
@@ -704,7 +714,7 @@ export const case8: Case = {
             sponge: `${sponge} försökte skrubba FRAM det gula på bussen. Och han lämnar blöta, fyrkantiga avtryck – fotspåren i solrosorna är små och ritade!`,
             chalk: `${chalk} bor i tavlan och ritar med vit krita. Fotspåren är ritade med grå blyerts.`,
             janitor: "Vaktmästarens egen gula mössa blev grå! Och han har stora stövlar, inte små ritade fötter.",
-            pet: `${classPet} sov i sin låda hela natten. Och hamstrar har inga ritade fötter!`,
+            pet: `${classPet} sov i sin låda hela natten. Och kaniner har inga ritade fötter!`,
             ghost: "Spöken lämnar inga fotspår alls. Men fotspåren i solrosorna och i bildsalen är ritade – med blyerts!",
           },
           why: {
@@ -760,7 +770,7 @@ export const case8: Case = {
     emptyCage: {
       name: "Den tomma buren",
       sprite: "schoolCage",
-      text: `${classPet}s bur är tom! Men haken på luckan är stängd. Någon har lyft ut honom – han har inte rymt själv.`,
+      text: `${classPet}s bur är tom! Men haken på luckan är stängd. Någon har lyft ut henne – hon har inte rymt själv.`,
     },
     kritanSaw: {
       name: `${chalk}s vittnesmål`,
@@ -800,7 +810,7 @@ export const case8: Case = {
     hamsterBox: {
       name: "Lådan i bildsalen",
       sprite: "schoolShoebox",
-      text: `${classPet} sover i en skokartong i bildsalen. På locket: "Stör ej! / ${teacher}". Han rymde inte – fröken bar dit honom!`,
+      text: `${classPet} sover i en kartong i bildsalen. På locket: "Stör ej! / ${teacher}". Hon rymde inte – fröken bar dit henne!`,
     },
     invitation: {
       name: "Det hemliga kortet",
@@ -853,7 +863,7 @@ export const case8: Case = {
       ],
     },
     { enter: "pet", sprite: "s2ClassPet", from: [14, 0], to: [8, 6] },
-    { say: "Ester", lines: [`Titta! ${classPet} har vaknat.`, "Han har något i munnen…"] },
+    { say: "Ester", lines: [`Titta! ${classPet} har vaknat.`, "Hon har något i munnen…"] },
     { reveal: "pet", sprite: "dropYellow" },
     {
       say: "Ester",
@@ -871,7 +881,7 @@ export const case8: Case = {
     `${sponge} sa att han sov i städskåpet hela natten. Men hans säng var torr – där hade ingen blöt svamp sovit!`,
     `Blöta, fyrkantiga avtryck vid bänkarna och såpbubblor från städskåpet. Och ${chalk} blev bortskrubbad med såpa. Det var ${sponge}!`,
     "Varför? Kalasordet på tavlan, \"60 år – PSST\" i kalendern, ballongerna och kortet: ett hemligt kalas för vaktmästaren!",
-    `${teacher} sa att hon inget visste. Men lappen på ${classPet}s låda var hennes – han skulle vara med på kalaset.`,
+    `${teacher} sa att hon inget visste. Men lappen på ${classPet}s låda var hennes – kaninen skulle vara med på kalaset.`,
     `${sponge} sköt ihop bänkarna till ett kalasbord och suddade tavlan varje morgon. Han ljög för att inte avslöja kalaset. Den bleka skuggan i fönstret var han.`,
     `Men det gula var något helt annat – ${sponge} försökte till och med skrubba fram det på bussen! Ritade fotspår i solrosorna, gula droppar under fönstret i bildsalen – och skissen av ${scribble}.`,
   ],

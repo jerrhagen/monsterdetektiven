@@ -120,3 +120,7 @@ Man behöver inte svara på allt. Det som inte får något svar behåller Claude
 | 8 | Måsen heter **Glimma**. |
 | 9 | Krabbmonstret är **litet och snabbt** och heter **Krabbot**. (Ester: Bubbels armar ska vara längre och synas mer, sex stycken.) |
 | 11 | Fröken heter **Fröken Josefin**. 🖍️ Nora ritade henne: gult hår till axlarna, stora ögon och ett leende, regnbågsrandig tröja med ett lila hjärta, korta randiga ärmar med röda muddar, jeans och svarta skor. |
+| 12 | Vaktmästaren heter **Vaktis**. 🖍️ Ritad: stor mössa (grå i spelet, för det gula har försvunnit), glad öppen mun, rosa tröja, bruna byxor, stora kängor och en kvast. |
+| 13 | Tvättsvampsmonstret heter **Skumpa** och är **ljusgul** (blekt i skolan, där det gula har försvunnit). |
+| 14 | Klassen har **två djur: en kanin och en sköldpadda**. (Kaninen blir klassens djur i fallet, sköldpaddan bor i ett eget terrarium bredvid.) Kaninen heter **Louise** (med e) och är vit med **gråbruna prickar**. Sköldpaddan heter **Skalman** och bor i ett terrarium bredvid buren. |
+| 15 | Kritmonstret är **en lång vit kritbit med ben**. |

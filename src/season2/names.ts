@@ -23,9 +23,11 @@ export const S2 = {
 
   // Fall 8 – Skolan
   teacher: "Fröken Josefin",
-  janitor: "Vaktmästare Viggo",
-  sponge: "Suddis",
-  classPet: "Hamstern Nöt",
+  janitor: "Vaktis",
+  sponge: "Skumpa",
+  classPet: "Kaninen Louise",
+  /** The class's second pet, a turtle in a terrarium (just for fun, no part in the mystery). */
+  turtle: "Sköldpaddan Skalman",
   chalk: "Kritan",
 
   // Fall 9 – Växthuset
